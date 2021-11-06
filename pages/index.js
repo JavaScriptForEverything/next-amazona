@@ -1,7 +1,9 @@
 import Link from 'next/link'
+import { useSelector } from 'react-redux'
 
-import data from '../data'
 import Layout from '../layout'
+import { wrapper } from '../store'
+import { getProducts } from '../store/productReducer'
 
 import Grid from '@mui/material/Grid'
 import Card from '@mui/material/Card'
@@ -16,13 +18,15 @@ import Button from '@mui/material/Button'
 
 const Home = () => {
 
+	const { products } = useSelector(state => state.product.product)
+
 	return (
 		<Layout>
 			<Typography variant='h3'>Home Page</Typography>
 			<Link href='/about'><Button>About</Button></Link>
 
 			<Grid container spacing={3} >
-				{data.products.map((product, key) => (
+				{products && products.map((product, key) => (
 					<Grid key={key} item md={4} >
 
 						<Card>
@@ -49,7 +53,8 @@ const Home = () => {
 export default Home
 
 
-// export const getServerSideProps = () => {
 
-// 	return { products: data.products }
-// }
+// must await to get data from server, no matter we await in getProducts()
+export const getServerSideProps = wrapper.getServerSideProps(({ dispatch }) => async({ req }) => {
+	await dispatch( getProducts(req) )
+})

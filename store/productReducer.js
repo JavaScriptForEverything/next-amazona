@@ -1,22 +1,24 @@
 import { createSlice } from '@reduxjs/toolkit'
 import { HYDRATE } from 'next-redux-wrapper'
 import axios from 'axios'
+import absoluteUrl from 'next-absolute-url'
+
+import { catchAsyncDispatch } from '../util'
+
 
 const { reducer, actions } = createSlice({
 	name: 'product',
 	initialState: {
-		loading: false,
-		error: '',
-		authenticated: false
+		products: [],
 	},
 	reducers: {
 		requested: (state, action) => ({ ...state, loading: true }),
-		error: (state, action) => ({
+		failed: (state, action) => ({
 			...state,
 			loading: false,
 			error: action.payload
 		}),
-		gotMe: (state, action) => ({
+		productGot: (state, action) => ({
 			...state,
 			loading: false,
 			...action.payload
@@ -30,11 +32,15 @@ const { reducer, actions } = createSlice({
 export default reducer
 
 
-export const getMe = () => async (dispatch, getStore) => {
+
+
+export const getProducts = (req) => catchAsyncDispatch( async (dispatch) => {
 	dispatch(actions.requested())
 
-	const { data } = await axios.get('https://api.github.com/users/robitops10')
+	const { origin } = absoluteUrl(req)
+	const { data } = await axios.get(`${origin}/api/products`)
+	// const { data } = await axios.get('https://api.github.com/users/robitops10')
 
-	dispatch(actions.gotMe( data ))
-}
+	dispatch(actions.productGot( data ))
+}, actions.failed)
 

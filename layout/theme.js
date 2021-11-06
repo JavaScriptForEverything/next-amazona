@@ -1,13 +1,13 @@
 import { createTheme } from '@mui/material/styles'
 
-const theme = createTheme({
+const theme = (darkMode) => createTheme({
 	typography: {
 		// h1: {
 		// 	fontSize: '1rem',
 		// }
 	},
 	palette: {
-		// mode: 'dark', 					// light or dark 	to enable dark or light mode
+		mode: darkMode ? 'dark' : 'light', 					// light or dark 	to enable dark or light mode
 		// primary: {
 		// 	main: '#f0c000'
 		// },
