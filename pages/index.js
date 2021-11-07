@@ -20,6 +20,10 @@ const Home = () => {
 
 	const { products } = useSelector(state => state.product.product)
 
+	const addToCartHandler = (evt, id) => {
+		console.log(id)
+	}
+
 	return (
 		<Layout>
 			<Typography variant='h3'>Home Page</Typography>
@@ -40,7 +44,7 @@ const Home = () => {
 							</CardContent>
 							<CardActions>
 								${product.price}
-								<Button>Add To Cart</Button>
+								<Button onClick={(evt) => addToCartHandler(evt, product._id)} >Add To Cart</Button>
 							</CardActions>
 						</Card>
 

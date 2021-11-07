@@ -7,19 +7,24 @@ import Link from 'next/link'
 
 import Button from '@mui/material/Button'
 // import Typography from '@mui/material/Typography'
-import Switch from '@mui/material/Switch'
+import Badge from '@mui/material/Badge'
 
 
 
 const About = () => {
 	// const product = useSelector( state => state.product.product )
-	console.log( process.env.DB_LOCAL_URL )
 
 	return (
 		<>
 			<Link href='/' passHref><Button>click</Button></Link>
-			<Switch checked={true} />
 
+			<Badge
+				badgeContent={432}
+				// color='error'
+				// variant='standard'
+			>
+				<Button>List</Button>
+			</Badge>
 
 
 		</>

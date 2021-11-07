@@ -1,4 +1,4 @@
-import database from '../../../server/models/database' 	// IIFE
+import '../../../server/models/database' 	// IIFE
 import nc from 'next-connect'
 import { onError } from '../../../server/util'
 import { getAllProducts, addProduct } from '../../../server/controllers/productController'

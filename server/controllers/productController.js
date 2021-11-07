@@ -13,6 +13,21 @@ export const getAllProducts = catchAsync( async (req, res, next) => {
 	})
 })
 
+export const getProductBySlug = catchAsync( async (req, res, next) => {
+	const { slug } = req.query
+
+	const product = await Product.findOne({ slug })
+
+	if(!product) return next(appError('No product found.', 404))
+
+	res.status(200).json({
+		status: 'success',
+		product
+	})
+})
+
+
+
 
 export const addProduct = catchAsync( async (req, res, next) => {
 

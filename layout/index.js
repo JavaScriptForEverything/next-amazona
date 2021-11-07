@@ -14,10 +14,15 @@ import CssBaseline from '@mui/material/CssBaseline'
 import Typography from '@mui/material/Typography'
 import Button from '@mui/material/Button'
 import Switch from '@mui/material/Switch'
+import Badge from '@mui/material/Badge'
+import IconButton from '@mui/material/IconButton'
+
+import ShoppingCartIcon from '@mui/icons-material/ShoppingCart'
 
 
 const Layout = ({ title, description, children }) => {
 	let [ darkMode, setDarkMode ] = useState(false)
+	let [ badge, setBadge ] = useState(1)
 
 	/* NextJS render server-seide rendering first, but we want bellow code only render in client-side
 			1. Because, window object only available in Browser in Client-Side, and we use window.localStorage
@@ -58,10 +63,14 @@ const Layout = ({ title, description, children }) => {
 					<Box sx={{ marginLeft: 'auto' }}>
 						<Switch color='secondary' checked={darkMode} onChange={changeHandler} />
 
-						<Link href='/cart'>
-							<Button color='inherit' sx={{ textTransform: 'capitalize' }} >Cart</Button>
+						<Link href='#'>
+							<IconButton color='inherit' >
+								<Badge badgeContent={badge} color='error' >
+									<ShoppingCartIcon />
+								</Badge>
+							</IconButton>
 						</Link>
-						<Link href='/login'>
+						<Link href='#'>
 							<Button color='inherit' sx={{ textTransform: 'capitalize' }} >Login</Button>
 						</Link>
 					</Box>

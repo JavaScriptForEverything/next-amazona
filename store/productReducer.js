@@ -10,6 +10,7 @@ const { reducer, actions } = createSlice({
 	name: 'product',
 	initialState: {
 		products: [],
+		product: {}
 	},
 	reducers: {
 		requested: (state, action) => ({ ...state, loading: true }),
@@ -19,8 +20,11 @@ const { reducer, actions } = createSlice({
 			error: action.payload
 		}),
 		productGot: (state, action) => ({
-			...state,
-			loading: false,
+			...state, loading: false,
+			...action.payload
+		}),
+		productBySlug: (state, action) => ({
+			...state, loading: false,
 			...action.payload
 		}),
 	},
@@ -42,5 +46,17 @@ export const getProducts = (req) => catchAsyncDispatch( async (dispatch) => {
 	// const { data } = await axios.get('https://api.github.com/users/robitops10')
 
 	dispatch(actions.productGot( data ))
+}, actions.failed)
+
+
+export const getProductBySlug = (req, slug) => catchAsyncDispatch( async (dispatch) => {
+	// dispatch(actions.requested())
+
+	const { origin } = absoluteUrl(req)
+	const { data } = await axios.get(`${origin}/api/products/${slug}`)
+
+	console.log(data)
+
+	dispatch(actions.productBySlug( data ))
 }, actions.failed)
 

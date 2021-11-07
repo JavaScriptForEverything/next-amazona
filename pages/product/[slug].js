@@ -2,7 +2,10 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { useRouter } from 'next/router'
 
-import data from '../../data'
+import { useSelector } from 'react-redux'
+import { wrapper } from '../../store'
+import { getProductBySlug } from '../../store/productReducer'
+
 import Layout from '../../layout'
 
 import Grid from '@mui/material/Grid'
@@ -19,7 +22,7 @@ const Product = () => {
 	const router = useRouter()
 	const { slug } = router.query
 
-	const product = data.products.find(product => product.slug === slug )
+	const { product } = useSelector(state => state.product.product )
 
 	// console.log(product)
 	if(!product) return (
@@ -84,3 +87,8 @@ const Product = () => {
 	)
 }
 export default Product
+
+
+export const getServerSideProps = wrapper.getServerSideProps(({ dispatch }) => async ({ req, params }) => {
+	await dispatch(getProductBySlug(req, params.slug))
+})
