@@ -36,6 +36,11 @@ const productSchema = new Schema({
 		required: true,
 		min: 0,
 	},
+	quantity: {
+		type: Number,
+		required: true,
+		min: 1,
+	},
 	numReviews: {
 		type: Number,
 	},

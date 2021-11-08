@@ -1,6 +1,9 @@
 import Head from 'next/head'
 import Link from 'next/link'
 import { useState, useEffect } from 'react'
+import { useSelector } from 'react-redux'
+
+import Snackbar from './snackbar'
 
 import { ThemeProvider } from '@mui/material/styles'
 import theme from './theme'
@@ -21,17 +24,21 @@ import ShoppingCartIcon from '@mui/icons-material/ShoppingCart'
 
 
 const Layout = ({ title, description, children }) => {
+	let { cartItems } = useSelector(state => state.dialog)
 	let [ darkMode, setDarkMode ] = useState(false)
-	let [ badge, setBadge ] = useState(1)
+	let [ badge, setBadge ] = useState(0)
+
 
 	/* NextJS render server-seide rendering first, but we want bellow code only render in client-side
 			1. Because, window object only available in Browser in Client-Side, and we use window.localStorage
 			2. We parse to json, because, only string value can be store in localStorage.
 			3. We can use Redux or useState hook, and in useEffect darkMode is dependencies */
 	useEffect(() => {
-		darkMode = JSON.parse( localStorage.getItem('darkMode') )
+		darkMode = JSON.parse( localStorage.getItem('darkMode') ) || false
 		setDarkMode(darkMode)
-	}, [darkMode])
+
+		setBadge(cartItems.length)
+	}, [darkMode, cartItems])
 
 	const changeHandler = (evt, newValue) => {
 		setDarkMode(newValue)
@@ -48,6 +55,10 @@ const Layout = ({ title, description, children }) => {
 				{ description && <meta name='description' content={description} />}
 			</Head>
 
+
+			{/*------[ Show Alert ]--------*/}
+			<Snackbar />
+
 			<CssBaseline />
 			<AppBar position='relative'>
 				<Toolbar>
@@ -63,7 +74,7 @@ const Layout = ({ title, description, children }) => {
 					<Box sx={{ marginLeft: 'auto' }}>
 						<Switch color='secondary' checked={darkMode} onChange={changeHandler} />
 
-						<Link href='#'>
+						<Link href='/cart'>
 							<IconButton color='inherit' >
 								<Badge badgeContent={badge} color='error' >
 									<ShoppingCartIcon />

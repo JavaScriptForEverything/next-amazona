@@ -1,13 +1,16 @@
 import { combineReducers, configureStore } from '@reduxjs/toolkit'
-import { createWrapper } from 'next-redux-wrapper'
+// import { createWrapper } from 'next-redux-wrapper'
 
-import productReducer from './productReducer'
+// import productReducer from './productReducer'
+import dialogReducer from './dialogReducer'
 
 const reducer = combineReducers({
-	product: productReducer
+	// product: productReducer,
+	dialog: dialogReducer
 })
 
-// const makeStore = () => configureStore({ reducer })
-// export const wrapper = createWrapper(makeStore)
+// // const makeStore = () => configureStore({ reducer })
+// // export const wrapper = createWrapper(makeStore)
+// export const wrapper = createWrapper( () => configureStore({ reducer }) )
 
-export const wrapper = createWrapper( () => configureStore({ reducer }) )
+export default configureStore({ reducer })

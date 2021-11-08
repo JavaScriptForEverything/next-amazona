@@ -9,6 +9,7 @@
     "rating": 4.5,
     "numReviews": 10,
     "inStock": 44,
+    "quantity": 2,
     "description": "a popular shirt description..."
 },
 {
@@ -21,6 +22,7 @@
     "rating": 4.1,
     "numReviews": 10,
     "inStock": 44,
+    "quantity": 4,
     "description": "a popular shirt description..."
 },
 {
@@ -33,6 +35,7 @@
     "rating": 5,
     "numReviews": 10,
     "inStock": 44,
+    "quantity": 3,
     "description": "a popular shirt description..."
 },
 {
@@ -45,6 +48,7 @@
     "rating": 4.5,
     "numReviews": 10,
     "inStock": 44,
+    "quantity": 2,
     "description": "a popular shirt description..."
 },
 {
@@ -57,6 +61,7 @@
     "rating": 4.5,
     "numReviews": 10,
     "inStock": 44,
+    "quantity": 2,
     "description": "a popular shirt description..."
 },
 {
@@ -69,5 +74,6 @@
     "rating": 4.5,
     "numReviews": 10,
     "inStock": 44,
+    "quantity": 4,
     "description": "a popular shirt description..."
 }]

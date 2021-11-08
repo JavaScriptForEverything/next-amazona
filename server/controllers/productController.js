@@ -12,7 +12,6 @@ export const getAllProducts = catchAsync( async (req, res, next) => {
 		products
 	})
 })
-
 export const getProductBySlug = catchAsync( async (req, res, next) => {
 	const { slug } = req.query
 
@@ -23,6 +22,18 @@ export const getProductBySlug = catchAsync( async (req, res, next) => {
 	res.status(200).json({
 		status: 'success',
 		product
+	})
+})
+export const getProductById = catchAsync( async (req, res, next) => {
+	// const { id } = req.query
+
+	console.log(req.query)
+	// const product = await Product.findById(id)
+	// if(!product) return next(appError('No product found.', 404))
+
+	res.status(200).json({
+		status: 'success',
+		// product
 	})
 })
 

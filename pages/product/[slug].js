@@ -1,10 +1,12 @@
+import axios from 'axios'
+import absoluteUrl from 'next-absolute-url'
+import { useDispatch, useSelector } from 'react-redux'
+import { addItemToCart, showAlert } from '../../store/dialogReducer'
+
 import Link from 'next/link'
 import Image from 'next/image'
-import { useRouter } from 'next/router'
+// import { useRouter } from 'next/router'
 
-import { useSelector } from 'react-redux'
-import { wrapper } from '../../store'
-import { getProductBySlug } from '../../store/productReducer'
 
 import Layout from '../../layout'
 
@@ -18,11 +20,18 @@ import ListItemText from '@mui/material/ListItemText'
 
 
 
-const Product = () => {
-	const router = useRouter()
-	const { slug } = router.query
+const Product = ({ product }) => {
+	const dispatch = useDispatch()
+	const { cartItems } = useSelector(state => state.dialog)
 
-	const { product } = useSelector(state => state.product.product )
+	const addToCartHandler = (evt, product) => {
+		const	itemFound = cartItems.some(item => item._id === product._id )
+
+		const message = 'This item already added to cart'
+		if(itemFound) return dispatch(showAlert({ open: true, severity: 'success', message}))
+		dispatch(addItemToCart(product))
+	}
+
 
 	// console.log(product)
 	if(!product) return (
@@ -76,7 +85,8 @@ const Product = () => {
 								<ListItemText> Status: {product.price ? 'In Stock' : 'Out of Stock'} </ListItemText>
 							</ListItem>
 							<ListItem>
-								<Button fullWidth variant='contained' >Add To Cart</Button>
+								<Button fullWidth variant='contained'
+								onClick={(evt) => addToCartHandler(evt, product)} >Add To Cart</Button>
 							</ListItem>
 						</List>
 					</Paper>
@@ -89,6 +99,9 @@ const Product = () => {
 export default Product
 
 
-export const getServerSideProps = wrapper.getServerSideProps(({ dispatch }) => async ({ req, params }) => {
-	await dispatch(getProductBySlug(req, params.slug))
-})
+export const getServerSideProps = async ({ req, params }) => {
+	const { origin } = absoluteUrl(req)
+	const { data } = await axios.get(`${origin}/api/products/${params.slug}`)
+
+	return { props: { product: data.product }}
+}
