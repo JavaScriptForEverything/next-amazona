@@ -1,7 +1,10 @@
+import { useState, useEffect } from 'react'
+import { useDispatch, useSelector } from 'react-redux'
+import { getUser, logoutMe } from '../store/userReducer'
+
 import Head from 'next/head'
 import Link from 'next/link'
-import { useState, useEffect } from 'react'
-import { useSelector } from 'react-redux'
+import { useRouter } from 'next/router'
 
 import Snackbar from './snackbar'
 
@@ -19,14 +22,37 @@ import Button from '@mui/material/Button'
 import Switch from '@mui/material/Switch'
 import Badge from '@mui/material/Badge'
 import IconButton from '@mui/material/IconButton'
+import Avatar from '@mui/material/Avatar'
+import Menu from '@mui/material/Menu'
+import MenuItem from '@mui/material/MenuItem'
+import NoSsr from '@mui/material/NoSsr'
 
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart'
 
+const menuitems = [
+	{ label: 'Profile', path: '/profile' },
+	{ label: 'My Account', path: '/account' },
+	{ label: 'Logout', path: '/logout' },
+]
 
 const Layout = ({ title, description, children }) => {
+	const dispatch = useDispatch()
+	const router = useRouter()
+	const { redirect } = router.query
+
+	const [ menuOpen, setMenuOpen ] = useState(false)
+	const [ anchorEl, setAnchorEl ] = useState(null)
+
 	let { cartItems } = useSelector(state => state.dialog)
 	let [ darkMode, setDarkMode ] = useState(false)
 	let [ badge, setBadge ] = useState(0)
+
+	const { token, authenticated, user } = useSelector(state => state.user)
+	// console.log(user)
+
+	useEffect(() => {
+		authenticated && dispatch(getUser(token))
+	}, [dispatch, token])
 
 
 	/* NextJS render server-seide rendering first, but we want bellow code only render in client-side
@@ -43,6 +69,22 @@ const Layout = ({ title, description, children }) => {
 	const changeHandler = (evt, newValue) => {
 		setDarkMode(newValue)
 		localStorage.setItem('darkMode', JSON.stringify(newValue))
+	}
+
+	const menuCloseHandler = () => setMenuOpen(false)
+	const menuHandler = (evt) => {
+		setAnchorEl(evt.currentTarget)
+		setMenuOpen(true)
+	}
+	const menuItemHandler = (evt, item) => {
+		menuCloseHandler()
+		// router.push(path)
+
+		if(item.label === 'Logout') {
+			// console.log(item.label)
+			dispatch(logoutMe())
+			router.push( redirect || '/login')
+		}
 	}
 
 
@@ -81,9 +123,28 @@ const Layout = ({ title, description, children }) => {
 								</Badge>
 							</IconButton>
 						</Link>
-						<Link href='#'>
-							<Button color='inherit' sx={{ textTransform: 'capitalize' }} >Login</Button>
-						</Link>
+
+						<NoSsr>
+						{ authenticated ? (
+							<IconButton color='inherit' onClick={menuHandler} sx={{ ml: 2 }} >
+								<Avatar sx={{ width: '2rem', height: '2rem' }} src={user?.avatar} />
+							</IconButton>
+						) : (
+							<Link href='/login'>
+								<Button color='inherit' sx={{ textTransform: 'capitalize' }} >Login</Button>
+							</Link>
+						)}
+						</NoSsr>
+						<Menu
+							open={menuOpen}
+							anchorEl={anchorEl}
+							onClose={menuCloseHandler}
+						>
+							{menuitems.map((item, key) => <MenuItem key={item.label}
+								onClick={(evt) => menuItemHandler(evt, item)}
+							>{item.label}</MenuItem> )}
+						</Menu>
+
 					</Box>
 				</Toolbar>
 			</AppBar>

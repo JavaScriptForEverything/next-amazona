@@ -8,6 +8,6 @@ module.exports = (() => {
 	if(connection.readyState >= 1) return
 	connect( DATABASE	)
 		.then(conn => console.log(`---- Database connected to : [${conn.connection.host}]----` ))
-		.catch(err => console.error(err.message))
+		.catch(err => console.error('Database Connection Error: ' + err.message))
 })()
 

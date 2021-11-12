@@ -4,6 +4,7 @@ import { removeItemFromCart, updateCartItem } from '../store/dialogReducer'
 
 import Image from 'next/image'
 import Link from 'next/link'
+import { useRouter } from 'next/router'
 
 import Layout from '../layout'
 
@@ -30,6 +31,7 @@ import DeleteIcon from '@mui/icons-material/Delete'
 import NoSsr from '@mui/material/NoSsr'
 
 const Cart = () => {
+	const router = useRouter()
 	const dispatch = useDispatch()
 	const { cartItems } = useSelector(state => state.dialog)
 
@@ -103,7 +105,7 @@ const Cart = () => {
 									</Typography>
 								</ListItem>
 								<ListItem>
-									<Button variant='contained' fullWidth >Check Out</Button>
+									<Button onClick={() => router.push('/shipping')} variant='contained' fullWidth >Check Out</Button>
 								</ListItem>
 							</List>
 						</Paper>

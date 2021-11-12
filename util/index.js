@@ -1,10 +1,12 @@
-// import { isEmail } from 'validator'
-// import Box from '@mui/material/Box'
+import { isEmail } from 'validator'
+import Box from '@mui/material/Box'
 
 
 
 export const catchAsyncDispatch = (fn, showError=f=>f) => (dispatch, getStore) => fn(dispatch, getStore).catch(err => {
-	dispatch( showError(err.response?.data?.message) )
+	// dispatch( showError(err.response?.data?.message) )
+	const message = err.response.data ? err.response.data.message : err.message
+	dispatch( showError(message) )
 })
 
 
@@ -42,28 +44,28 @@ export const catchAsyncDispatch = (fn, showError=f=>f) => (dispatch, getStore) =
 // }
 
 
-// // used with Tabs + Tab Component
-// export const TabPanel = ({ children, value, index}) => (
-// 	<Box hidden={value !== index } >
-// 		{children}
-// 	</Box>
-// )
+// used with Tabs + Tab Component
+export const TabPanel = ({ children, value, index}) => (
+	<Box hidden={value !== index } >
+		{children}
+	</Box>
+)
 
 
-// // Form Validator
-// export const formValidator = (obj, errorStateUpdateMethod, requireLength=4) => {
-// 	const errorObj = {}
+// Form Validator
+export const formValidator = (obj, errorStateUpdateMethod, requireLength=4) => {
+	const errorObj = {}
 
-// 	if( obj.username && obj.username.length < 4)  errorObj.username = 'name reqired 4 digit long'
-// 	if( obj.email && !isEmail(obj.email) ) errorObj.email = 'Invalid Email address'
+	if( obj.username && obj.username.length < 4)  errorObj.username = 'name reqired 4 digit long'
+	if( obj.email && !isEmail(obj.email) ) errorObj.email = 'Invalid Email address'
 
-// 	if(obj.password && obj.password.length < requireLength ) errorObj.password = `Password must be ${requireLength} character long`
-// 	if(obj.password && obj.confirmPassword && obj.password !== obj.confirmPassword) errorObj.confirmPassword = 'Confirm Password not matched'
+	if(obj.password && obj.password.length < requireLength ) errorObj.password = `Password must be ${requireLength} character long`
+	if(obj.password && obj.confirmPassword && obj.password !== obj.confirmPassword) errorObj.confirmPassword = 'Confirm Password not matched'
 
-// 	Object.entries(obj).forEach(([key, value]) => {
-// 		if(value.trim() === '')  errorObj[key] = `'${key}' field is empty`
-// 	})
+	Object.entries(obj).forEach(([key, value]) => {
+		if(value.trim() === '')  errorObj[key] = `'${key}' field is empty`
+	})
 
-
-// 		errorStateUpdateMethod(errorObj)
-// 		return Object.keys(errorObj).every(item => item === '')
+	errorStateUpdateMethod(errorObj)
+	return Object.keys(errorObj).every(item => item === '')
+}

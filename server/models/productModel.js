@@ -62,7 +62,3 @@ const productSchema = new Schema({
 
 module.exports = models.Product || model('Product', productSchema)
 
-
-productSchema.pre(/^find/, function(){
-	console.log('Hello Hook')
-})

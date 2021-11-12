@@ -3,10 +3,12 @@ import { combineReducers, configureStore } from '@reduxjs/toolkit'
 
 // import productReducer from './productReducer'
 import dialogReducer from './dialogReducer'
+import userReducer from './userReducer'
 
 const reducer = combineReducers({
 	// product: productReducer,
-	dialog: dialogReducer
+	dialog: dialogReducer,
+	user: userReducer
 })
 
 // // const makeStore = () => configureStore({ reducer })

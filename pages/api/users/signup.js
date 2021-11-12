@@ -1,10 +1,12 @@
 import '../../../server/models/database'
-import { getProductBySlug } from '../../../server/controllers/productController'
+import { signup } from '../../../server/controllers/userController'
 import { onError } from '../../../server/util'
 import nc from 'next-connect'
 
 const handler = nc({ onError })
+
 handler
-	.get(getProductBySlug)
+	.post(signup)
+
 
 export default handler

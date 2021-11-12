@@ -4,6 +4,7 @@
   "main": "index.js",
   "license": "MIT",
   "scripts": {
+    "start": "NODE_ENV=production next",
     "dev": "next dev",
     "seeder": "node server/models/seeder.js --import"
   },
@@ -14,6 +15,8 @@
     "@mui/material": "^5.0.6",
     "@reduxjs/toolkit": "^1.6.2",
     "axios": "^0.24.0",
+    "bcryptjs": "^2.4.3",
+    "jsonwebtoken": "^8.5.1",
     "mongoose": "^6.0.12",
     "next": "^12.0.2",
     "next-absolute-url": "^1.2.2",
@@ -21,7 +24,8 @@
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
     "react-redux": "^7.2.6",
-    "slugify": "^1.6.1"
+    "slugify": "^1.6.1",
+    "validator": "^13.7.0"
   },
   "devDependencies": {
     "dotenv": "^10.0.0"
