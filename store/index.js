@@ -4,11 +4,13 @@ import { combineReducers, configureStore } from '@reduxjs/toolkit'
 // import productReducer from './productReducer'
 import dialogReducer from './dialogReducer'
 import userReducer from './userReducer'
+import paymentReducer from './paymentReducer'
 
 const reducer = combineReducers({
 	// product: productReducer,
 	dialog: dialogReducer,
-	user: userReducer
+	user: userReducer,
+	payment: paymentReducer
 })
 
 // // const makeStore = () => configureStore({ reducer })

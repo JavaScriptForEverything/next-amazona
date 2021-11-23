@@ -3,6 +3,7 @@ import { useRouter } from 'next/router'
 import { useSelector } from 'react-redux'
 
 import Layout from '../layout'
+import Checkout from '../stripe'
 
 const Shipping = () => {
 	const router = useRouter()
@@ -18,7 +19,7 @@ const Shipping = () => {
 
 	return (
 		<Layout title='shipping'>
-			<h2>shipping</h2>
+			<Checkout />
 		</Layout>
 	)
 }
