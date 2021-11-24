@@ -15,10 +15,11 @@ const Details = () => {
 	const shippingCharge = 0
 	const { cartItems: tours } = useSelector(state => state.dialog )
 
+
 	return (
 		<>
 			<Tabs value={0} onChange={f=>f} sx={{ borderBottom: 1, borderColor: 'divider' }}>
-				<Tab label='Tour Details' />
+				<Tab label='Product Details' />
 			</Tabs>
 			<List>
 				{tours?.map((tour, index) => (

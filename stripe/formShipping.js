@@ -1,3 +1,5 @@
+import dynamic from 'next/dynamic'
+
 import { useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { addShippingInfo } from '../store/paymentReducer'
@@ -9,7 +11,6 @@ import { countries } from 'countries-list'
 import TextField from '@mui/material/TextField'
 import Autocomplete from '@mui/material/Autocomplete'
 import Box from '@mui/material/Box'
-import NoSsr from '@mui/material/NoSsr'
 import Tabs from '@mui/material/Tabs'
 import Tab from '@mui/material/Tab'
 import { TabPanel } from '../util'
@@ -51,46 +52,45 @@ const ShippingForm = () => {
 				<Tab label='Shipping Info'  />
 			</Tabs>
 
-			<NoSsr>
-				{/*-----[ Update Password Form ]-----*/}
-				<TabPanel value={value} index={0} >
-					{shippingItems.map(({label, name, type}, index) => name !== 'country' ? (
-						<TextField key={index}
-							sx={ index === 0 ? {} : { mt: 2 } }
+			{/*-----[ Update Password Form ]-----*/}
+			<TabPanel value={value} index={0} >
+				{shippingItems.map(({label, name, type}, index) => name !== 'country' ? (
+					<TextField key={index}
+						sx={ index === 0 ? {} : { mt: 2 } }
+						label={label}
+						type={type}
+						name={name}
+						fullWidth
+						required
+						// InputProps={{
+						// 	startAdornment: <InputAdornment position='start'><EmailIcon /></InputAdornment>
+						// }}
+						value={shippingObj[name]}
+						onChange={changeHandler}
+						// error={!fields.email || !!fieldErrors.email}
+						// helperText={fieldErrors.email}
+					/>
+				) : (
+					<Autocomplete key={index}
+						options={countriesList}
+						getOptionLabel={country => `${country.emoji} ${country.name}`}
+						renderInput={params => <TextField {...params}
+							sx={{ mt: 2 }}
 							label={label}
 							type={type}
-							name={name}
+							// name={name}
 							fullWidth
 							required
-							// InputProps={{
-							// 	startAdornment: <InputAdornment position='start'><EmailIcon /></InputAdornment>
-							// }}
-							value={shippingObj[name]}
-							onChange={changeHandler}
-							// error={!fields.email || !!fieldErrors.email}
-							// helperText={fieldErrors.email}
-						/>
-					) : (
-						<Autocomplete key={index}
-							options={countriesList}
-							getOptionLabel={country => `${country.emoji} ${country.name}`}
-							renderInput={params => <TextField {...params}
-								sx={{ mt: 2 }}
-								label={label}
-								type={type}
-								// name={name}
-								fullWidth
-								required
-							/>}
-							onChange={(evt, country) => changeHandler(evt, country)}
-							// value={{ emoji: shippingObj.emoji, name: shippingObj.name }}
-							value={shippingObj.country}
-						/>
-					)
-					)}
-				</TabPanel>
-			</NoSsr>
+						/>}
+						onChange={(evt, country) => changeHandler(evt, country)}
+						// value={{ emoji: shippingObj.emoji, name: shippingObj.name }}
+						value={shippingObj.country}
+					/>
+				)
+				)}
+			</TabPanel>
 		</Box>
 	)
 }
-export default ShippingForm
+// export default ShippingForm
+export default dynamic(() => Promise.resolve(ShippingForm), { ssr: false })
