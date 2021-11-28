@@ -8,10 +8,13 @@ const { reducer, actions } = createSlice({
 	initialState: {
 		loading: false,
 		error: '',
-		cartItems: (typeof window !== 'undefined') && JSON.parse(localStorage.getItem('cartItems')) || [],
 		open: false,
 		severity: 'success',
 		message: '',
+
+		cartItems: (typeof window !== 'undefined') && JSON.parse(localStorage.getItem('cartItems')) || [],
+		shippingCharge: 0,
+		totalPrice: 0,
 	},
 	reducers: {
 		requested: (state, action) => ({ ...state, loading: true }),
@@ -43,6 +46,11 @@ const { reducer, actions } = createSlice({
 			return { ...state, loading: false, cartItems }
 		},
 
+		totalPrice: (state, action) => ({
+			...state,
+			totalPrice: state.cartItems?.reduce((total, item) => total + item.price*item.quantity, state.shippingCharge)
+		})
+
 	} // end of reducer method
 })
 export default reducer
@@ -69,6 +77,9 @@ export const updateCartItem = (cart, plus=true) => async (dispatch, getStore) =>
 	dispatch( actions.cartItemUpdated({ ...data, quantity}) )
 }
 
+export const getTotalPrice = () => (dispatch) => {
+	dispatch(actions.totalPrice())
+}
 
 
 /*

@@ -7,7 +7,8 @@ const shippingInfo = typeof window !== 'undefined' && JSON.parse(localStorage.ge
 const { reducer, actions } = createSlice({
 	name: 'stripe',
 	initialState: {
-		shippingObj : shippingInfo || shippingObj
+		shippingObj : shippingInfo || shippingObj,
+		paymentObj: { currency: 'usd' }
 	},
 	reducers: {
 		addedShippingInfo: (state, action) => {
@@ -17,6 +18,13 @@ const { reducer, actions } = createSlice({
 				...state,
 				shippingObj: action.payload
 			}
+		},
+		addedPaymentInfo: (state, action) => {
+
+			return {
+				...state,
+				paymentObj: { ...state.paymentObj, ...action.payload }
+			}
 		}
 	}
 })
@@ -24,6 +32,8 @@ export default reducer
 
 
 export const addShippingInfo = (obj) => (dispatch) => {
-	// console.log( obj )
 	dispatch(actions.addedShippingInfo(obj))
+}
+export const addPaymentInfo = (obj) => (dispatch) => {
+	dispatch(actions.addedPaymentInfo(obj))
 }

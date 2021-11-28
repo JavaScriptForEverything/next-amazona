@@ -1,9 +1,17 @@
+import dynamic from 'next/dynamic'
+
 import { useEffect } from 'react'
 import { useRouter } from 'next/router'
 import { useSelector } from 'react-redux'
 
 import Layout from '../layout'
-import Checkout from '../stripe'
+import Stepper from '../stripe'
+
+import { Elements } from '@stripe/react-stripe-js'
+import { loadStripe } from '@stripe/stripe-js'
+
+const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY)
+
 
 const Shipping = () => {
 	const router = useRouter()
@@ -19,8 +27,12 @@ const Shipping = () => {
 
 	return (
 		<Layout title='shipping'>
-			<Checkout />
+			<Elements stripe={stripePromise}>
+				<Stepper />
+			</Elements>
 		</Layout>
 	)
 }
-export default Shipping
+// export default Shipping
+export default dynamic(() => Promise.resolve(Shipping), { ssr: false })
+

@@ -1,12 +1,9 @@
-import dynamic from 'next/dynamic'
-
 import { useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { addShippingInfo } from '../store/paymentReducer'
 
 import { shippingItems } from './data'
 import { countries } from 'countries-list'
-
 
 import TextField from '@mui/material/TextField'
 import Autocomplete from '@mui/material/Autocomplete'
@@ -15,27 +12,13 @@ import Tabs from '@mui/material/Tabs'
 import Tab from '@mui/material/Tab'
 import { TabPanel } from '../util'
 
-// import InputAdornment from '@mui/material/InputAdornment'
-// import Button from '@mui/material/Button'
-// import IconButton from '@mui/material/IconButton'
-
-// import EmailIcon from '@mui/icons-material/Email'
-
-
 const countriesList = Object.values(countries)
-// console.log(countriesList[0])
+
 
 const ShippingForm = () => {
 	const [ value, setValue ] = useState(0) 						// to set Tabs
 	const dispatch = useDispatch()
 	const { shippingObj } = useSelector(state => state.payment)
-	// console.log( shippingObj )
-
-
-	// const [ fields, setFields ] = useState(shippingObj)
-	// console.log( fields )
-
-
 
 	const tabHandler = (evt, newValue) => setValue(newValue)
 	const changeHandler = (evt, country) => {
@@ -44,7 +27,6 @@ const ShippingForm = () => {
 			country: {emoji: country?.emoji, name: country?.name}
 		}))
 	}
-
 
 	return (
 		<Box>
@@ -62,9 +44,6 @@ const ShippingForm = () => {
 						name={name}
 						fullWidth
 						required
-						// InputProps={{
-						// 	startAdornment: <InputAdornment position='start'><EmailIcon /></InputAdornment>
-						// }}
 						value={shippingObj[name]}
 						onChange={changeHandler}
 						// error={!fields.email || !!fieldErrors.email}
@@ -92,5 +71,4 @@ const ShippingForm = () => {
 		</Box>
 	)
 }
-// export default ShippingForm
-export default dynamic(() => Promise.resolve(ShippingForm), { ssr: false })
+export default ShippingForm

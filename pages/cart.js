@@ -1,6 +1,6 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { removeItemFromCart, updateCartItem } from '../store/dialogReducer'
+import { removeItemFromCart, updateCartItem, getTotalPrice } from '../store/dialogReducer'
 
 import Image from 'next/image'
 import Link from 'next/link'
@@ -33,7 +33,12 @@ import NoSsr from '@mui/material/NoSsr'
 const Cart = () => {
 	const router = useRouter()
 	const dispatch = useDispatch()
-	const { cartItems } = useSelector(state => state.dialog)
+	const { cartItems, shippingCharge, totalPrice } = useSelector(state => state.dialog)
+
+	// Calculate Total Items, on every dependencies changes
+	useEffect(() => dispatch(getTotalPrice()), [cartItems, shippingCharge, totalPrice])
+
+
 
 	const clickHandler = (evt, cart) => dispatch(removeItemFromCart(cart))
 
@@ -101,7 +106,8 @@ const Cart = () => {
 								<ListItem>
 									<Typography variant='h5'> Subtotal
 										({cartItems.reduce((total, item, index) => total + index, 1)} items):
-										${cartItems.reduce((total, item, index) => total + item.price * item.quantity, 0)}
+											${totalPrice}
+										{/*${cartItems.reduce((total, item, index) => total + item.price * item.quantity, 0)}*/}
 									</Typography>
 								</ListItem>
 								<ListItem>

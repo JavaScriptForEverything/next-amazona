@@ -1,4 +1,6 @@
-import { useSelector } from 'react-redux'
+import { useEffect } from 'react'
+import { useDispatch, useSelector } from 'react-redux'
+import { getTotalPrice } from '../store/dialogReducer'
 
 import Tabs from '@mui/material/Tabs'
 import Tab from '@mui/material/Tab'
@@ -12,9 +14,11 @@ import Divider from '@mui/material/Divider'
 
 
 const Details = () => {
-	const shippingCharge = 0
-	const { cartItems: tours } = useSelector(state => state.dialog )
+	const dispatch = useDispatch()
+	const { cartItems, shippingCharge, totalPrice } = useSelector(state => state.dialog )
 
+	// Calculate Total Items, no need any dependency here, just call if directly get this page, it will just calcaulate
+	useEffect(() => dispatch(getTotalPrice()), [])
 
 	return (
 		<>
@@ -22,7 +26,7 @@ const Details = () => {
 				<Tab label='Product Details' />
 			</Tabs>
 			<List>
-				{tours?.map((tour, index) => (
+				{cartItems?.map((tour, index) => (
 					<ListItem key={tour._id}>
 						<ListItemText
 							// primary={tour.name}
@@ -35,7 +39,7 @@ const Details = () => {
 				))}
 
 				<ListItem>
-					<ListItemText primary='Shipping'/>
+					<ListItemText primary='Shipping Charge'/>
 					<ListItemIcon> $ {shippingCharge.toFixed(2)} </ListItemIcon>
 				</ListItem>
 
@@ -43,7 +47,8 @@ const Details = () => {
 				<ListItem>
 					<ListItemText primary='Total' />
 					<ListItemIcon>
-						$ {tours?.reduce((total, tour) => total + tour.price*tour.quantity, shippingCharge).toFixed(2) }
+						$ {totalPrice.toFixed(2)}
+						{/*$ {cartItems?.reduce((total, tour) => total + tour.price*tour.quantity, shippingCharge).toFixed(2) }*/}
 					</ListItemIcon>
 				</ListItem>
 			</List>

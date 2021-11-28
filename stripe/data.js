@@ -23,9 +23,9 @@ shippingItems.forEach(obj => shippingObj[obj.name] = '')
 export const paymentItems = [
 	itemCreator('Currency', 'currency'),
 	itemCreator('Amount', 'amount', 'number'),
-	itemCreator('Credit Card Number', 'card'),
-	itemCreator('Expiration Date', 'expires'),
-	itemCreator('CVC', 'cvc'),
+	// itemCreator('Credit Card Number', 'card'),
+	// itemCreator('Expiration Date', 'expires'),
+	// itemCreator('CVC', 'cvc'),
 ]
 export const paymentObj = {} 				// No need Because error will be checked by stripe
 paymentItems.forEach(obj => paymentObj[obj.name] = '')

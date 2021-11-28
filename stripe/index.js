@@ -1,3 +1,4 @@
+import axios from 'axios'
 import { useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { showAlert } from '../store/dialogReducer'
@@ -15,26 +16,28 @@ import StepLabel from '@mui/material/StepLabel'
 import CircularProgress from '@mui/material/CircularProgress'
 
 
+import { CardNumberElement, useStripe, useElements } from '@stripe/react-stripe-js'
+
+
+
 const labels = ['Shipping', 'Details', 'Payment']
 
 
-const CheckoutForm = () => {
+const Checkout = () => {
 	const [ activeStep, setActiveStep ] = useState(0)
 	const [ disabled, setDisabled ] = useState(false)
 	const [ loading, setLoading ] = useState(false)
 	const dispatch = useDispatch()
-
 	// const { shippingObj, detailsArr, paymentObj } = useSelector(state => state.stripe )
+	const { paymentObj: { currency } } = useSelector(state => state.payment )
+	const { totalPrice } = useSelector(state => state.dialog )
+
+	const stripe = useStripe()
+	const elements = useElements()
 
 
-	// --------[ Handle Sub Forms ]--------
-	/* We No need this type of dispatch:
-			Because we store modified data on every key stock Change, by onChange handler
-			by dispatch, It is quite resource consuming task, but it is ok because, this
-			process used very less, only when user try to pay.
-	*/
-	const nextHandler = () => {
-		if(activeStep >= labels.length) return
+	const nextHandler = () => { 				// this function only used on form submit not on button click
+		if( activeStep >= 3 ) return
 		setActiveStep(step => step + 1)
 	}
 	const backHandler = () => {
@@ -44,31 +47,68 @@ const CheckoutForm = () => {
 		setDisabled(false) 								// To reset to default
 	}
 
-	// --------[ Handle Main Forms ]--------
-/* We know need to handle any form data in this form, because every form field
-	 will modify by redux dispatch on every change, and store that data into localStorage
-	 so when we need to send data to backend, we have to just read from localStorage
-	 That's it. */
-	const handleFormSubmit = (evt) => {
+	const handleFormSubmit = async (evt) => {
 		evt.preventDefault()
 
-		// 1 & 2 perform by click handler and 3 the last one handle by form handler
-		if(activeStep === 3) {
-			setLoading(true)
-			const message = 'Payment Success'
+		// Only handle payment form here else  elements.getElement(CardNumberElement) return null
+		if( activeStep !== 2 ) return nextHandler()
 
-			setTimeout( () => {
-				dispatch(showAlert({open: true, severity: 'success', message}))
-				setLoading(false)
-				setDisabled(true)
+		setLoading(true)
+		setDisabled(true)
 
-				// console.log({shippingObj, detailsArr, paymentObj })
 
-			}, 2000)
-		}
-	}
 
-	// console.log( activeStep )
+
+		// // /* Remove to complete payment
+		// setActiveStep(step => step + 1)
+		// console.log(currency, totalPrice)
+		// setTimeout(() => {
+		// 	setLoading(false)
+		// 	setDisabled(false)
+
+		// }, 1000)
+		// return
+		// // Remove to complete payment 	*/
+
+
+
+
+		if(!stripe || !elements) return
+
+try {
+		const { data: { clientSecret } } = await axios.post('/api/checkout', {
+			amount: totalPrice,
+			currency
+		})
+
+		const { error, paymentIntent } = await stripe.confirmCardPayment(clientSecret, {
+			payment_method: {
+				card: elements.getElement(CardNumberElement)
+			}
+		})
+
+    if(error) {
+			setLoading(false)
+    	console.log(error)
+    	return
+    }
+
+    // on success
+		dispatch(showAlert({open: true, severity: 'success', message: 'Payment Success'}))
+  	console.log(paymentIntent)
+
+		setActiveStep(step => step + 1) 		// push on success step
+		setLoading(false)
+		setDisabled(false)
+
+
+} catch(error) {
+	console.log(error)
+	setLoading(false)
+}
+
+	} // End of submitForm
+
 
 	return (
 		<Box sx={{ my: 3 }} >
@@ -91,15 +131,18 @@ const CheckoutForm = () => {
 						{/*-------[ Button Setup ]---------*/}
 						<Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 6 }} >
 							{ activeStep ? <Button onClick={backHandler}>Back</Button> : '' }
-							<Button onClick={nextHandler} type='submit' variant='outlined'
-								disabled={disabled}
+							<Button type='submit' variant='outlined'
+								disabled={disabled || !stripe || !elements}
 							>
-							{ (activeStep === labels.length - 1) ? 'Pay' :
-								(activeStep === labels.length) ? (
+							{ (activeStep === 2 ) ? 'Pay' :
+								(activeStep === 3) ? (
 									loading ?	<CircularProgress size={24} /> : 'Success'
 								) : 'Next'
 							}
 							</Button>
+
+
+
 						</Box>
 					</form>
 
@@ -108,4 +151,4 @@ const CheckoutForm = () => {
 		</Box>
 	)
 }
-export default CheckoutForm
+export default Checkout
