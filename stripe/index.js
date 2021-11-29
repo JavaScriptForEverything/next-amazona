@@ -53,44 +53,43 @@ const Checkout = () => {
 		if(!stripe || !elements) return
 		setLoading(true)
 
-try {
-		const { data: { clientSecret } } = await axios.post('/api/checkout', {
-			payment: { amount: totalPrice, currency },
-			shipping: shippingObj
-		}, {
-			headers: { 'Authorization': `Bearer ${token}`}
-		})
+		try {
+			const { data: { clientSecret, payment } } = await axios.post('/api/checkout', {
+				payment: { amount: totalPrice, currency },
+				shipping: shippingObj
+			}, {
+				headers: { 'Authorization': `Bearer ${token}`}
+			})
 
-		const { error, paymentIntent } = await stripe.confirmCardPayment(clientSecret, {
-			payment_method: {
-				card: elements.getElement(CardNumberElement)
-			}
-		})
+			const { error, paymentIntent: { status } } = await stripe.confirmCardPayment(clientSecret, {
+				payment_method: {
+					card: elements.getElement(CardNumberElement)
+				}
+			})
 
-    if(error) {
+	    if(error) {
+				setLoading(false)
+	    	console.log(error)
+				dispatch(showAlert({open: true, severity: 'error', message: error.message}))
+	    	return
+	    }
+
+	    // on success
+			dispatch(showAlert({open: true, severity: 'success', message: 'Payment Success'}))
+			setActiveStep(step => step + 1) 		// push on success step(page)
 			setLoading(false)
-    	console.log(error)
+
+			// Remove cart items from localStorage after payment complete by Instant Update
+			dispatch(removeCartItems())
+
+			// we can pass this product success on database to save it
+	  	console.log({ payment, clientSecret, status })
+
+		} catch(error) {
+			console.log(error)
+			setLoading(false)
 			dispatch(showAlert({open: true, severity: 'error', message: error.message}))
-    	return
-    }
-
-    // on success
-		dispatch(showAlert({open: true, severity: 'success', message: 'Payment Success'}))
-		setActiveStep(step => step + 1) 		// push on success step(page)
-		setLoading(false)
-
-		// Remove cart items from localStorage after payment complete by Instant Update
-		dispatch(removeCartItems())
-
-		// we can pass this product success on database to save it
-  	console.log(paymentIntent)
-
-
-} catch(error) {
-	console.log(error)
-	setLoading(false)
-	dispatch(showAlert({open: true, severity: 'error', message: error.message}))
-}
+		}
 
 	} // End of submitForm
 
