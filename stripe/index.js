@@ -29,9 +29,9 @@ const Checkout = () => {
 	const stripe = useStripe()
 	const elements = useElements()
 
-	// const { shippingObj, detailsArr, paymentObj } = useSelector(state => state.stripe )
-	const { paymentObj: { currency } } = useSelector(state => state.payment )
+	const { shippingObj, paymentObj: { currency } } = useSelector(state => state.payment )
 	const { totalPrice } = useSelector(state => state.dialog )
+	const { token } = useSelector(state => state.user )
 
 
 	const nextHandler = () => { 				// this function only used on form submit not on button click
@@ -55,8 +55,10 @@ const Checkout = () => {
 
 try {
 		const { data: { clientSecret } } = await axios.post('/api/checkout', {
-			amount: totalPrice,
-			currency
+			payment: { amount: totalPrice, currency },
+			shipping: shippingObj
+		}, {
+			headers: { 'Authorization': `Bearer ${token}`}
 		})
 
 		const { error, paymentIntent } = await stripe.confirmCardPayment(clientSecret, {

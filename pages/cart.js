@@ -38,6 +38,8 @@ const Cart = () => {
 	// Calculate Total Items, on every dependencies changes
 	useEffect(() => dispatch(getTotalPrice()), [cartItems, shippingCharge, totalPrice])
 
+	// if no card items then go to home page to shopping
+	useEffect(() => !cartItems.length && router.push('/'), [cartItems])
 
 
 	const clickHandler = (evt, cart) => dispatch(filterCartItems(cart))
