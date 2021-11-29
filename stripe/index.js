@@ -1,4 +1,5 @@
 import axios from 'axios'
+import { useRouter } from 'next/router'
 import { useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { showAlert } from '../store/dialogReducer'
@@ -20,20 +21,20 @@ import { CardNumberElement, useStripe, useElements } from '@stripe/react-stripe-
 
 
 
-const labels = ['Shipping', 'Details', 'Payment']
 
 
 const Checkout = () => {
 	const [ activeStep, setActiveStep ] = useState(0)
-	const [ disabled, setDisabled ] = useState(false)
 	const [ loading, setLoading ] = useState(false)
 	const dispatch = useDispatch()
-	// const { shippingObj, detailsArr, paymentObj } = useSelector(state => state.stripe )
-	const { paymentObj: { currency } } = useSelector(state => state.payment )
-	const { totalPrice } = useSelector(state => state.dialog )
+	const router = useRouter()
 
 	const stripe = useStripe()
 	const elements = useElements()
+
+	// const { shippingObj, detailsArr, paymentObj } = useSelector(state => state.stripe )
+	const { paymentObj: { currency } } = useSelector(state => state.payment )
+	const { totalPrice } = useSelector(state => state.dialog )
 
 
 	const nextHandler = () => { 				// this function only used on form submit not on button click
@@ -41,10 +42,10 @@ const Checkout = () => {
 		setActiveStep(step => step + 1)
 	}
 	const backHandler = () => {
+		if(activeStep === 3 ) return router.push('/')
 		if(activeStep <= 0) return
 		setActiveStep(step => step - 1)
 		setLoading(false) 								// To reset to default
-		setDisabled(false) 								// To reset to default
 	}
 
 	const handleFormSubmit = async (evt) => {
@@ -52,28 +53,8 @@ const Checkout = () => {
 
 		// Only handle payment form here else  elements.getElement(CardNumberElement) return null
 		if( activeStep !== 2 ) return nextHandler()
-
-		setLoading(true)
-		setDisabled(true)
-
-
-
-
-		// // /* Remove to complete payment
-		// setActiveStep(step => step + 1)
-		// console.log(currency, totalPrice)
-		// setTimeout(() => {
-		// 	setLoading(false)
-		// 	setDisabled(false)
-
-		// }, 1000)
-		// return
-		// // Remove to complete payment 	*/
-
-
-
-
 		if(!stripe || !elements) return
+		setLoading(true)
 
 try {
 		const { data: { clientSecret } } = await axios.post('/api/checkout', {
@@ -90,21 +71,26 @@ try {
     if(error) {
 			setLoading(false)
     	console.log(error)
+			dispatch(showAlert({open: true, severity: 'error', message: error.message}))
     	return
     }
 
     // on success
 		dispatch(showAlert({open: true, severity: 'success', message: 'Payment Success'}))
-  	console.log(paymentIntent)
-
-		setActiveStep(step => step + 1) 		// push on success step
+		setActiveStep(step => step + 1) 		// push on success step(page)
 		setLoading(false)
-		setDisabled(false)
+
+		// Remove cart items from localStorage after payment complete
+		localStorage.removeItem('cartItems')
+
+		// we can pass this product success on database to save it
+  	console.log(paymentIntent)
 
 
 } catch(error) {
 	console.log(error)
 	setLoading(false)
+	dispatch(showAlert({open: true, severity: 'error', message: error.message}))
 }
 
 	} // End of submitForm
@@ -116,7 +102,7 @@ try {
 				<Paper sx={{ px: 2, py: 3 }} >
 					<Typography variant='h4' align='center' > Checkout </Typography>
 					<Stepper activeStep={activeStep} sx={{ my: 4 }} >
-						{labels.map(label => (
+						{['Shipping', 'Details', 'Payment'].map(label => (
 							<Step key={label} >
 								<StepLabel>{label}</StepLabel>
 							</Step>
@@ -130,19 +116,13 @@ try {
 
 						{/*-------[ Button Setup ]---------*/}
 						<Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 6 }} >
-							{ activeStep ? <Button onClick={backHandler}>Back</Button> : '' }
-							<Button type='submit' variant='outlined'
-								disabled={disabled || !stripe || !elements}
-							>
-							{ (activeStep === 2 ) ? 'Pay' :
-								(activeStep === 3) ? (
-									loading ?	<CircularProgress size={24} /> : 'Success'
-								) : 'Next'
-							}
+							{ activeStep ? <Button onClick={backHandler}>
+								{ activeStep === 3 ? 'Home' : 'Back' }
+							</Button> : '' }
+
+							<Button type='submit' variant='outlined'disabled={loading || activeStep >= 1 && !totalPrice} >
+								{ activeStep === 2 ? loading ? <CircularProgress size={24} /> : 'Pay' : activeStep === 3 ? 'Success' : 'Next' }
 							</Button>
-
-
-
 						</Box>
 					</form>
 

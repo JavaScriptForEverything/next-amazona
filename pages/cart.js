@@ -111,7 +111,14 @@ const Cart = () => {
 									</Typography>
 								</ListItem>
 								<ListItem>
-									<Button onClick={() => router.push('/shipping')} variant='contained' fullWidth >Check Out</Button>
+									<Button
+										variant='contained'
+										fullWidth
+										onClick={() => router.push('/shipping')}
+										disabled= {totalPrice <= 0}
+									>
+										Check Out
+									</Button>
 								</ListItem>
 							</List>
 						</Paper>
