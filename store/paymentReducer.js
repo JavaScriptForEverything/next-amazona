@@ -14,18 +14,13 @@ const { reducer, actions } = createSlice({
 		addedShippingInfo: (state, action) => {
 			localStorage.setItem('shippingInfo', JSON.stringify({ ...state.shippingObj, ...action.payload })  )
 
-			return {
-				...state,
-				shippingObj: action.payload
-			}
+			return { ...state, shippingObj: action.payload }
 		},
-		addedPaymentInfo: (state, action) => {
+		addedPaymentInfo: (state, action) => ({
+			...state,
+			paymentObj: { ...state.paymentObj, ...action.payload }
 
-			return {
-				...state,
-				paymentObj: { ...state.paymentObj, ...action.payload }
-			}
-		}
+		})
 	}
 })
 export default reducer

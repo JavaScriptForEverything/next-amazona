@@ -2,7 +2,7 @@ import axios from 'axios'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { showAlert } from '../store/dialogReducer'
+import { showAlert, removeCartItems } from '../store/dialogReducer'
 
 import StepContent from './stepContent'
 
@@ -18,9 +18,6 @@ import CircularProgress from '@mui/material/CircularProgress'
 
 
 import { CardNumberElement, useStripe, useElements } from '@stripe/react-stripe-js'
-
-
-
 
 
 const Checkout = () => {
@@ -80,8 +77,8 @@ try {
 		setActiveStep(step => step + 1) 		// push on success step(page)
 		setLoading(false)
 
-		// Remove cart items from localStorage after payment complete
-		localStorage.removeItem('cartItems')
+		// Remove cart items from localStorage after payment complete by Instant Update
+		dispatch(removeCartItems())
 
 		// we can pass this product success on database to save it
   	console.log(paymentIntent)

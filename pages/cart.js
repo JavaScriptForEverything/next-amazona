@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { removeItemFromCart, updateCartItem, getTotalPrice } from '../store/dialogReducer'
+import { filterCartItems, updateCartItem, getTotalPrice } from '../store/dialogReducer'
 
 import Image from 'next/image'
 import Link from 'next/link'
@@ -40,7 +40,7 @@ const Cart = () => {
 
 
 
-	const clickHandler = (evt, cart) => dispatch(removeItemFromCart(cart))
+	const clickHandler = (evt, cart) => dispatch(filterCartItems(cart))
 
 	const addHandler = (evt, cart) => {
 		if(cart.quantity >= cart.inStock) return

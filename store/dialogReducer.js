@@ -32,7 +32,7 @@ const { reducer, actions } = createSlice({
 
 			return { ...state, loading: false, cartItems: state.cartItems.concat(action.payload) }
 		},
-		cartItemRemoved: (state, action) => {
+		cartItemsFiltered: (state, action) => {
 			localStorage.setItem('cartItems', JSON .stringify(state.cartItems .filter( item => item._id !== action.payload._id)) )
 
 			return { ...state, loading: false, cartItems: state.cartItems.filter(item => item._id !== action.payload._id) }
@@ -44,6 +44,14 @@ const { reducer, actions } = createSlice({
 			localStorage.setItem('cartItems', JSON.stringify(cartItems) )
 
 			return { ...state, loading: false, cartItems }
+		},
+		cartItemsRemoved: (state, action) => {
+			localStorage.removeItem('cartItems')
+			return {
+				...state,
+				cartItems: []
+
+			}
 		},
 
 		totalPrice: (state, action) => ({
@@ -66,15 +74,18 @@ export const addItemToCart = (cart) => (dispatch) => {
 	dispatch(actions.requested())
 	dispatch(actions.cartItemAdded(cart))
 }
-export const removeItemFromCart = (cart) => (dispatch) => {
+export const filterCartItems = (cart) => (dispatch) => {
 	dispatch(actions.requested())
-	dispatch(actions.cartItemRemoved(cart))
+	dispatch(actions.cartItemsFiltered(cart))
 }
 export const updateCartItem = (cart, plus=true) => async (dispatch, getStore) => {
 	// const { data } = await axios.get(`/api/products/${cart.slug}`)
 	const data = getStore().dialog.cartItems.find(item => item._id === cart._id)
 	const quantity = plus ? data.quantity + 1 : data.quantity - 1
 	dispatch( actions.cartItemUpdated({ ...data, quantity}) )
+}
+export const removeCartItems = () => (dispatch) => {
+	dispatch(actions.cartItemsRemoved())
 }
 
 export const getTotalPrice = () => (dispatch) => {
