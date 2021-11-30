@@ -21,7 +21,8 @@ const { reducer, actions } = createSlice({
 		failed: (state, action) => ({
 			...state,
 			loading: false,
-			error: action.payload
+			error: action.payload,
+			// open: true
 		}),
 		showAlert: (state, action) => ({
 			...state, loading: false, ...action.payload

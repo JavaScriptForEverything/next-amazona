@@ -89,40 +89,34 @@ export const signUpMe = (obj) => catchAsyncDispatch(async (dispatch) => {
 }, actions.failed)
 
 
-
-
-
-
-
-
-
-
-
-
-
-
+// Forgot Password function
 export const forgotPassword = (obj) => catchAsyncDispatch(async (dispatch) => {
 	dispatch(actions.requested())
 
-	const { data } = await axios.post('/api/users/forgot-password', obj)
-	console.log( data )
+	const { data }  = await axios.post('/api/users/forgot-password', obj)
+	// console.log({data, status})
 
 	const message = 'No token found'
-	if( !data.resetToken ) return dispatch(showAlert({ open: true, severity: 'error', message}))
+	if(!data || data.status !== 'success') return dispatch(showAlert({ open: true, severity: 'error', message}))
+	// if(!data) return dispatch(showAlert({ open: true, severity: 'error', message}))
 
-	dispatch(showAlert({ open: true, severity: 'success', message: data.message}))
+	dispatch(showAlert({ open: true, severity: 'success', message: data.message }))
 	dispatch(actions.tokenSent())
 }, actions.failed)
 
+
+
+// Reset Password function
 export const resetPassword = (obj) => catchAsyncDispatch(async (dispatch) => {
 	dispatch(actions.requested())
 
 	// we used patch request on Backend, to this route, don't know why ?
 	// Perhapse 2 route matches same signeture.
-	const { data } = await axios.patch(`/api/users/reset-password/${obj.token}`, obj)
+	// const { data } = await axios.post(`/api/users/reset-password/`, obj.token)
+	const { data } = await axios.patch(`/api/users/forgot-password/`, obj)
 	console.log( data )
 
-	if( !data.token ) return dispatch(showAlert({ open: true, severity: 'error', message}))
+	if( !data ) return dispatch(showAlert({ open: true, severity: 'error', message}))
 
 	const message = 'Password reset successfully !!!'
 	dispatch(showAlert({ open: true, severity: 'success', message}))
@@ -133,7 +127,15 @@ export const resetPassword = (obj) => catchAsyncDispatch(async (dispatch) => {
 
 
 
-// Need to fix it.
+
+
+
+
+
+
+
+
+// Not Used Yet: (Need to fix it)
 export const profileUpdate = (obj) => catchAsyncDispatch(async (dispatch) => {
 	dispatch(actions.requested())
 

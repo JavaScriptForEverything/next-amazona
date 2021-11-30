@@ -1,89 +1,22 @@
-// import { useRef } from 'react'
+import Link from 'next/link'
+import Error from 'next/error'
 
-// import MyInput from '../stripe/stripeInput'
+import Layout from '../layout'
 
-// const About = () => {
-// 	const inputRef = useRef('')
-
-// 	const formHandler = (evt) => {
-// 		evt.preventDefault()
-// 		if(!inputRef.current.value) return inputRef.current.focus()
-// 		console.log(inputRef.current.value)
-// 	}
-
-// 	return (
-// 		<>
-// 			<form onSubmit={formHandler}>
-// 				<MyInput ref={inputRef} /> <br />
-
-// 				<button type='submit'>Submit</button>
-// 			</form>
-// 		</>
-// 	)
-// }
-// export default About
-
-
-
-
-
-
-// import { forwardRef } from 'react'
-// import TextField from '@mui/material/TextField'
-
-// const Input = forwardRef((props, ref) => <input {...props} ref={ref} />)
-
-
-// const About = () => {
-
-// 	return (
-// 		<TextField
-// 			label='Username'
-// 			fullWidth
-// 			InputProps={{
-// 				inputComponent: Input,
-// 			}}
-// 		/>
-// 	)
-// }
-// export default About
-
-
-// https://mui.com/components/text-fields/#integration-with-3rd-party-input-libraries
-
-
-
-
-import { forwardRef } from 'react'
-import TextField from '@mui/material/TextField'
-import { CardNumberElement, Elements } from '@stripe/react-stripe-js'
-import { loadStripe } from '@stripe/stripe-js'
-import MyInput from '../stripe/stripeInput'
-
-const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY)
-
-
+import Typography from '@mui/material/Typography'
+import MuiLink from '@mui/material/Link'
 
 const About = () => {
+	if(false) return <Error statusCode={400} />
 
 	return (
-		<Elements stripe={stripePromise}>
+		<Layout title='about page'>
+			<Typography>About Page</Typography>
 
-			<TextField
-				label='Username'
-				fullWidth
-				InputProps={{
-					inputComponent: MyInput,
-					inputProps: { component: CardNumberElement }
-				}}
-				InputLabelProps={{ shrink: true }}
-			/>
-
-		</Elements>
+			<Link href='/user/profile' passHref >
+				<MuiLink>profile</MuiLink>
+			</Link>
+		</Layout>
 	)
 }
 export default About
-
-
-
-

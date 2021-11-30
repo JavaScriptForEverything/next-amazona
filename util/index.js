@@ -5,8 +5,9 @@ import Box from '@mui/material/Box'
 
 export const catchAsyncDispatch = (fn, showError=f=>f) => (dispatch, getStore) => fn(dispatch, getStore).catch(err => {
 	// dispatch( showError(err.response?.data?.message) )
-	const message = err.response.data ? err.response.data.message : err.message
+	const message = err.response?.data.message || err.message
 	dispatch( showError(message) )
+	console.error({message})
 })
 
 

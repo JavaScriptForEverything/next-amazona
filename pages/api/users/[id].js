@@ -5,7 +5,7 @@ import { getUserById } from '../../../server/controllers/userController'
 
 const handler = nc({ onError })
 
-	handler
+handler
 		.get(getUserById) 								// /api/users/:id
 
 export default handler

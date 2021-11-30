@@ -30,9 +30,9 @@ import NoSsr from '@mui/material/NoSsr'
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart'
 
 const menuitems = [
-	{ label: 'Profile', path: '/profile' },
-	{ label: 'My Account', path: '/account' },
-	{ label: 'Logout', path: '/logout' },
+	{ label: 'Profile', path: '/user/profile' },
+	{ label: 'My Account', path: '/user/account' },
+	{ label: 'Logout', path: '/user/logout' },
 ]
 
 const Layout = ({ title, description, children }) => {
@@ -76,15 +76,13 @@ const Layout = ({ title, description, children }) => {
 		setAnchorEl(evt.currentTarget)
 		setMenuOpen(true)
 	}
-	const menuItemHandler = (evt, item) => {
+	const menuItemHandler = (evt, {label, path}) => {
 		menuCloseHandler()
-		// router.push(path)
 
-		if(item.label === 'Logout') {
-			// console.log(item.label)
-			dispatch(logoutMe())
-			router.push( redirect || '/login')
-		}
+		if(label !== 'Logout') return router.push(path)
+
+		dispatch(logoutMe())
+		router.push( redirect || '/login')
 	}
 
 

@@ -52,7 +52,9 @@ const Login = () => {
 	const { authenticated, error } = useSelector(state => state.user)
 
 
-	useEffect(() => (authenticated) && router.push(redirect || '/login'), [dispatch, authenticated])
+	useEffect(() => {
+		(authenticated) && router.push(redirect || '/user/profile')
+	}, [authenticated])
 
 
 	const tabHandler = (evt, newValue) => setValue(newValue)
@@ -67,7 +69,7 @@ const Login = () => {
 		/* Shend Data to Backend + Set token into Store + change authenticated to true in store,
 			 so that no need page refresing to take immediately login */
 		dispatch(loginMe(loginFields))
-		router.push( redirect || '/')
+		router.push(redirect || '/user/profile')
 	}
 
 	// -----------[ Sign Up Form ]-----------
@@ -95,7 +97,7 @@ const Login = () => {
 	}
 
 	return (
-		<Layout title='Login Page'>
+		<Layout title={ value ? 'Sign Up Page' : 'Login Page'} >
 			<Box sx={{ mt: 3, p: 3 }} >
 				{/*-----[ start coding bellow here ]------*/}
 
@@ -110,6 +112,7 @@ const Login = () => {
 								<form noValidate onSubmit={handleLoginForm}>
 									<TextField
 										// sx={{ mt: 2 }}
+										label='Email Address'
 										placeholder='Email Address'
 										type='email'
 										fullWidth
@@ -124,6 +127,7 @@ const Login = () => {
 									/>
 									<TextField
 										sx={{ mt: 2 }}
+										label='Password'
 										placeholder='Password'
 										type={!visibility ? 'text' : 'password'}
 										fullWidth
@@ -142,7 +146,7 @@ const Login = () => {
 										helperText={loginFieldErrors.password}
 									/>
 
-									<Link href='/reset-password' passHref>
+									<Link href='/user/reset-password' passHref>
 										<MuiLink>
 											<Typography
 												sx={{ mt: 2, display: 'flex', justifyContent: 'flex-end' }}
@@ -168,6 +172,7 @@ const Login = () => {
 								<form noValidate onSubmit={handleSignupForm} >
 									<TextField
 										// sx={{ mt: 2 }}
+										label='Full Name'
 										placeholder='Full Name'
 										type='text'
 										fullWidth
@@ -182,6 +187,7 @@ const Login = () => {
 									/>
 									<TextField
 										sx={{ mt: 2 }}
+										label='Email Address'
 										placeholder='Email Address'
 										type='email'
 										fullWidth
@@ -196,6 +202,7 @@ const Login = () => {
 									/>
 									<TextField
 										sx={{ mt: 2 }}
+										label='Password'
 										placeholder='Password'
 										type={!passwordVisibility ? 'text' : 'password'}
 										fullWidth
@@ -215,6 +222,7 @@ const Login = () => {
 									/>
 									<TextField
 										sx={{ mt: 2 }}
+										label='Confirm Password'
 										placeholder='Confirm Password'
 										type={!confirmPasswordVisibility ? 'text' : 'password'}
 										fullWidth

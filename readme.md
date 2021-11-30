@@ -1,4 +1,4 @@
-# Stripe Next MaterialUI Redux Mongoose(MongoDB) JWT(Token)
+# Stripe Next MaterialUI Redux Mongoose JWT(Token) SendMail
 
 <img
 	width = "100%"
@@ -15,6 +15,7 @@
 	. Mongoose (MongoDB)
 	. Stripe Payment Method
 	. JsonWebToken
+	. Reset Password by Send Token by Mail (SendMail)
 
 	. Do next:
 		. Pagination
@@ -34,3 +35,4 @@
 	. user:
 		. Profile 	: /user/profile
 		. Dashboard	: /user/dashboard
+		. resetPassword : /user/reset-password
