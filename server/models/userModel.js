@@ -1,4 +1,5 @@
 const { Schema, model, models } = require('mongoose')
+const { isEmail } = require('validator')
 const { hash } = require('bcryptjs')
 
 const userSchema = new Schema({
@@ -14,6 +15,7 @@ const userSchema = new Schema({
 		trim: true,
 		unique: true,
 		required: true,
+		validate: (email) => isEmail(email)
 	},
 	password: {
 		type: String,

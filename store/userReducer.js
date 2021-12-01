@@ -66,7 +66,6 @@ const { reducer, actions } = createSlice({
 export default reducer
 
 
-
 export const loginMe = (obj) => catchAsyncDispatch(async (dispatch, getStore) => {
 	dispatch(actions.requested())
 	const { data } = await axios.post(`/api/users/login`, obj)
@@ -74,12 +73,15 @@ export const loginMe = (obj) => catchAsyncDispatch(async (dispatch, getStore) =>
 }, actions.failed)
 
 /*Geting User but how ?
-		. Because of 'cookie' which set on backend section, see authController.protect() */
+	1. as header: { Authorization : `Bearer ${token}` }
+	2. as header: { cookie : token } */
 export const getUser = (token) => catchAsyncDispatch(async (dispatch) => {
-	// const { data } = await axios.get(`/api/users/me`)
-	const { data } = await axios.get(`/api/users/${token}`)
+	const { data } = await axios.get(`/api/users/me`, { headers: {Authorization: `Bearer ${token}`} })
 	dispatch(actions.getMe(data))
 }, actions.failed)
+
+
+
 
 export const logoutMe = () => (dispatch) => dispatch(actions.logedOut())
 export const signUpMe = (obj) => catchAsyncDispatch(async (dispatch) => {

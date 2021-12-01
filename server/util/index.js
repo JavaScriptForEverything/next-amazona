@@ -41,3 +41,10 @@ export const sendMail = async ({ from='<next.amazona.gmail.com>', to, subject, t
 	await transport.sendMail({ from, to, subject, text })
 }
 
+
+export const filterObjByArray = (obj, arr) => {
+	const newObj = {}
+	arr.forEach(item => newObj[item] = obj[item])
+
+	return newObj
+}

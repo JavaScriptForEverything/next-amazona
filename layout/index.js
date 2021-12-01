@@ -26,13 +26,21 @@ import Avatar from '@mui/material/Avatar'
 import Menu from '@mui/material/Menu'
 import MenuItem from '@mui/material/MenuItem'
 import NoSsr from '@mui/material/NoSsr'
+import MuiLink from '@mui/material/Link'
+import Divider from '@mui/material/Divider'
+
+import ListItemIcon from '@mui/material/ListItemIcon'
+import ListItemText from '@mui/material/ListItemText'
+
 
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart'
+import DashboardIcon from '@mui/icons-material/Dashboard'
+import LogoutIcon from '@mui/icons-material/Logout'
 
-const menuitems = [
-	{ label: 'Profile', path: '/user/profile' },
-	{ label: 'My Account', path: '/user/account' },
-	{ label: 'Logout', path: '/user/logout' },
+const menuItems = [
+	// { label: 'Profile', path: '/user/profile' },
+	{ label: 'Dashboard', path: '/user/account', icon: <DashboardIcon /> },
+	{ label: 'Logout', path: '/user/logout', icon: <LogoutIcon /> },
 ]
 
 const Layout = ({ title, description, children }) => {
@@ -122,11 +130,14 @@ const Layout = ({ title, description, children }) => {
 							</IconButton>
 						</Link>
 
+
 						<NoSsr>
 						{ authenticated ? (
 							<IconButton color='inherit' onClick={menuHandler} sx={{ ml: 2 }} >
 								<Avatar sx={{ width: '2rem', height: '2rem' }} src={user?.avatar} />
-							</IconButton>
+								<Typography sx={{ ml: 1, display: {xs: 'none', sm: 'block'} }}>
+									{user?.username.split(' ').shift()} </Typography>
+								</IconButton>
 						) : (
 							<Link href='/login'>
 								<Button color='inherit' sx={{ textTransform: 'capitalize' }} >Login</Button>
@@ -137,10 +148,36 @@ const Layout = ({ title, description, children }) => {
 							open={menuOpen}
 							anchorEl={anchorEl}
 							onClose={menuCloseHandler}
+							PaperProps={{
+								style: {
+									width: 200,
+								}
+							}}
 						>
-							{menuitems.map((item, key) => <MenuItem key={item.label}
-								onClick={(evt) => menuItemHandler(evt, item)}
-							>{item.label}</MenuItem> )}
+							<Box sx={{display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 0.5, my: 2 }} >
+								<Avatar
+									src={user?.avatar}
+									alt={user?.avatar}
+								/>
+								<Typography sx={{textTransform: 'capitalize'}} >{user?.username}</Typography>
+								<Link href='/user/profile' passHref><MuiLink>My Profile</MuiLink></Link>
+							</Box>
+							{menuItems.map((item, key) => [
+								key === 0 && <Divider />,
+								<MenuItem
+									key={item.label}
+									onClick={(evt) => menuItemHandler(evt, item)}
+									divider={item.label !== 'Logout'}
+									dense
+									>
+									<ListItemIcon>
+										{item.icon}
+									</ListItemIcon>
+									<ListItemText>
+									{item.label}
+									</ListItemText>
+								</MenuItem>
+							])}
 						</Menu>
 
 					</Box>

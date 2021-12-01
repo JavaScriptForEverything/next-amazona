@@ -10,36 +10,59 @@ import User from '../models/userModel'
 
 
 
-// Token must be come from header or body
+/* protect middleware used with:
+	. /api/users/me.js								:	handler.get(protect, getUser)
+	. /api/users/forgot-password/ 		: handler.patch(protect, resetPassword)
+*/
 export const protect = catchAsync(async(req, res, next) => {
+
+	// 1. Get Token 		: Token must be come from header or body
 	const authorization = req.headers.authorization
 	const token = authorization?.split('Bearer ').pop() || req.body.token
-
 	if(!token) return next(appError('Please send token as header or body', 401))
+
+	// 2. Get id from token
 	const { _id, iat } = getIdFromToken(token)
 
+	// 3. Get user by id
 	const user = await User.findById(_id)
 	if(!user) return next(appError('Please login first', 401))
 
-	req.user = user
+	/* 4. check is user update password ?
+		How do we check is password updated or not ?
+			if we create token before password change, then token iat always will be
+			less than user.passwordChangedAt property, on the other hand passwordChangedAt property
+			eighter not exist if any time user did not update password. or passwordChangedAt will be
+			greater than token iat time, because which one will created first will be less timestamp */
 
+	let updateTime = user.passwordChangedAt 	// timpstamp When user change password
+	    updateTime = new Date(updateTime) 		// => String => Date
+	    updateTime = updateTime.getTime() 		// => time in Number <= Date
+
+	let tokenTime = iat * 1000 								// => in second so convert to miliSeconds, because updateTime in miliSeconds
+	const isPasswordChangedAfterLogin = tokenTime < updateTime
+
+	if(isPasswordChangedAfterLogin) return next(appError('Please relogin, password changed', 403))
+
+	req.user = user
 	next()
 })
 
 
 
-// const createPasswordResetToken = () => {
-// 	let resetToken = crypto.randomBytes(32).toString('hex') 							// Generate Random value
-// 			resetToken = crypto.createHash('sha256').update(resetToken).digest('hex')
+/* userReducer.js  > /pages/api/users/me.js	:	handler.get(protect, getMe)
+ 		.	/layout/index.js */
+export const getMe = (req, res, next) => {
 
-// 	// const passwordResetToken = crypto.createHash('sha256').update(resetToken).digest('hex')
+	res.status(200).json({
+		status: 'success',
+		user: req.user
+	})
+}
 
-// 	// this.passwordResetToken = await bcrypt.hash(resetToken, 2)
-// 	// this.passwordResetExpires = Date.now() + 1000 * 60 * 10 								// 10 minute
-// 	// this.save({validateBeforeSave: false}) 																// save the document after modify
 
-// 	return resetToken
-// }
+/* userReducer.js  > /pages/api/users/forgot-password.js	:	handler.post(forgotPassword)
+ 		.	/pages/users/forgot-password.js */
 export const forgotPassword = catchAsync( async(req, res, next) => {
 	const { email } = req.body
 
@@ -77,7 +100,8 @@ export const forgotPassword = catchAsync( async(req, res, next) => {
 })
 
 
-// handler.patch(protect, resetPassword) 	=> axios.patch(`/api/users/forgot-password/`, obj)
+/* userReducer.js  > /pages/api/users/forgot-password.js	:	handler.patch(protect, resetPassword)
+ 		.	/pages/users/forgot-password.js */
 export const resetPassword = catchAsync( async(req, res, next) => {
 	const { token: passwordResetToken, password, confirmPassword } = req.body
 
