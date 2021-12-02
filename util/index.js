@@ -10,6 +10,7 @@ export const catchAsyncDispatch = (fn, showError=f=>f) => (dispatch, getStore) =
 })
 
 
+export const toCapitalize = (str) => str && str.replace(/\b./g, match => match.toUpperCase())
 
 
 
@@ -18,7 +19,6 @@ export const catchAsyncDispatch = (fn, showError=f=>f) => (dispatch, getStore) =
 
 
 
-// export const toCapitalize = (str) => str.replace(/\b./g, match => match.toUpperCase())
 
 // export const shorter = (content, length=250) => {
 // 	if(content.length > length) return content.substr(0, length) + '...'

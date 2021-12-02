@@ -162,12 +162,12 @@ const Layout = ({ title, description, children }) => {
 								<Typography sx={{textTransform: 'capitalize'}} >{user?.username}</Typography>
 								<Link href='/user/profile' passHref><MuiLink>My Profile</MuiLink></Link>
 							</Box>
-							{menuItems.map((item, key) => [
+							{menuItems.map((item, key, items) => [
 								key === 0 && <Divider />,
 								<MenuItem
 									key={item.label}
 									onClick={(evt) => menuItemHandler(evt, item)}
-									divider={item.label !== 'Logout'}
+									divider={item.label !== items[items.length - 1].label}
 									dense
 									>
 									<ListItemIcon>

@@ -36,7 +36,7 @@ const { reducer, actions } = createSlice({
 		},
 		logedOut: (state, action) => {
 			localStorage.removeItem('token')
-			return {...state, loading: false, authenticated: false, }
+			return {...state, loading: false, authenticated: false, isSignedUp: false }
 		},
 		signedUp: (state, action) => ({ ...state, loading: false, isSignedUp: !!action.payload }),
 

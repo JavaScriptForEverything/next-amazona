@@ -36,7 +36,6 @@ const userSchema = new Schema({
 	passwordResetExpires: Date, 		// required to make token expire after given time
 	passwordChangedAt: Date, 				// required to make token invalid after modify password
 
-	// user details
 	avatar: {
 		type: String,
 		default: '/user.jpg'
@@ -50,42 +49,18 @@ const userSchema = new Schema({
 		type: String,
 		// required: true,
 		lowercase: true,
-		// minLength: 100, 			// for
+		minLength: 100, 			// for
 		maxLength: 500,
 		trim: true,
-		default: 'about user skill experiences details ...lorem'
+		default: 'Lorem ipsum dolor sit amet consectetur adipisicing elit. Et inventore soluta quae tempore reprehenderit accusantium aliquam nisi facere similique omnis cum architecto perspiciatis aperiam eaque nulla possimus perferendis officia, quibusdam?',
 	},
-	skills: [{
-		type: String,
-		enum: ['reactjs', 'redux', 'material-ui', 'nodejs', 'mongodb', 'expressjs'],
+	skills: {
+		type: [String],
 		lowercase: true,
 		maxLength: 50,
 		trim: true,
 		default: ['ReactJs', 'Redux', 'Material-UI', 'NodeJs', 'MongoDB', 'ExpressJS'],
-	}],
-	location: {
-		address: {
-			type: String,
-			lowercase: true,
-			maxLength: 100,
-			trim: true,
-			default: '315 hazipara mosjid road'
-		},
-		city: {
-			type: String,
-			lowercase: true,
-			maxLength: 100,
-			trim: true,
-			default: 'dhaka'
-		},
-		country: {
-			type: String,
-			lowercase: true,
-			maxLength: 100,
-			trim: true,
-			default: 'bangladesh'
-		},
-	}
+	},
 
 }, {
 	timestamps: true

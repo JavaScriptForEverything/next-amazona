@@ -1,7 +1,10 @@
+import { useState } from 'react'
 import { useSelector } from 'react-redux'
 
+import { description } from '../../data/profile'
 
 import Layout from '../../layout'
+import { toCapitalize } from '../../util'
 
 import Container from '@mui/material/Container'
 import Paper from '@mui/material/Paper'
@@ -10,24 +13,91 @@ import Typography from '@mui/material/Typography'
 import Avatar from '@mui/material/Avatar'
 import TextField from '@mui/material/TextField'
 import Button from '@mui/material/Button'
+import IconButton from '@mui/material/IconButton'
 import Divider from '@mui/material/Divider'
+
+import Menu from '@mui/material/Menu'
+import MenuItem from '@mui/material/MenuItem'
+import ListItemIcon from '@mui/material/ListItemIcon'
+import ListItemText from '@mui/material/ListItemText'
+
 
 import Accordion from '@mui/material/Accordion'
 import AccordionSummary from '@mui/material/AccordionSummary'
 import AccordionDetails from '@mui/material/AccordionDetails'
 
-
 import FileDownloadIcon from '@mui/icons-material/Download'
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
+import MoreVertIcon from '@mui/icons-material/MoreVert'
+import AddIcon from '@mui/icons-material/Add'
+import EditIcon from '@mui/icons-material/Edit'
+import DeleteIcon from '@mui/icons-material/Delete'
 
-import { skills, basic, experiences, description } from '../../data/profile'
-
+const experiencesInfo = [
+	// {label: 'create', icon: <AddIcon />},
+	{label: 'edit', icon: <EditIcon />},
+	{label: 'delete', icon: <DeleteIcon />}
+]
 
 
 
 const UserProfile = () => {
+	const [ menuOpen, setMenuOpen ] = useState(true)
+	const [ anchorEl, setAnchorEl ] = useState()
+
 	const { user } = useSelector(state => state.user)
-	// console.log(user)
+	// console.log({ ...user, avatar: ''})
+	// console.log(user?.skills)
+
+	const menuCloseHandler = () => setMenuOpen(false)
+	const moreVertHandler = (evt) => {
+		setAnchorEl(evt.currentTarget)
+		setMenuOpen(true)
+	}
+	const menuItemHandler = (evt, menuItem) => {
+		menuCloseHandler()
+
+		// edit and delete item
+		console.log(menuItem)
+	}
+	const experienceAddButtonHandler = () => {
+		console.log('open a dialog to insert new experience')
+	}
+
+	const sendMailHandler = () => {
+		console.log('send resume to mail by click on it')
+	}
+
+
+
+	const basic = [
+		{ label: 'Age', value: toCapitalize(user?.age) || '28 Years' },
+		{ label: 'Years of Experience', value: toCapitalize(user?.experience)  || '1 Years' },
+		{ label: 'Phone', value: user?.phone || '01957500605' },
+		{ label: 'CTC', value: '2.5 Lac' },
+		{ label: 'Location', value: toCapitalize(`${user?.location.city} ${user?.location.country}`) || 'Dhaka, Bangladesh'  },
+		{ label: 'Email', value: user?.email || 'javascriptforeverything@gmail.com'  },
+	]
+	const experiences = [
+		{
+			title: 'Pixel Studio',
+			subheader: 'Ux/UI Designer',
+			date: 'Apr 2010',
+			status: 'Present',
+			location: 'Dhaka, Bangladesh',
+			avatar: 'PS',
+			backgroundColor: '#42a5f5'
+		},
+		{
+			title: 'Ramasion Studio',
+			subheader: 'Web Designer',
+			date: 'May 2017',
+			status: 'Present',
+			location: 'Dhaka, Bangladesh',
+			avatar: 'RS',
+			backgroundColor: 'lightPink'
+		},
+	]
 
 	return (
 		<Layout>
@@ -46,7 +116,7 @@ const UserProfile = () => {
 									sx={{ width: 150, height: 150, mb: 1 }}
 								/>
 								<Typography color='primary' sx={{textTransform: 'capitalize'}} >{user?.username}</Typography>
-								<Typography variant='caption' >{user?.title || 'Full Stack Developer'}</Typography>
+								<Typography variant='caption' >{toCapitalize(user?.title) || 'Full Stack Developer'}</Typography>
 								<Typography sx={{ mt: 2 }} variant='body2' color='textSecondary' align='justify' paragraph >
 									{user?.description || description}
 								</Typography>
@@ -56,7 +126,7 @@ const UserProfile = () => {
 							<Divider sx={{ mb: 2 }} />
 
 							<Grid item container sx={{ gap: 1 }} >
-								{skills.map(skill => <Button key={skill}
+								{user?.skills.map(skill => <Button key={skill}
 									variant='outlined'
 									size='small'
 									sx={{ py:.5, px: 2, borderRadius: 4, textTransform: 'Capitalize' }}
@@ -97,7 +167,11 @@ const UserProfile = () => {
 										startIcon={<FileDownloadIcon />}
 										component='a' href='/resume.pdf' download
 										>Download Resume</Button>
-									<Button variant='outlined'  sx={{ textTransform: 'Capitalize' }} >Send Mail</Button>
+									<Button
+										variant='outlined'
+										sx={{ textTransform: 'Capitalize' }}
+										onClick={sendMailHandler}
+									>Send Mail</Button>
 								</Grid>
 							</Grid>
 						</Paper>
@@ -105,11 +179,22 @@ const UserProfile = () => {
 
 					{/*------[ Right: 2nd block ]------*/}
 						<Paper sx={{ p: 2, my: 2 }} >
-							<Typography variant='h5' paragraph >Experience</Typography>
+							<Grid container justifyContent='space-between' >
+								<Grid item> <Typography variant='h5' >Experience</Typography> </Grid>
+								<Grid item>
+									<Button
+										variant='contained'
+										size='small'
+										startIcon={<AddIcon />}
+										onClick={experienceAddButtonHandler}
+									> Add </Button>
+								</Grid>
+							</Grid>
 
 							{ experiences.map((item, key) => (
 								<Grid key={key} sx={{ my: 3 }}>
 									<Grid container direction='row' alignItems='center'>
+										{/*----- 1st item (left)	-----*/}
 										<Grid item xs>
 											<Avatar sx={{
 												width: 70,
@@ -120,8 +205,16 @@ const UserProfile = () => {
 											}} >{item.avatar}</Avatar>
 										</Grid>
 
+										{/*----- 2nd item (Right)	-----*/}
 										<Grid item xs={9} md={10} container direction='column'>
-											<Typography color='primary' >{item.title}</Typography>
+											<Grid container justifyContent='space-between' >
+												<Grid item> <Typography color='primary' >{item.title}</Typography> </Grid>
+												<Grid item>
+													<IconButton onClick={moreVertHandler}>
+														<MoreVertIcon />
+													</IconButton>
+												</Grid>
+											</Grid>
 											<Typography color='textSecondary' variant='caption'>{item.subheader}</Typography>
 											<Typography color='textSecondary' variant='caption'>
 											{item.date} - {item.status} | {item.location}</Typography>
@@ -130,11 +223,27 @@ const UserProfile = () => {
 
 									<Grid container>
 										<Grid item xs> </Grid>
-										<Grid item xs={9} md={10}> <Divider sx={{ display: 'block' }} /> </Grid>
+										<Grid item xs={9} md={10}> <Divider sx={{ mt: 1 }} /> </Grid>
 									</Grid>
 								</Grid>
 							))}
 						</Paper>
+
+						<Menu
+							open={menuOpen}
+							anchorEl={anchorEl}
+							onClose={menuCloseHandler}
+						>
+							{experiencesInfo.map((item, key, arr) => <MenuItem key={key}
+								dense
+								divider={item.label !== arr[arr.length - 1].label}
+								onClick={(evt) => menuItemHandler(evt, item.label)}
+							>
+								<ListItemIcon>{item.icon}</ListItemIcon>
+								<ListItemText>{item.label}</ListItemText>
+							</MenuItem>
+							)}
+						</Menu>
 
 					{/*------[ Right: 3rd block ]------*/}
 					<Grid sx={{ display: 'flex', flexDirection: 'column', gap: 2 }} >
