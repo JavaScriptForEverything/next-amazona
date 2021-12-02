@@ -27,10 +27,6 @@ const userSchema = new Schema({
 		required: true,
 		validate: function() { return this.password === this.confirmPassword }
 	},
-	avatar: {
-		type: String,
-		default: '/user.jpg'
-	},
 	isAdmin: {
 		type: Boolean,
 		default: false
@@ -39,6 +35,58 @@ const userSchema = new Schema({
 	passwordResetToken: String, 		// required to reset password
 	passwordResetExpires: Date, 		// required to make token expire after given time
 	passwordChangedAt: Date, 				// required to make token invalid after modify password
+
+	// user details
+	avatar: {
+		type: String,
+		default: '/user.jpg'
+	},
+	title: {
+		type: String,
+		lowercase: true,
+		default: 'full stack developer'
+	},
+	description: {
+		type: String,
+		// required: true,
+		lowercase: true,
+		// minLength: 100, 			// for
+		maxLength: 500,
+		trim: true,
+		default: 'about user skill experiences details ...lorem'
+	},
+	skills: [{
+		type: String,
+		enum: ['reactjs', 'redux', 'material-ui', 'nodejs', 'mongodb', 'expressjs'],
+		lowercase: true,
+		maxLength: 50,
+		trim: true,
+		default: ['ReactJs', 'Redux', 'Material-UI', 'NodeJs', 'MongoDB', 'ExpressJS'],
+	}],
+	location: {
+		address: {
+			type: String,
+			lowercase: true,
+			maxLength: 100,
+			trim: true,
+			default: '315 hazipara mosjid road'
+		},
+		city: {
+			type: String,
+			lowercase: true,
+			maxLength: 100,
+			trim: true,
+			default: 'dhaka'
+		},
+		country: {
+			type: String,
+			lowercase: true,
+			maxLength: 100,
+			trim: true,
+			default: 'bangladesh'
+		},
+	}
+
 }, {
 	timestamps: true
 })

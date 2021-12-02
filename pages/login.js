@@ -1,6 +1,5 @@
-import { useRouter } from 'next/router'
 import Link from 'next/link'
-
+import { useRouter } from 'next/router'
 import { useState, useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { showAlert } from '../store/dialogReducer'
@@ -49,28 +48,28 @@ const Login = () => {
 	const [signupFields, setSignupFields] = useState({username: '', email: '', password: '', confirmPassword: '', avatar: ''})
 	const [signupFieldErrors, setSignupFieldErrors] = useState({})
 
-	const { authenticated, error } = useSelector(state => state.user)
-
-
-	useEffect(() => {
-		(authenticated) && router.push(redirect || '/user/profile')
-	}, [authenticated])
-
+	const { error, authenticated, isSignedUp } = useSelector(state => state.user)
 
 	const tabHandler = (evt, newValue) => setValue(newValue)
+	useEffect(() => {
+		if(error) return dispatch(showAlert({ open: true, severity: 'error', message: error}))
+		if(authenticated) return router.push(redirect || '/user/profile')
+		if(isSignedUp) {
+			dispatch(showAlert({ open: true, severity: 'success', message: 'Congratulation To join our community !!!'}))
+			tabHandler(null, 0) 		// if signup success then redirect to login page
+		}
+	}, [error, authenticated, isSignedUp])
+
+
 
 	// -----------[ Login Form ]-----------
-	const handleLoginForm = (evt) => {
+	const handleLoginForm = async (evt) => {
 		evt.preventDefault()
 
 		const isValidated = formValidator(loginFields, setLoginFieldErrors)
 		if(!isValidated) return
 
-		/* Shend Data to Backend + Set token into Store + change authenticated to true in store,
-			 so that no need page refresing to take immediately login */
-
 		dispatch(loginMe(loginFields))
-		router.push(redirect || '/user/profile')
 	}
 
 	// -----------[ Sign Up Form ]-----------
@@ -78,23 +77,12 @@ const Login = () => {
 		evt.preventDefault()
 
 		const isValidated = formValidator(signupFields, setSignupFieldErrors)
-		if(!isValidated) return
+		if(!isValidated) return 		// client-side validation
 
-
-		/* When we try to read from store it takes some time (event it happen very quickly)
-				So our next code execure event error exist in tore,
-					we wait this line, now our code wait until dispatch not finshed, That's what we want. */
-		await dispatch(signUpMe(signupFields))
-
-// Error message show success on first time
-		if(error) return dispatch(showAlert({ open: true, severity: 'error', message: error}))
-
-		// error alert will be handeld by hook, only success alert handle here.
-		const message = 'Congratulation To join our community !!!'
-		dispatch(showAlert({ open: true, severity: 'success', message}))
+		dispatch(signUpMe(signupFields))
 
 		// 3. Redirect to login (But we already in Login Page, We have to switch to login TAB ?)
-		tabHandler(null, 0) 		// Switch to Login Tab (Do the Redirect Effect)
+		// tabHandler(null, 0) 		// Switch to Login Tab (Do the Redirect Effect)
 	}
 
 	return (

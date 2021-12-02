@@ -13,6 +13,7 @@ const { reducer, actions } = createSlice({
 		loading: false, 					// Required to add loading features
 		authenticated: token && !!token || false,
 		token,
+		isSignedUp: false
 	},
 	reducers: {
 		requested: (state, action) => ({
@@ -28,17 +29,17 @@ const { reducer, actions } = createSlice({
 
 		logedIn: (state, action) => {
 			const { token } = action.payload
-
 			if(!token) return { ...state, loading: false }
-			localStorage.setItem('token', token)
 
+			localStorage.setItem('token', token)
 			return { ...state, loading: false, authenticated: true, token }
 		},
 		logedOut: (state, action) => {
 			localStorage.removeItem('token')
 			return {...state, loading: false, authenticated: false, }
 		},
-		signedUp: (state, action) => ({ ...state, loading: false }),
+		signedUp: (state, action) => ({ ...state, loading: false, isSignedUp: !!action.payload }),
+
 		tokenSent: (state, action) => ({ ...state, loading: false }),
 		getMe: (state, action) => ({
 			...state,
@@ -69,6 +70,7 @@ export default reducer
 export const loginMe = (obj) => catchAsyncDispatch(async (dispatch, getStore) => {
 	dispatch(actions.requested())
 	const { data } = await axios.post(`/api/users/login`, obj)
+
 	dispatch(actions.logedIn(data))
 }, actions.failed)
 
@@ -87,7 +89,7 @@ export const logoutMe = () => (dispatch) => dispatch(actions.logedOut())
 export const signUpMe = (obj) => catchAsyncDispatch(async (dispatch) => {
 	dispatch(actions.requested())
 	const { data } = await axios.post('/api/users/signup', obj)
-	dispatch(actions.signedUp())
+	dispatch(actions.signedUp(data))
 }, actions.failed)
 
 
