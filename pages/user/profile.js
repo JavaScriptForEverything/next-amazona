@@ -5,7 +5,6 @@ import { useSelector } from 'react-redux'
 import Layout from '../../layout'
 import { toCapitalize } from '../../util'
 import { description } from '../../data/profile'
-import StyledAvatar from '../../components/styledAvatar'
 
 import Container from '@mui/material/Container'
 import Paper from '@mui/material/Paper'
@@ -27,6 +26,7 @@ import Accordion from '@mui/material/Accordion'
 import AccordionSummary from '@mui/material/AccordionSummary'
 import AccordionDetails from '@mui/material/AccordionDetails'
 
+import UploadIcon from '@mui/icons-material/Upload'
 import FileDownloadIcon from '@mui/icons-material/Download'
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
 import MoreVertIcon from '@mui/icons-material/MoreVert'
@@ -34,6 +34,10 @@ import AddIcon from '@mui/icons-material/Add'
 import EditIcon from '@mui/icons-material/Edit'
 import DeleteIcon from '@mui/icons-material/Delete'
 
+const avatarMenuItems = [
+	{label: 'Upload Photo', icon: <UploadIcon />},
+	{label: 'Delete Photo', icon: <DeleteIcon />}
+]
 const experiencesInfo = [
 	// {label: 'create', icon: <AddIcon />},
 	{label: 'Update', icon: <EditIcon />},
@@ -43,17 +47,32 @@ const experiencesInfo = [
 
 
 const UserProfile = () => {
-	const [ menuOpen, setMenuOpen ] = useState(false)
-	const [ anchorEl, setAnchorEl ] = useState()
+	const [ avatarOpen, setAvatarOpen ] = useState(false)
+	const [ avatarAnchorEl, setAvatarAnchorEl ] = useState()
+
+	const [ experienceMenuOpen, setExperienceMenuOpen ] = useState(false)
+	const [ experienceAnchorEl, setExperienceAnchorEl ] = useState()
 
 	const { user } = useSelector(state => state.user)
 	// console.log({ ...user, avatar: ''})
 	// console.log(user?.skills)
 
-	const menuCloseHandler = () => setMenuOpen(false)
+	const avatarMenuCloseHandler = () => setAvatarOpen(false)
+	const profileAvatarClickHandler = (evt) => {
+		setAvatarAnchorEl(evt.currentTarget)
+		setAvatarOpen(true)
+	}
+	const avatarMenuItemHandler = (evt, item) => {
+		setAvatarOpen(false)
+		setAvatarAnchorEl(null)
+		console.log(item)
+	}
+
+
+	const menuCloseHandler = () => setExperienceMenuOpen(false)
 	const moreVertHandler = (evt) => {
-		setAnchorEl(evt.currentTarget)
-		setMenuOpen(true)
+		setExperienceAnchorEl(evt.currentTarget)
+		setExperienceMenuOpen(true)
 	}
 	const menuItemHandler = (evt, menuItem) => {
 		menuCloseHandler()
@@ -73,9 +92,6 @@ const UserProfile = () => {
 		console.log('open a dialog to edit basic info')
 	}
 
-	const profileAvatarClickHandler = () => {
-		console.log('clicked')
-	}
 
 	const basic = [
 		{ label: 'Age', value: toCapitalize(user?.age) || '28 Years' },
@@ -116,21 +132,56 @@ const UserProfile = () => {
 					<Grid item xs={12} sm={4} >
 						<Paper sx={{ p: 2 }} >
 							<Grid container direction='column' alignItems='center' >
-								<StyledAvatar
-									src={user?.avatar}
-									alt={user?.avatar}
-									title={user?.username || 'user avatar'}
-									sx={{ width: 150, height: 150, mb: 1 }}
-									active={false}
-									onClick={profileAvatarClickHandler}
-									// onClick={ evt => profileAvatarClickHandler(evt)}
-								/>
+								<IconButton onClick={profileAvatarClickHandler} component='section' >
+									<div style={{
+										position: 'relative'
+									}}>
+
+									<Avatar
+										src={user?.avatar}
+										alt={user?.avatar}
+										title={user?.username || 'user avatar'}
+										sx={{ width: 150, height: 150, mb: 1 }}
+									/>
+									<div style={{
+										position: 'absolute',
+										bottom: 10,
+										left: 0,
+									}}>
+										<Button
+											color='inherit'
+											size='small'
+											variant='contained'
+											startIcon={<EditIcon />}
+										>Edit</Button>
+									</div>
+
+									</div>
+								</IconButton>
 								<Typography color='primary' sx={{textTransform: 'capitalize'}} >{user?.username}</Typography>
 								<Typography variant='caption' >{toCapitalize(user?.title) || 'Full Stack Developer'}</Typography>
 								<Typography sx={{ mt: 2 }} variant='body2' color='textSecondary' align='justify' paragraph >
 									{user?.description || description}
 								</Typography>
 							</Grid>
+							<Menu
+								open={avatarOpen}
+								anchorEl={avatarAnchorEl}
+								onClose={avatarMenuCloseHandler}
+								anchorOrigin={{ vertical: 'center', horizontal: 'center' }}
+    						// transformOrigin={{ vertical: 'top', horizontal: 'center' }}
+							>
+								{avatarMenuItems.map(({label, icon}, key, items) => (
+									<MenuItem key={key}
+										onClick={(evt) => avatarMenuItemHandler(evt, label)}
+										dense
+										divider={ label !== items[items.length - 1].label}
+									>
+										<ListItemIcon>{icon}</ListItemIcon>
+										<ListItemText>{label}</ListItemText>
+									</MenuItem>
+								))}
+							</Menu>
 
 							<Grid container justifyContent='space-between' >
 								<Grid item> <Typography variant='h5' >Skills</Typography> </Grid>
@@ -253,8 +304,8 @@ const UserProfile = () => {
 							))}
 						</Paper>
 						<Menu
-							open={menuOpen}
-							anchorEl={anchorEl}
+							open={experienceMenuOpen}
+							anchorEl={experienceAnchorEl}
 							onClose={menuCloseHandler}
 						>
 							{experiencesInfo.map((item, key, arr) => <MenuItem key={key}
