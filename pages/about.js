@@ -9,32 +9,27 @@ import Layout from '../layout'
 import Typography from '@mui/material/Typography'
 import MuiLink from '@mui/material/Link'
 import Card from '@mui/material/Card'
-import Avatar from '@mui/material/Avatar'
+import AvatarGroup from '@mui/material/AvatarGroup'
+import IconButton from '@mui/material/IconButton'
+
+
+import StyledAvatar from '../components/styledAvatar'
+
 
 const About = () => {
-	// if(false) return <Error statusCode={400} />
-	// const dispatch = useDispatch()
-	// const { token } = useSelector(state => state.user)
-
-	// useEffect(() => {
-	// 	dispatch(getUser2(token))
-	// }, [token])
 
 	return (
 		<Layout title='about page'>
 			<Typography>About Page</Typography>
 
-			<Link href='/user/profile' passHref >
-				<MuiLink>profile</MuiLink>
-			</Link>
 
-
-			<Card sx={{ display: 'flex', flexDirection: 'column',
-			alignItems: 'center', gap: 0.5 }} >
-				<Avatar />
-				<Typography>Riajul Islam</Typography>
-				<Link href='/user/profile' passHref><MuiLink>My Profile</MuiLink></Link>
-			</Card>
+			<StyledAvatar
+				active
+				// onClick={() => console.log('clicked')}
+				// onClick={'hallow'}
+				src='/user.jpg'
+				// sx={{ width: '2rem', height: '2rem' }}
+			/>
 
 
 		</Layout>

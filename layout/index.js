@@ -7,6 +7,7 @@ import Link from 'next/link'
 import { useRouter } from 'next/router'
 
 import Snackbar from './snackbar'
+import StyledAvatar from '../components/styledAvatar'
 
 import { ThemeProvider } from '@mui/material/styles'
 import theme from './theme'
@@ -134,7 +135,7 @@ const Layout = ({ title, description, children }) => {
 						<NoSsr>
 						{ authenticated ? (
 							<IconButton color='inherit' onClick={menuHandler} sx={{ ml: 2 }} >
-								<Avatar sx={{ width: '2rem', height: '2rem' }} src={user?.avatar} />
+								<StyledAvatar sx={{ width: '2rem', height: '2rem' }} src={user?.avatar} />
 								<Typography sx={{ ml: 1, display: {xs: 'none', sm: 'block'} }}>
 									{user?.username.split(' ').shift()} </Typography>
 								</IconButton>
@@ -155,9 +156,10 @@ const Layout = ({ title, description, children }) => {
 							}}
 						>
 							<Box sx={{display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 0.5, my: 2 }} >
-								<Avatar
+								<StyledAvatar
 									src={user?.avatar}
 									alt={user?.avatar}
+									onClick={f =>router.push('/user/profile')}
 								/>
 								<Typography sx={{textTransform: 'capitalize'}} >{user?.username}</Typography>
 								<Link href='/user/profile' passHref><MuiLink>My Profile</MuiLink></Link>
