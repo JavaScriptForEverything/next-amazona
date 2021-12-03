@@ -34,31 +34,16 @@ const StyledBadge = styled(Badge)(({ theme }) => ({
 }))
 
 
-const StyledAvatar = ({ active=true, onClick=f=>f, ...props}) => {
-	const handler = onClick.constructor === Function 		// is diven value is function or not
+const StyledAvatar = ({ active=true, ...props}) => (
+	<StyledBadge
+		variant={active ? 'dot' : 'standard'}
+		overlap='circular'
+  	anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+	>
+		<Avatar {...props}  />
+	</StyledBadge>
+)
 
-	if(!handler) return (
-		<StyledBadge
-			variant={active ? 'dot' : 'standard'}
-			overlap='circular'
-	  	anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
-		>
-			<Avatar {...props}  />
-		</StyledBadge>
-	)
-
-	return (
-		<IconButton onClick={onClick}>
-			<StyledBadge
-				variant={active ? 'dot' : 'standard'}
-				overlap='circular'
-		  	anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
-			>
-				<Avatar {...props}  />
-			</StyledBadge>
-		</IconButton>
-	)
-}
 
 export default StyledAvatar
 

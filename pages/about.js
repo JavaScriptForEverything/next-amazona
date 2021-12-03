@@ -9,7 +9,7 @@ import Layout from '../layout'
 import Typography from '@mui/material/Typography'
 import MuiLink from '@mui/material/Link'
 import Card from '@mui/material/Card'
-import AvatarGroup from '@mui/material/AvatarGroup'
+import Avatar from '@mui/material/Avatar'
 import IconButton from '@mui/material/IconButton'
 
 
@@ -17,19 +17,19 @@ import StyledAvatar from '../components/styledAvatar'
 
 
 const About = () => {
+	const menuHandler = () => {}
+	const user = {}
 
 	return (
 		<Layout title='about page'>
 			<Typography>About Page</Typography>
 
+			<IconButton color='inherit' onClick={menuHandler} sx={{ ml: 2 }} >
+				<StyledAvatar sx={{ width: '2rem', height: '2rem' }} src={user?.avatar} />
+				<Typography sx={{ ml: 1, display: {xs: 'none', sm: 'block'} }}> {user?.username?.split(' ').shift()} </Typography>
+			</IconButton>
 
-			<StyledAvatar
-				active
-				// onClick={() => console.log('clicked')}
-				// onClick={'hallow'}
-				src='/user.jpg'
-				// sx={{ width: '2rem', height: '2rem' }}
-			/>
+			<Typography>About Page</Typography>
 
 
 		</Layout>

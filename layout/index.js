@@ -138,7 +138,7 @@ const Layout = ({ title, description, children }) => {
 								<StyledAvatar sx={{ width: '2rem', height: '2rem' }} src={user?.avatar} />
 								<Typography sx={{ ml: 1, display: {xs: 'none', sm: 'block'} }}>
 									{user?.username.split(' ').shift()} </Typography>
-								</IconButton>
+							</IconButton>
 						) : (
 							<Link href='/login'>
 								<Button color='inherit' sx={{ textTransform: 'capitalize' }} >Login</Button>
@@ -156,11 +156,12 @@ const Layout = ({ title, description, children }) => {
 							}}
 						>
 							<Box sx={{display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 0.5, my: 2 }} >
+							<IconButton onClick={f =>router.push('/user/profile')} >
 								<StyledAvatar
 									src={user?.avatar}
 									alt={user?.avatar}
-									onClick={f =>router.push('/user/profile')}
 								/>
+							</IconButton>
 								<Typography sx={{textTransform: 'capitalize'}} >{user?.username}</Typography>
 								<Link href='/user/profile' passHref><MuiLink>My Profile</MuiLink></Link>
 							</Box>
