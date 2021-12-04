@@ -69,3 +69,22 @@ export const formValidator = (obj, errorStateUpdateMethod, requireLength=4) => {
 	errorStateUpdateMethod(errorObj)
 	return Object.keys(errorObj).every(item => item === '')
 }
+
+
+export const readAsDataURL = (file, setMethod) => {
+	if(!file) return console.error('pass a file as argument')
+	if(!setMethod || setMethod.constructor !== Function) {
+		return console.error('2nd argument (as setState) required')
+	}
+
+	const isImage = file.type.match('image/*')
+	if(!isImage) return console.error('You must have to pass image')
+
+	const reader = new FileReader()
+	reader.readAsDataURL(file)
+	reader.addEventListener('load', () => {
+		if(reader.readyState === 2) setMethod( reader.result )
+	})
+}
+
+

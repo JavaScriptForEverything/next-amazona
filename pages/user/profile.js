@@ -3,7 +3,7 @@ import { useSelector } from 'react-redux'
 
 
 import Layout from '../../layout'
-import { toCapitalize } from '../../util'
+import { toCapitalize, readAsDataURL } from '../../util'
 import { description } from '../../data/profile'
 
 import Container from '@mui/material/Container'
@@ -46,9 +46,12 @@ const experiencesInfo = [
 
 
 
+
+
 const UserProfile = () => {
 	const [ avatarOpen, setAvatarOpen ] = useState(false)
 	const [ avatarAnchorEl, setAvatarAnchorEl ] = useState()
+	const [ avatarFile, setAvatarFile ] = useState()
 
 	const [ experienceMenuOpen, setExperienceMenuOpen ] = useState(false)
 	const [ experienceAnchorEl, setExperienceAnchorEl ] = useState()
@@ -57,18 +60,29 @@ const UserProfile = () => {
 	// console.log({ ...user, avatar: ''})
 	// console.log(user?.skills)
 
+	console.log({ avatarFile })
+
+
+
+
 	const avatarMenuCloseHandler = () => setAvatarOpen(false)
 	const profileAvatarClickHandler = (evt) => {
 		setAvatarAnchorEl(evt.currentTarget)
 		setAvatarOpen(true)
 	}
-	const avatarMenuItemHandler = (evt, item) => {
-		setAvatarOpen(false)
-		setAvatarAnchorEl(null)
-		console.log(item)
+	const avatarMenuItemHandler = (evt, label, items) => {
+		if(label === items[0].label) return 	// if not upload file menu item
+		setAvatarOpen(false) 		// immediately close menu Popup
+
+		console.log(label)
+		setAvatarFile('') 			// make file upload value empty
+	}
+	const inputFileChangeHandler = (evt) => {
+		readAsDataURL(evt.target.files[0], setAvatarFile)
 	}
 
 
+	// Experience Items: 		MoreVertIcon
 	const menuCloseHandler = () => setExperienceMenuOpen(false)
 	const moreVertHandler = (evt) => {
 		setExperienceAnchorEl(evt.currentTarget)
@@ -83,6 +97,8 @@ const UserProfile = () => {
 	const experienceAddButtonHandler = () => {
 		console.log('open a dialog to insert new experience')
 	}
+
+
 
 	const sendMailHandler = () => {
 		console.log('send resume to mail by click on it')
@@ -173,12 +189,14 @@ const UserProfile = () => {
 							>
 								{avatarMenuItems.map(({label, icon}, key, items) => (
 									<MenuItem key={key}
-										onClick={(evt) => avatarMenuItemHandler(evt, label)}
+										onClick={(evt) => avatarMenuItemHandler(evt, label, items)}
 										dense
 										divider={ label !== items[items.length - 1].label}
+										component={ items[0].label === label ? 'label' : 'li'}
 									>
 										<ListItemIcon>{icon}</ListItemIcon>
 										<ListItemText>{label}</ListItemText>
+										{label === items[0].label && <input type='file' accept='image/*' hidden onChange={inputFileChangeHandler} /> }
 									</MenuItem>
 								))}
 							</Menu>

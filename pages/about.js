@@ -1,4 +1,4 @@
-// import { useEffect } from 'react'
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
 // import Error from 'next/error'
 // import { useDispatch, useSelector } from 'react-redux'
@@ -11,25 +11,30 @@ import MuiLink from '@mui/material/Link'
 import Card from '@mui/material/Card'
 import Avatar from '@mui/material/Avatar'
 import IconButton from '@mui/material/IconButton'
+import Button from '@mui/material/Button'
+import Menu from '@mui/material/Menu'
+import MenuItem from '@mui/material/MenuItem'
 
+import Dialog from '@mui/material/Dialog'
+import DialogTitle from '@mui/material/DialogTitle'
+import DialogContent from '@mui/material/DialogContent'
+import DialogContentText from '@mui/material/DialogContentText'
+import DialogActions from '@mui/material/DialogActions'
 
-import StyledAvatar from '../components/styledAvatar'
+import TextField from '@mui/material/TextField'
+
+import UploadPhoto from '../components/dialog/uploadPhoto'
 
 
 const About = () => {
-	const menuHandler = () => {}
-	const user = {}
+	const [open, setOpen] = useState(false)
 
 	return (
 		<Layout title='about page'>
 			<Typography>About Page</Typography>
 
-			<IconButton color='inherit' onClick={menuHandler} sx={{ ml: 2 }} >
-				<StyledAvatar sx={{ width: '2rem', height: '2rem' }} src={user?.avatar} />
-				<Typography sx={{ ml: 1, display: {xs: 'none', sm: 'block'} }}> {user?.username?.split(' ').shift()} </Typography>
-			</IconButton>
-
-			<Typography>About Page</Typography>
+				<Button variant='contained' onClick={() => setOpen(true)}>Open Dialog</Button>
+				<UploadPhoto open={open} setOpen={setOpen} />
 
 
 		</Layout>
