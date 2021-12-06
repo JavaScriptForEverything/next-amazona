@@ -59,7 +59,7 @@ const userSchema = new Schema({
 		lowercase: true,
 		maxLength: 50,
 		trim: true,
-		default: ['ReactJs', 'Redux', 'Material-UI', 'NodeJs', 'MongoDB', 'ExpressJS'],
+		default: ['ReactJS', 'Redux', 'Material-UI', 'NodeJS', 'MongoDB', 'ExpressJS'],
 	},
 
 }, {

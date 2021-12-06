@@ -16,25 +16,38 @@ import Menu from '@mui/material/Menu'
 import MenuItem from '@mui/material/MenuItem'
 
 import Dialog from '@mui/material/Dialog'
-import DialogTitle from '@mui/material/DialogTitle'
-import DialogContent from '@mui/material/DialogContent'
-import DialogContentText from '@mui/material/DialogContentText'
-import DialogActions from '@mui/material/DialogActions'
+import FormControlLabel from '@mui/material/FormControlLabel'
+import Switch from '@mui/material/Switch'
 
 import TextField from '@mui/material/TextField'
-
-import UploadPhoto from '../components/dialog/uploadPhoto'
+import UpdateProfileSkills from '../components/dialog/updateProfileSkills'
 
 
 const About = () => {
 	const [open, setOpen] = useState(false)
+	const [checked, setChecked] = useState(false)
 
 	return (
 		<Layout title='about page'>
 			<Typography>About Page</Typography>
 
 				<Button variant='contained' onClick={() => setOpen(true)}>Open Dialog</Button>
-				<UploadPhoto open={open} setOpen={setOpen} />
+				<UpdateProfileSkills open={open} setOpen={setOpen} />
+
+				<br />
+
+				<TextField
+					label='Username'
+				/> <br />
+				<FormControlLabel
+					label={!checked ? 'Remove' : 'Add'}
+					labelPlacement='end'
+					control={<Switch
+						color='primary'
+						checked={checked}
+						onChange={() => setChecked(check => !check)}
+					/>}
+				/>
 
 
 		</Layout>

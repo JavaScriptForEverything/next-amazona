@@ -5,6 +5,7 @@ import { useSelector } from 'react-redux'
 import Layout from '../../layout'
 import { toCapitalize, readAsDataURL } from '../../util'
 import { description } from '../../data/profile'
+import UpdateProfileSkills from '../../components/dialog/updateProfileSkills'
 
 import Container from '@mui/material/Container'
 import Paper from '@mui/material/Paper'
@@ -58,9 +59,13 @@ const UserProfile = () => {
 
 	const { user } = useSelector(state => state.user)
 	// console.log({ ...user, avatar: ''})
-	// console.log(user?.skills)
+	// console.log(user)
 
-	console.log({ avatarFile })
+	const [ openSkill, setOpenSkill ] = useState(false)
+
+
+
+	// console.log({ avatarFile })
 
 
 
@@ -140,6 +145,10 @@ const UserProfile = () => {
 
 	return (
 		<Layout>
+
+			{/*-----[ dialog/models ]------*/}
+			{ user && <UpdateProfileSkills open={openSkill} setOpen={setOpenSkill} user={user} /> }
+
 			<Container sx={{ my: 3 }} >
 				{/*-----[ start coding bellow here ]------*/}
 
@@ -185,7 +194,6 @@ const UserProfile = () => {
 								anchorEl={avatarAnchorEl}
 								onClose={avatarMenuCloseHandler}
 								anchorOrigin={{ vertical: 'center', horizontal: 'center' }}
-    						// transformOrigin={{ vertical: 'top', horizontal: 'center' }}
 							>
 								{avatarMenuItems.map(({label, icon}, key, items) => (
 									<MenuItem key={key}
@@ -204,8 +212,8 @@ const UserProfile = () => {
 							<Grid container justifyContent='space-between' >
 								<Grid item> <Typography variant='h5' >Skills</Typography> </Grid>
 								<Grid item>
-									<IconButton onClick={basicEditButtonHandler} >
-										<EditIcon fontSize='small' />
+									<IconButton onClick={() => setOpenSkill(true)} >
+										<EditIcon fontSize='small' color='primary' />
 									</IconButton>
 								</Grid>
 							</Grid>
