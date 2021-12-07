@@ -118,8 +118,8 @@ const Checkout = () => {
 								{ activeStep === 3 ? 'Home' : 'Back' }
 							</Button> : '' }
 
-							<Button type='submit' variant='outlined'disabled={loading || activeStep >= 1 && !totalPrice} >
-								{ activeStep === 2 ? loading ? <CircularProgress size={24} /> : 'Pay' : activeStep === 3 ? 'Success' : 'Next' }
+							<Button type='submit' variant='outlined' disabled={loading || (activeStep >= 1 && !totalPrice) 	|| (activeStep === 3)} >
+								{ activeStep === 2 ? (loading ? <CircularProgress size={24} /> : 'Pay') : (activeStep === 3 ? 'Success' : 'Next') }
 							</Button>
 						</Box>
 					</form>

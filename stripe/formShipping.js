@@ -27,6 +27,8 @@ const ShippingForm = () => {
 			country: {emoji: country?.emoji, name: country?.name}
 		}))
 	}
+	console.log(shippingObj.country)
+
 
 	return (
 		<Box>

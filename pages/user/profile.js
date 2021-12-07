@@ -5,7 +5,10 @@ import { useSelector } from 'react-redux'
 import Layout from '../../layout'
 import { toCapitalize, readAsDataURL } from '../../util'
 import { description } from '../../data/profile'
-import UpdateProfileSkills from '../../components/dialog/updateProfileSkills'
+import ProfileSkills from '../../components/dialog/profileSkills'
+import ProfileBasicInfo from '../../components/dialog/profileBasicInfo'
+import ProfileSendMail from '../../components/dialog/profileSendMail'
+import ProfileAddExperience from '../../components/dialog/profileAddExperience'
 
 import Container from '@mui/material/Container'
 import Paper from '@mui/material/Paper'
@@ -61,7 +64,10 @@ const UserProfile = () => {
 	// console.log({ ...user, avatar: ''})
 	// console.log(user)
 
-	const [ openSkill, setOpenSkill ] = useState(false)
+	const [ openSkill, setOpenSkill ] = useState(false) 	// profile Skill handler
+	const [ openBasic, setOpenBasic ] = useState(false) 	// profile Basic Info handler
+	const [ openMail, setOpenMail ] = useState(false) 		// profile Basic Send Mail Button handler
+	const [ openAddExperience, setOpenAddExperience ] = useState(false)
 
 
 
@@ -99,19 +105,13 @@ const UserProfile = () => {
 		// edit and delete item
 		console.log(menuItem)
 	}
-	const experienceAddButtonHandler = () => {
-		console.log('open a dialog to insert new experience')
-	}
+
+	const profileSkillHandler = () => setOpenSkill(true)
+	const basicEditButtonHandler = () => setOpenBasic(true)
+	const sendMailHandler = () => setOpenMail(true)
+	const experienceAddButtonHandler = () => setOpenAddExperience(true)
 
 
-
-	const sendMailHandler = () => {
-		console.log('send resume to mail by click on it')
-	}
-
-	const basicEditButtonHandler = () => {
-		console.log('open a dialog to edit basic info')
-	}
 
 
 	const basic = [
@@ -129,7 +129,6 @@ const UserProfile = () => {
 			date: 'Apr 2010',
 			status: 'Present',
 			location: 'Dhaka, Bangladesh',
-			avatar: 'PS',
 			backgroundColor: '#42a5f5'
 		},
 		{
@@ -138,7 +137,6 @@ const UserProfile = () => {
 			date: 'May 2017',
 			status: 'Present',
 			location: 'Dhaka, Bangladesh',
-			avatar: 'RS',
 			backgroundColor: 'lightPink'
 		},
 	]
@@ -147,7 +145,10 @@ const UserProfile = () => {
 		<Layout>
 
 			{/*-----[ dialog/models ]------*/}
-			{ user && <UpdateProfileSkills open={openSkill} setOpen={setOpenSkill} user={user} /> }
+			{ user && <ProfileSkills open={openSkill} setOpen={setOpenSkill} user={user} /> }
+			{ user && <ProfileBasicInfo open={openBasic} setOpen={setOpenBasic} user={user} /> }
+			{ user && <ProfileSendMail open={openMail} setOpen={setOpenMail} user={user} /> }
+			{ user && <ProfileAddExperience open={openAddExperience} setOpen={setOpenAddExperience} user={user} /> }
 
 			<Container sx={{ my: 3 }} >
 				{/*-----[ start coding bellow here ]------*/}
@@ -212,8 +213,8 @@ const UserProfile = () => {
 							<Grid container justifyContent='space-between' >
 								<Grid item> <Typography variant='h5' >Skills</Typography> </Grid>
 								<Grid item>
-									<IconButton onClick={() => setOpenSkill(true)} >
-										<EditIcon fontSize='small' color='primary' />
+									<IconButton onClick={profileSkillHandler} >
+										<EditIcon fontSize='small' />
 									</IconButton>
 								</Grid>
 							</Grid>
@@ -297,13 +298,9 @@ const UserProfile = () => {
 									<Grid container direction='row' alignItems='center'>
 										{/*----- 1st item (left)	-----*/}
 										<Grid item xs>
-											<Avatar sx={{
-												width: 70,
-												height: 70,
-												// backgroundColor: (theme) => theme.palette.primary.light,
-												backgroundColor: item.backgroundColor
-
-											}} >{item.avatar}</Avatar>
+											<Avatar sx={{width: 70, height: 70, backgroundColor: item.backgroundColor }} >
+												{item.title.split(' ').map(word => word[0]).join('').toUpperCase()}
+											</Avatar>
 										</Grid>
 
 										{/*----- 2nd item (Right)	-----*/}

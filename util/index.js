@@ -2,6 +2,9 @@ import { isEmail } from 'validator'
 import Box from '@mui/material/Box'
 
 
+// Replace every Zero with random number + always return 6 digit long hex code
+export const randomHexColor = "#000000".replace(/0/g,() => (~~(Math.random()*16)).toString(16) )
+
 
 export const catchAsyncDispatch = (fn, showError=f=>f) => (dispatch, getStore) => fn(dispatch, getStore).catch(err => {
 	const message = err.response?.data.message || err.message
@@ -68,6 +71,7 @@ export const formValidator = (obj, errorStateUpdateMethod, requireLength=4) => {
 
 	errorStateUpdateMethod(errorObj)
 	return Object.keys(errorObj).every(item => item === '')
+	// it should be Object.values() but still works fine
 }
 
 

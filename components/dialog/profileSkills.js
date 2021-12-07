@@ -12,6 +12,7 @@ import IconButton from '@mui/material/IconButton'
 import Avatar from '@mui/material/Avatar'
 import FormControlLabel from '@mui/material/FormControlLabel'
 import Switch from '@mui/material/Switch'
+import Alert from '@mui/material/Alert'
 
 import ClearIcon from '@mui/icons-material/Clear'
 import PersonIcon from '@mui/icons-material/Person'
@@ -22,13 +23,13 @@ const optionsItems = ['None', 'ReactJS', 'Redux', 'Material-UI', 'NodeJS', 'Mong
 
 const FormDialog = ({ open, setOpen, user={} }) => {
 	const [ disabled, setDisabled ] = useState(false)
-	const [ skillError, setSkillError ] = useState()
 	const [ isUpdated, setIsUpdated ] = useState(false)
 	const [ checked, setChecked ] = useState(false) 				// Controll Switch Component
 
-	const [ skills, setSkills ] = useState(user.skills || [])
 	const [ options, setOptions ] = useState(optionsItems)
+	const [ skills, setSkills ] = useState(user.skills || [])
 	const [ skill, setSkill ] = useState(options[0])
+	const [ skillError, setSkillError ] = useState()
 
 	// console.log({ skills })
 
@@ -56,6 +57,7 @@ const FormDialog = ({ open, setOpen, user={} }) => {
 	const closeHandler = () => setOpen(false)
 	const resetHandler = (evt) => {
 		setSkill('') 									// clear skill state value + autoComplete
+		setIsUpdated(false) 					// add updated text after added to skills array
 		// evt.target.form.reset() 		// reset form
 	}
 	const submitHandler = (evt) => {
@@ -67,16 +69,13 @@ const FormDialog = ({ open, setOpen, user={} }) => {
 			const filtered = skills.filter(item => item !== skill)
 			setOptions([...filtered ]) 		// remove to make remove features handly
 			setSkills([...filtered ]) 		// add item to skills array
-			setIsUpdated(true) 						// add updated text after added to skills array
-
 		} else {
 			// remove features
 			setOptions([...skills, skill ]) //
 			setSkills([...skills, skill ]) 	// add item to skills array
-			setIsUpdated(true) 							// add updated text after added to skills array
 		}
 
-
+		setIsUpdated(true) 							// Apply to both
 	}
 
 	return (
@@ -114,8 +113,10 @@ const FormDialog = ({ open, setOpen, user={} }) => {
 						 { <PersonIcon color='primary' />}
 						</Avatar>
 
-						<Typography variant='h5' sx={{ textTransform: 'uppercase'}} >Skills</Typography>
+						<Typography variant='h6' sx={{ textTransform: 'uppercase'}} >Skills</Typography>
 					</Box>
+
+					{isUpdated && <Alert sx={{mb: 2}} severity='success' color='info'> Skill {checked ? 'Added' : 'Removed'} </Alert> }
 
 					<form onSubmit={submitHandler} noValidate >
 						<Autocomplete

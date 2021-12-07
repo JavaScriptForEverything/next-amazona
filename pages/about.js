@@ -1,10 +1,12 @@
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
+import Image from 'next/image'
 // import Error from 'next/error'
 // import { useDispatch, useSelector } from 'react-redux'
 
 
 import Layout from '../layout'
+import { randomHexColor } from '../util'
 
 import Typography from '@mui/material/Typography'
 import MuiLink from '@mui/material/Link'
@@ -20,7 +22,7 @@ import FormControlLabel from '@mui/material/FormControlLabel'
 import Switch from '@mui/material/Switch'
 
 import TextField from '@mui/material/TextField'
-import UpdateProfileSkills from '../components/dialog/updateProfileSkills'
+import UpdateProfileSkills from '../components/dialog/profileSkills'
 
 
 const About = () => {
@@ -34,20 +36,11 @@ const About = () => {
 				<Button variant='contained' onClick={() => setOpen(true)}>Open Dialog</Button>
 				<UpdateProfileSkills open={open} setOpen={setOpen} />
 
-				<br />
+				<br /> <br />
 
-				<TextField
-					label='Username'
-				/> <br />
-				<FormControlLabel
-					label={!checked ? 'Remove' : 'Add'}
-					labelPlacement='end'
-					control={<Switch
-						color='primary'
-						checked={checked}
-						onChange={() => setChecked(check => !check)}
-					/>}
-				/>
+
+
+				<Image src='/images/banner1.jpg' width='2000px' height='2000px' />
 
 
 		</Layout>

@@ -11,6 +11,15 @@ export const createPaymentIntent = catchAsync(async (req, res, next) => {
 	if(!amount) return next(appError('You must send amount'))
 	if(!currency) return next(appError('You must send currency'))
 
+	/* 	create paymentIntents if already create and which has an session token client_id
+			else every missed transaction create incomplete list in stripe payment tab
+
+			if(paymentIntentId) {
+				stripe.paymentIntents.retrieve(paymentId)...
+			} else {
+				stripe.paymentIntents.create({...})
+			}
+	*/
 
 	// Stripe payment
 	const { client_secret } = await stripe.paymentIntents.create({
