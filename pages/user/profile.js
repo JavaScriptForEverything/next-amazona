@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useSelector } from 'react-redux'
-
+import nookies from 'nookies'
 
 import Layout from '../../layout'
 import { toCapitalize, readAsDataURL } from '../../util'
@@ -52,7 +52,7 @@ const experiencesInfo = [
 
 
 
-const UserProfile = () => {
+const Profile = () => {
 	const [ avatarOpen, setAvatarOpen ] = useState(false)
 	const [ avatarAnchorEl, setAvatarAnchorEl ] = useState()
 	const [ avatarFile, setAvatarFile ] = useState()
@@ -68,12 +68,6 @@ const UserProfile = () => {
 	const [ openBasic, setOpenBasic ] = useState(false) 	// profile Basic Info handler
 	const [ openMail, setOpenMail ] = useState(false) 		// profile Basic Send Mail Button handler
 	const [ openAddExperience, setOpenAddExperience ] = useState(false)
-
-
-
-	// console.log({ avatarFile })
-
-
 
 
 	const avatarMenuCloseHandler = () => setAvatarOpen(false)
@@ -119,7 +113,8 @@ const UserProfile = () => {
 		{ label: 'Years of Experience', value: toCapitalize(user?.experience)  || '1 Years' },
 		{ label: 'Phone', value: user?.phone || '01957500605' },
 		{ label: 'CTC', value: '2.5 Lac' },
-		{ label: 'Location', value: toCapitalize(`${user?.location.city} ${user?.location.country}`) || 'Dhaka, Bangladesh'  },
+		{ label: 'Location', value: (`${user?.location?.city} ${user?.location?.country}`) || 'Dhaka, Bangladesh'  },
+		// { label: 'Location', value: user ? toCapitalize(`${user.location.city} ${user.location.country}`) : 'Dhaka, Bangladesh'  },
 		{ label: 'Email', value: user?.email || 'javascriptforeverything@gmail.com'  },
 	]
 	const experiences = [
@@ -140,6 +135,7 @@ const UserProfile = () => {
 			backgroundColor: 'lightPink'
 		},
 	]
+
 
 	return (
 		<Layout>
@@ -221,7 +217,7 @@ const UserProfile = () => {
 							<Divider sx={{ mb: 2 }} />
 
 							<Grid item container sx={{ gap: 1 }} >
-								{user?.skills.map(skill => <Button key={skill}
+								{user?.skills?.map(skill => <Button key={skill}
 									variant='outlined'
 									size='small'
 									sx={{ py:.5, px: 2, borderRadius: 4, textTransform: 'Capitalize' }}
@@ -373,4 +369,19 @@ const UserProfile = () => {
 		</Layout>
 	)
 }
-export default UserProfile
+export default Profile
+
+
+export const getServerSideProps = (ctx) => {
+	const { token } = nookies.get(ctx)
+
+	if(!token) return { redirect: {// NextJS built-in Redirect features
+			destination: '/login',
+			parmanent: false
+		}
+	}
+
+	return { props: {} }
+}
+
+

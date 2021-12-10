@@ -1,6 +1,6 @@
 import { useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { getTotalPrice } from '../store/dialogReducer'
+import { getTotalPrice } from '../store/productReducer'
 
 import Tabs from '@mui/material/Tabs'
 import Tab from '@mui/material/Tab'
@@ -15,7 +15,7 @@ import Divider from '@mui/material/Divider'
 
 const Details = () => {
 	const dispatch = useDispatch()
-	const { cartItems, shippingCharge, totalPrice } = useSelector(state => state.dialog )
+	const { cartItems, shippingCharge, totalPrice } = useSelector(state => state.product )
 
 	// Calculate Total Items, no need any dependency here, just call if directly get this page, it will just calcaulate
 	useEffect(() => dispatch(getTotalPrice()), [])

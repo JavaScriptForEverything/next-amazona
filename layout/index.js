@@ -1,3 +1,4 @@
+import nookies from 'nookies'
 import { useState, useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { getUser, logoutMe } from '../store/userReducer'
@@ -8,11 +9,10 @@ import { useRouter } from 'next/router'
 
 import Snackbar from './snackbar'
 import StyledAvatar from '../components/styledAvatar'
-
-import { ThemeProvider } from '@mui/material/styles'
 import theme from './theme'
 import LinearProgressBar from './linearProgressBar'
 
+import { ThemeProvider } from '@mui/material/styles'
 import Container from '@mui/material/Container'
 import Box from '@mui/material/Box'
 import AppBar from '@mui/material/AppBar'
@@ -24,19 +24,23 @@ import Switch from '@mui/material/Switch'
 import Badge from '@mui/material/Badge'
 import IconButton from '@mui/material/IconButton'
 import Avatar from '@mui/material/Avatar'
+import MuiLink from '@mui/material/Link'
 import Menu from '@mui/material/Menu'
 import MenuItem from '@mui/material/MenuItem'
-import NoSsr from '@mui/material/NoSsr'
-import MuiLink from '@mui/material/Link'
-import Divider from '@mui/material/Divider'
-
 import ListItemIcon from '@mui/material/ListItemIcon'
 import ListItemText from '@mui/material/ListItemText'
-
+import NoSsr from '@mui/material/NoSsr'
+import Divider from '@mui/material/Divider'
 
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart'
 import DashboardIcon from '@mui/icons-material/Dashboard'
 import LogoutIcon from '@mui/icons-material/Logout'
+
+const navItems = [
+	{label: 'Amazona', path: '/'},
+	{label: 'About', path: '/about'},
+	{label: 'Contact', path: '/contact'},
+]
 
 const menuItems = [
 	// { label: 'Profile', path: '/user/profile' },
@@ -51,17 +55,18 @@ const Layout = ({ title, description, children }) => {
 
 	const [ menuOpen, setMenuOpen ] = useState(false)
 	const [ anchorEl, setAnchorEl ] = useState(null)
+	const [ cookieToken, setCookieToken ] = useState('')
 
-	let { cartItems } = useSelector(state => state.dialog)
+	let { cartItems } = useSelector(state => state.product)
 	let [ darkMode, setDarkMode ] = useState(false)
 	let [ badge, setBadge ] = useState(0)
 
-	const { token, authenticated, user } = useSelector(state => state.user)
-	// console.log(user)
+	const { authenticated, token, user } = useSelector(state => state.user)
 
-	useEffect(() => {
-		authenticated && dispatch(getUser(token))
-	}, [dispatch, token])
+	// console.log({ authenticated, token, user })
+
+	// Client-Side Redirect here and Server-Side redirect done in bottom in getServerSideProps
+	useEffect(() => (token) && dispatch(getUser(token)) , [token])
 
 
 	/* NextJS render server-seide rendering first, but we want bellow code only render in client-side
@@ -111,15 +116,14 @@ const Layout = ({ title, description, children }) => {
 			<CssBaseline />
 			<AppBar position='relative'>
 				<Toolbar>
-					{/*------[ Left side ]--------*/}
-					<Link href='/' passHref>
-						<Button color='inherit' sx={{ textTransform: 'capitalize' }} >Amazona</Button>
-					</Link>
-					<Link href='/about' passHref>
-						<Button color='inherit' sx={{ textTransform: 'capitalize' }} >About</Button>
-					</Link>
+					{/*------[ Toolbar: Left side ]--------*/}
+					{ navItems.map((nav, key) => (
+						<Link key={key} href={nav.path} passHref>
+							<Button color='inherit' sx={{ textTransform: 'capitalize' }} >{nav.label}</Button>
+						</Link>
+					))}
 
-					{/*------[ Right side ]--------*/}
+					{/*------[ Toolbar: Right side ]--------*/}
 					<Box sx={{ marginLeft: 'auto' }}>
 						<Switch color='secondary' checked={darkMode} onChange={changeHandler} />
 
@@ -137,7 +141,7 @@ const Layout = ({ title, description, children }) => {
 							<IconButton color='inherit' onClick={menuHandler} sx={{ ml: 2 }} >
 								<StyledAvatar sx={{ width: '2rem', height: '2rem' }} src={user?.avatar} />
 								<Typography sx={{ ml: 1, display: {xs: 'none', sm: 'block'} }}>
-									{user?.username.split(' ').shift()} </Typography>
+									{user?.username?.split(' ').shift()} </Typography>
 							</IconButton>
 						) : (
 							<Link href='/login'>
@@ -159,7 +163,7 @@ const Layout = ({ title, description, children }) => {
 							<IconButton onClick={f =>router.push('/user/profile')} >
 								<StyledAvatar
 									src={user?.avatar}
-									alt={user?.avatar}
+									alt={`${user?.title}-${user?.username}`}
 								/>
 							</IconButton>
 								<Typography sx={{textTransform: 'capitalize'}} >{user?.username}</Typography>
@@ -199,3 +203,4 @@ const Layout = ({ title, description, children }) => {
 	)
 }
 export default Layout
+

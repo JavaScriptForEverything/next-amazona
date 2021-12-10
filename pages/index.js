@@ -2,7 +2,7 @@ import { useEffect } from 'react'
 import axios from 'axios'
 import absoluteUrl from 'next-absolute-url'
 import { useDispatch, useSelector } from 'react-redux'
-import { addItemToCart, showAlert } from '../store/dialogReducer'
+import { addItemToCart, showAlert } from '../store/productReducer'
 
 import Link from 'next/link'
 
@@ -21,7 +21,7 @@ import Button from '@mui/material/Button'
 
 const Home = ({ products }) => {
 	const dispatch = useDispatch()
-	const { cartItems } = useSelector(state => state.dialog)
+	const { cartItems } = useSelector(state => state.product)
 
 
 	const addToCartHandler = (evt, product) => {
@@ -35,8 +35,7 @@ const Home = ({ products }) => {
 
 	return (
 		<Layout>
-			<Typography variant='h3'>Home Page</Typography>
-			<Link href='/about'><Button>About</Button></Link>
+			<Typography variant='h4'>Home Page</Typography>
 
 			<Grid container spacing={3} >
 				{products && products.map((product, key) => (

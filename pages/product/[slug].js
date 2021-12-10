@@ -1,7 +1,8 @@
 import axios from 'axios'
 import absoluteUrl from 'next-absolute-url'
 import { useDispatch, useSelector } from 'react-redux'
-import { addItemToCart, showAlert } from '../../store/dialogReducer'
+import { showAlert } from '../../store/dialogReducer'
+import { addItemToCart } from '../../store/productReducer'
 
 import Link from 'next/link'
 import Image from 'next/image'
@@ -22,7 +23,7 @@ import ListItemText from '@mui/material/ListItemText'
 
 const Product = ({ product }) => {
 	const dispatch = useDispatch()
-	const { cartItems } = useSelector(state => state.dialog)
+	const { cartItems } = useSelector(state => state.product)
 
 	const addToCartHandler = (evt, product) => {
 		const	itemFound = cartItems.some(item => item._id === product._id )

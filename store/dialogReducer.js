@@ -11,59 +11,18 @@ const { reducer, actions } = createSlice({
 		open: false,
 		severity: 'success',
 		message: '',
-
-		cartItems: (typeof window !== 'undefined') && JSON.parse(localStorage.getItem('cartItems')) || [],
-		shippingCharge: 0,
-		totalPrice: 0,
 	},
 	reducers: {
 		requested: (state, action) => ({ ...state, loading: true }),
-		failed: (state, action) => ({
-			...state,
-			loading: false,
-			error: action.payload,
-			// open: true
-		}),
+		failed: (state, action) => ({...state, loading: false, error: action.payload, }),
 		showAlert: (state, action) => ({
 			...state, loading: false, ...action.payload
 		}),
 
-		cartItemAdded: (state, action) => {
-			localStorage.setItem('cartItems', JSON.stringify(state.cartItems.concat(action.payload)) )
-
-			return { ...state, loading: false, cartItems: state.cartItems.concat(action.payload) }
-		},
-		cartItemsFiltered: (state, action) => {
-			localStorage.setItem('cartItems', JSON .stringify(state.cartItems .filter( item => item._id !== action.payload._id)) )
-
-			return { ...state, loading: false, cartItems: state.cartItems.filter(item => item._id !== action.payload._id) }
-		},
-		cartItemUpdated: (state, action) => {
-			const { _id, quantity } = action.payload
-			const cartItems = state.cartItems.map(item => item._id === _id ? {...item, quantity } : item )
-
-			localStorage.setItem('cartItems', JSON.stringify(cartItems) )
-
-			return { ...state, loading: false, cartItems }
-		},
-		cartItemsRemoved: (state, action) => {
-			localStorage.removeItem('cartItems')
-			return {
-				...state,
-				cartItems: []
-
-			}
-		},
-
-		totalPrice: (state, action) => ({
-			...state,
-			totalPrice: state.cartItems?.reduce((total, item) => total + item.price*item.quantity, state.shippingCharge)
-		})
 
 	} // end of reducer method
 })
 export default reducer
-
 
 
 export const showAlert = (obj) => (dispatch) => {
@@ -71,27 +30,7 @@ export const showAlert = (obj) => (dispatch) => {
 	dispatch(actions.showAlert(obj))
 }
 
-export const addItemToCart = (cart) => (dispatch) => {
-	dispatch(actions.requested())
-	dispatch(actions.cartItemAdded(cart))
-}
-export const filterCartItems = (cart) => (dispatch) => {
-	dispatch(actions.requested())
-	dispatch(actions.cartItemsFiltered(cart))
-}
-export const updateCartItem = (cart, plus=true) => async (dispatch, getStore) => {
-	// const { data } = await axios.get(`/api/products/${cart.slug}`)
-	const data = getStore().dialog.cartItems.find(item => item._id === cart._id)
-	const quantity = plus ? data.quantity + 1 : data.quantity - 1
-	dispatch( actions.cartItemUpdated({ ...data, quantity}) )
-}
-export const removeCartItems = () => (dispatch) => {
-	dispatch(actions.cartItemsRemoved())
-}
 
-export const getTotalPrice = () => (dispatch) => {
-	dispatch(actions.totalPrice())
-}
 
 
 /*

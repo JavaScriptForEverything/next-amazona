@@ -1,8 +1,9 @@
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
-// import Error from 'next/error'
+import { useRouter } from 'next/router'
 // import { useDispatch, useSelector } from 'react-redux'
+import { wrapper } from '../store'
 
 
 import Layout from '../layout'
@@ -32,6 +33,7 @@ const About = () => {
 	return (
 		<Layout title='about page'>
 			<Typography>About Page</Typography>
+				{/*<Image src='/images/banner1.jpg' width='2000px' height='2000px' />*/}
 
 				<Button variant='contained' onClick={() => setOpen(true)}>Open Dialog</Button>
 				<UpdateProfileSkills open={open} setOpen={setOpen} />
@@ -40,10 +42,11 @@ const About = () => {
 
 
 
-				<Image src='/images/banner1.jpg' width='2000px' height='2000px' />
 
 
 		</Layout>
 	)
 }
 export default About
+
+

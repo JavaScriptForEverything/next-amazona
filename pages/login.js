@@ -1,3 +1,4 @@
+import nookies from 'nookies'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useState, useEffect } from 'react'
@@ -48,7 +49,8 @@ const Login = () => {
 	const [signupFields, setSignupFields] = useState({username: '', email: '', password: '', confirmPassword: '', avatar: ''})
 	const [signupFieldErrors, setSignupFieldErrors] = useState({})
 
-	const { error, authenticated, isSignedUp } = useSelector(state => state.user)
+	const { error, authenticated, isSignedUp, user } = useSelector(state => state.user)
+	// console.log('login Page: ', user)
 
 	const tabHandler = (evt, newValue) => setValue(newValue)
 	useEffect(() => {
@@ -274,3 +276,14 @@ const Login = () => {
 export default Login
 
 
+// login & signup page make server-seide redirect based on cookie
+export const getServerSideProps = (ctx) => {
+	const { token } = nookies.get(ctx)
+
+	if(token) return { redirect: {
+		destination: '/user/profile',
+		parmanent: false
+	}}
+
+	return { props: {}}
+}

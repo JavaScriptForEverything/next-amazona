@@ -208,3 +208,14 @@ const UserPasswordReset = ({ history }) => {
 	)
 }
 export default UserPasswordReset
+
+export const getServerSideProps = (ctx) => {
+	const { token } = ctx.req.cookies
+
+	if(token) return { redirect : {
+		destination: '/user/profile',
+		parmanent: false
+	}}
+
+	return { props: {}}
+}

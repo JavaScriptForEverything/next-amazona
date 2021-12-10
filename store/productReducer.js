@@ -11,22 +11,48 @@ const { reducer, actions } = createSlice({
 	initialState: {
 		// products: [],
 		// product: {}
+
+		loading: false,
+		error: '',
+
+		cartItems: (typeof window !== 'undefined') && JSON.parse(localStorage.getItem('cartItems')) || [],
+		shippingCharge: 0,
+		totalPrice: 0,
 	},
 	reducers: {
-		// requested: (state, action) => ({ ...state, loading: true }),
-		// failed: (state, action) => ({
-		// 	...state,
-		// 	loading: false,
-		// 	error: action.payload
-		// }),
-		// productGot: (state, action) => ({
-		// 	...state, loading: false,
-		// 	...action.payload
-		// }),
-		// productBySlug: (state, action) => ({
-		// 	...state, loading: false,
-		// 	...action.payload
-		// }),
+		requested: (state, action) => ({ ...state, loading: true }),
+		failed: (state, action) => ({...state, loading: false, error: action.payload, }),
+		cartItemAdded: (state, action) => {
+			localStorage.setItem('cartItems', JSON.stringify(state.cartItems.concat(action.payload)) )
+
+			return { ...state, loading: false, cartItems: state.cartItems.concat(action.payload) }
+		},
+		cartItemsFiltered: (state, action) => {
+			localStorage.setItem('cartItems', JSON .stringify(state.cartItems .filter( item => item._id !== action.payload._id)) )
+
+			return { ...state, loading: false, cartItems: state.cartItems.filter(item => item._id !== action.payload._id) }
+		},
+		cartItemUpdated: (state, action) => {
+			const { _id, quantity } = action.payload
+			const cartItems = state.cartItems.map(item => item._id === _id ? {...item, quantity } : item )
+
+			localStorage.setItem('cartItems', JSON.stringify(cartItems) )
+
+			return { ...state, loading: false, cartItems }
+		},
+		cartItemsRemoved: (state, action) => {
+			localStorage.removeItem('cartItems')
+			return {
+				...state,
+				cartItems: []
+
+			}
+		},
+
+		totalPrice: (state, action) => ({
+			...state,
+			totalPrice: state.cartItems?.reduce((total, item) => total + item.price*item.quantity, state.shippingCharge)
+		})
 	},
 
 	// extraReducers: {
@@ -36,8 +62,33 @@ const { reducer, actions } = createSlice({
 export default reducer
 
 
-/*
+export const addItemToCart = (cart) => (dispatch) => {
+	dispatch(actions.requested())
+	dispatch(actions.cartItemAdded(cart))
+}
+export const filterCartItems = (cart) => (dispatch) => {
+	dispatch(actions.requested())
+	dispatch(actions.cartItemsFiltered(cart))
+}
+export const updateCartItem = (cart, plus=true) => async (dispatch, getStore) => {
+	const data = getStore().product.cartItems.find(item => item._id === cart._id)
+	const quantity = plus ? data.quantity + 1 : data.quantity - 1
+	dispatch( actions.cartItemUpdated({ ...data, quantity}) )
+}
+export const removeCartItems = () => (dispatch) => {
+	dispatch(actions.cartItemsRemoved())
+}
 
+export const getTotalPrice = () => (dispatch) => {
+	dispatch(actions.totalPrice())
+}
+
+
+
+
+
+
+/*
 export const getProducts = (req) => catchAsyncDispatch( async (dispatch) => {
 	dispatch(actions.requested())
 

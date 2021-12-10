@@ -1,13 +1,16 @@
 import { createSlice } from '@reduxjs/toolkit'
 import axios from 'axios'
+import absoluteURL from 'next-absolute-url'
+import nookies from 'nookies'
+import { HYDRATE } from 'next-redux-wrapper'
 
 import { showAlert } from './dialogReducer'
 import { catchAsyncDispatch } from '../util'
 
-const	token = typeof window !== 'undefined' && localStorage.getItem('token')
+const	{ token } = nookies.get(null)
 
 const { reducer, actions } = createSlice({
-	name: 'products',
+	name: 'user',
 	initialState: {
 		error: '', 								// Must need to empty error on every request
 		loading: false, 					// Required to add loading features
@@ -31,21 +34,25 @@ const { reducer, actions } = createSlice({
 			const { token } = action.payload
 			if(!token) return { ...state, loading: false }
 
-			localStorage.setItem('token', token)
+			nookies.set(null, 'token', token, {
+				maxAge: 30 * 24 * 60 * 60,
+				secure: true, 			// https only except localhost
+				// httpOnly: true, 	// remove from document.cookie to read by javascript
+				sameSite: 'strict' 	// Stop CORS
+			})
 			return { ...state, loading: false, authenticated: true, token }
 		},
 		logedOut: (state, action) => {
-			localStorage.removeItem('token')
-			return {...state, loading: false, authenticated: false, isSignedUp: false }
+			nookies.destroy(null, 'token', { path: '/'})
+			return {...state, loading: false, authenticated: false, isSignedUp: false, user: null, token: undefined }
 		},
 		signedUp: (state, action) => ({ ...state, loading: false, isSignedUp: !!action.payload }),
 
 		tokenSent: (state, action) => ({ ...state, loading: false }),
-		getMe: (state, action) => ({
+		getMe: (state, action) => ({ // this method used to dispatch on SSR, which pass data to extraReducers [HYDRATE]
 			...state,
 			loading: false,
-			// ...action.payload.data,   				// this `data` comes from backend, next time make it 'doc'
-			user: action.payload.user 					// used as useSelector(state => state.user.user)
+			...action.payload
 		}),
 		profileUpdated: (state, action) => {
 
@@ -62,7 +69,13 @@ const { reducer, actions } = createSlice({
 		},
 
 
-	} // End of Reducer
+	}, // End of Reducer
+	extraReducers: {
+		[HYDRATE]: (state, action) => ({
+			...state, ...action.payload
+			// ...state, ...action.payload.user
+		})
+	}
 })
 export default reducer
 
@@ -74,13 +87,14 @@ export const loginMe = (obj) => catchAsyncDispatch(async (dispatch, getStore) =>
 	dispatch(actions.logedIn(data))
 }, actions.failed)
 
-/*Geting User but how ?
+/*Geting User but how ? By sending token as cookie or Brearer token
 	1. as header: { Authorization : `Bearer ${token}` }
 	2. as header: { cookie : token } */
 export const getUser = (token) => catchAsyncDispatch(async (dispatch) => {
 	const { data } = await axios.get(`/api/users/me`, { headers: {Authorization: `Bearer ${token}`} })
 	dispatch(actions.getMe(data))
 }, actions.failed)
+
 
 
 

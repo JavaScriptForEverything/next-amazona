@@ -9,16 +9,19 @@ import User from '../models/userModel'
 
 
 
-
 /* protect middleware used with:
 	. /api/users/me.js								:	handler.get(protect, getUser)
 	. /api/users/forgot-password/ 		: handler.patch(protect, resetPassword)
 */
 export const protect = catchAsync(async(req, res, next) => {
+	/* 1. Get Token: Token may comes form
+				1. browser Cookie automatically or
+				2. user set manually as cookie or bearer token or
+				3. user send with body: required for reset password based on token */
+	let token = req.headers.cookie?.split('=').pop()  						// from browser  or user send 	{ headers: {cookie: token} }
+	    token = token || req.headers.authorization?.split('Bearer ').pop() 	// 	{ headers: { Authorization: `Bearer ${token}`}}
+	    token = token || req.body.token  																		// { username: 'riajul', token: 'eyJhbGciOiJIUzI1...'}
 
-	// 1. Get Token 		: Token must be come from header or body
-	const authorization = req.headers.authorization
-	const token = authorization?.split('Bearer ').pop() || req.body.token
 	if(!token) return next(appError('Please send token as header or body', 401))
 
 	// 2. Get id from token

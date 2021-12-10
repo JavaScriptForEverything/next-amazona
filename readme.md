@@ -11,11 +11,15 @@
 ###### Features Added
 	. Serverless API
 	. Material UI (User Friendly UI) + Dark Mode
-	. Redux
+	. Redux (dispatch on ServerSide + on Client-Side)
 	. Mongoose (MongoDB)
 	. Stripe Payment Method
 	. JsonWebToken
 	. Reset Password by Send Token by Mail (SendMail)
+	. Route
+		.	Protected Route on ServerSide + Client-Side (I prefer ServerSide)
+		. Restricted Route: if login then don't go to login(signup)|reset-password page
+
 
 	. Do next:
 		. Pagination
@@ -26,7 +30,7 @@
 ###### Routes (Pages)
 	. Home 		: /
 	. About 	: /about
-	. Login 	: /login
+	. Login 	: /login ( /login + /signup)
 	. Logout 	:  Client-Side Logout
 	. Cart  	: /cart
 	. Payment : /shipping
@@ -35,4 +39,4 @@
 	. user:
 		. Profile 	: /user/profile
 		. Dashboard	: /user/dashboard
-		. resetPassword : /user/reset-password
+		. resetPassword : /user/reset-password (forgot-password + reset-password)
