@@ -2,7 +2,8 @@ import axios from 'axios'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { showAlert, removeCartItems } from '../store/dialogReducer'
+import { showAlert } from '../store/dialogReducer'
+import { removeCartItems } from '../store/productReducer'
 
 import StepContent from './stepContent'
 
@@ -30,7 +31,7 @@ const Checkout = () => {
 	const elements = useElements()
 
 	const { shippingObj, paymentObj: { currency } } = useSelector(state => state.payment )
-	const { totalPrice } = useSelector(state => state.dialog )
+	const { totalPrice } = useSelector(state => state.product )
 	const { token } = useSelector(state => state.user )
 
 

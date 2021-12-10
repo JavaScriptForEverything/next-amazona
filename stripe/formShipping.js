@@ -14,6 +14,7 @@ import { TabPanel } from '../util'
 
 const countriesList = Object.values(countries)
 
+console.log(shippingItems)
 
 const ShippingForm = () => {
 	const [ value, setValue ] = useState(0) 						// to set Tabs

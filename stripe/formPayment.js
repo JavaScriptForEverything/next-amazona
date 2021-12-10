@@ -25,7 +25,7 @@ const defaultCountry = countriesList.find(country => country.name === 'United St
 const PaymentDetails = () => {
 	const [ value, setValue ] = useState(0) 						// to set Tabs
 	const dispatch = useDispatch()
-	const { totalPrice } = useSelector(state => state.dialog)
+	const { totalPrice } = useSelector(state => state.product)
 
 	const tabHandler = (evt, newValue) => setValue(newValue)
 	const changeHandler = (evt, country) => {
