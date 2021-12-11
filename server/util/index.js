@@ -42,9 +42,16 @@ export const sendMail = async ({ from='<next.amazona.gmail.com>', to, subject, t
 }
 
 
-export const filterObjByArray = (obj, arr) => {
+export const filterObjectWithExcludedArray = (obj, filteredField) => {
+	const tempObj = JSON.parse(JSON.stringify(obj))
+	Object.keys(obj).forEach(item => filteredField.includes(item) && delete tempObj[item] )
+
+	return tempObj
+}
+
+export const filterObjectWithAllowedArray = (obj, allowedItems) => {
 	const newObj = {}
-	arr.forEach(item => newObj[item] = obj[item])
+	allowedItems.forEach(item => newObj[item] = obj[item])
 
 	return newObj
 }

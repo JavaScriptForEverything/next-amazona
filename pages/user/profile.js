@@ -1,14 +1,15 @@
-import { useState } from 'react'
-import { useSelector } from 'react-redux'
+import { useState, useEffect } from 'react'
+import { useDispatch, useSelector } from 'react-redux'
 import nookies from 'nookies'
+import { updateProfile } from '../../store/userReducer'
 
 import Layout from '../../layout'
 import { toCapitalize, readAsDataURL } from '../../util'
 import { description } from '../../data/profile'
-import ProfileSkills from '../../components/dialog/profileSkills'
-import ProfileBasicInfo from '../../components/dialog/profileBasicInfo'
-import ProfileSendMail from '../../components/dialog/profileSendMail'
-import ProfileAddExperience from '../../components/dialog/profileAddExperience'
+import ProfileSkills from '../../components/dialog/profile/skills'
+import ProfileBasicInfo from '../../components/dialog/profile/basicInfo'
+import ProfileSendMail from '../../components/dialog/profile/sendMail'
+import ProfileAddExperience from '../../components/dialog/profile/addExperience'
 
 import Container from '@mui/material/Container'
 import Paper from '@mui/material/Paper'
@@ -53,6 +54,8 @@ const experiencesInfo = [
 
 
 const Profile = () => {
+	const dispatch = useDispatch()
+
 	const [ avatarOpen, setAvatarOpen ] = useState(false)
 	const [ avatarAnchorEl, setAvatarAnchorEl ] = useState()
 	const [ avatarFile, setAvatarFile ] = useState()
@@ -60,14 +63,21 @@ const Profile = () => {
 	const [ experienceMenuOpen, setExperienceMenuOpen ] = useState(false)
 	const [ experienceAnchorEl, setExperienceAnchorEl ] = useState()
 
-	const { user } = useSelector(state => state.user)
-	// console.log({ ...user, avatar: ''})
-	// console.log(user)
-
 	const [ openSkill, setOpenSkill ] = useState(false) 	// profile Skill handler
 	const [ openBasic, setOpenBasic ] = useState(false) 	// profile Basic Info handler
 	const [ openMail, setOpenMail ] = useState(false) 		// profile Basic Send Mail Button handler
 	const [ openAddExperience, setOpenAddExperience ] = useState(false)
+
+	const { user } = useSelector(state => state.user)
+	// console.log(user.resume)
+
+	// update/delete avatar here
+	useEffect(() => {
+		dispatch(updateProfile({ avatar: avatarFile })) 	// update avatar in store + in Database
+		setAvatarOpen(false)
+	}, [avatarFile])
+
+
 
 
 	const avatarMenuCloseHandler = () => setAvatarOpen(false)
@@ -76,11 +86,10 @@ const Profile = () => {
 		setAvatarOpen(true)
 	}
 	const avatarMenuItemHandler = (evt, label, items) => {
-		if(label === items[0].label) return 	// if not upload file menu item
-		setAvatarOpen(false) 		// immediately close menu Popup
+		if(label === items[0].label) return 			// if upload avatar then handle in useEffect()
 
-		console.log(label)
-		setAvatarFile('') 			// make file upload value empty
+		setAvatarOpen(false) 											// immediately close menu Popup
+		dispatch(updateProfile({ avatar: '' })) 	// delete avatar from database + redux store
 	}
 	const inputFileChangeHandler = (evt) => {
 		readAsDataURL(evt.target.files[0], setAvatarFile)
@@ -109,13 +118,12 @@ const Profile = () => {
 
 
 	const basic = [
-		{ label: 'Age', value: toCapitalize(user?.age) || '28 Years' },
-		{ label: 'Years of Experience', value: toCapitalize(user?.experience)  || '1 Years' },
-		{ label: 'Phone', value: user?.phone || '01957500605' },
-		{ label: 'CTC', value: '2.5 Lac' },
-		{ label: 'Location', value: (`${user?.location?.city} ${user?.location?.country}`) || 'Dhaka, Bangladesh'  },
-		// { label: 'Location', value: user ? toCapitalize(`${user.location.city} ${user.location.country}`) : 'Dhaka, Bangladesh'  },
-		{ label: 'Email', value: user?.email || 'javascriptforeverything@gmail.com'  },
+		{ label: 'Age', value: `${ user.age || 15} Years` },
+		{ label: 'Years of Experience', value: `${user.experience || 1} Years`},
+		{ label: 'Phone', value: user.phone || '01957500605' },
+		{ label: 'CTC', value: `${user.ctc || 2.5} Lac` },
+		{ label: 'Location', value: user ? toCapitalize(`${user.location.city} ${user.location.country}`) : 'Dhaka, Bangladesh'  },
+		{ label: 'Email', value: user.email || 'javascriptforeverything@gmail.com'  },
 	]
 	const experiences = [
 		{
@@ -141,10 +149,10 @@ const Profile = () => {
 		<Layout>
 
 			{/*-----[ dialog/models ]------*/}
-			{ user && <ProfileSkills open={openSkill} setOpen={setOpenSkill} user={user} /> }
-			{ user && <ProfileBasicInfo open={openBasic} setOpen={setOpenBasic} user={user} /> }
-			{ user && <ProfileSendMail open={openMail} setOpen={setOpenMail} user={user} /> }
-			{ user && <ProfileAddExperience open={openAddExperience} setOpen={setOpenAddExperience} user={user} /> }
+			{ user && <ProfileSkills open={openSkill} setOpen={setOpenSkill} /> }
+			{ user && <ProfileBasicInfo open={openBasic} setOpen={setOpenBasic} /> }
+			{ user && <ProfileSendMail open={openMail} setOpen={setOpenMail} /> }
+			{ user && <ProfileAddExperience open={openAddExperience} setOpen={setOpenAddExperience} /> }
 
 			<Container sx={{ my: 3 }} >
 				{/*-----[ start coding bellow here ]------*/}
@@ -160,9 +168,9 @@ const Profile = () => {
 									}}>
 
 									<Avatar
-										src={user?.avatar}
-										alt={user?.avatar}
-										title={user?.username || 'user avatar'}
+										src={user.avatar}
+										alt={user.avatar}
+										title={user.username || 'user avatar'}
 										sx={{ width: 150, height: 150, mb: 1 }}
 									/>
 									<div style={{
@@ -180,10 +188,10 @@ const Profile = () => {
 
 									</div>
 								</IconButton>
-								<Typography color='primary' sx={{textTransform: 'capitalize'}} >{user?.username}</Typography>
-								<Typography variant='caption' >{toCapitalize(user?.title) || 'Full Stack Developer'}</Typography>
+								<Typography color='primary' sx={{textTransform: 'capitalize'}} >{user.username}</Typography>
+								<Typography variant='caption' >{toCapitalize(user.title) || 'Full Stack Developer'}</Typography>
 								<Typography sx={{ mt: 2 }} variant='body2' color='textSecondary' align='justify' paragraph >
-									{user?.description || description}
+									{user.description || description}
 								</Typography>
 							</Grid>
 							<Menu
@@ -217,7 +225,7 @@ const Profile = () => {
 							<Divider sx={{ mb: 2 }} />
 
 							<Grid item container sx={{ gap: 1 }} >
-								{user?.skills?.map(skill => <Button key={skill}
+								{user.skills.map(skill => <Button key={skill}
 									variant='outlined'
 									size='small'
 									sx={{ py:.5, px: 2, borderRadius: 4, textTransform: 'Capitalize' }}
@@ -263,7 +271,8 @@ const Profile = () => {
 										variant='contained'
 										sx={{ textTransform: 'Capitalize' }}
 										startIcon={<FileDownloadIcon />}
-										component='a' href='/resume.pdf' download
+										// component='a' href='/resume.pdf' download
+										component='a' href={user.resume} download='resume.pdf'
 										>Download Resume</Button>
 									<Button
 										variant='outlined'

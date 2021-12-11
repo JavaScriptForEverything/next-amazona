@@ -17,7 +17,7 @@
 	. JsonWebToken
 	. Reset Password by Send Token by Mail (SendMail)
 	. Route
-		.	Protected Route on ServerSide + Client-Side (I prefer ServerSide)
+		. Protected Route on ServerSide + Client-Side (I prefer ServerSide)
 		. Restricted Route: if login then don't go to login(signup)|reset-password page
 
 

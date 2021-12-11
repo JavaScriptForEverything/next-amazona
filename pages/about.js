@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { useSelector } from 'react-redux'
 import Link from 'next/link'
 import Image from 'next/image'
 import { useRouter } from 'next/router'
@@ -23,12 +24,13 @@ import FormControlLabel from '@mui/material/FormControlLabel'
 import Switch from '@mui/material/Switch'
 
 import TextField from '@mui/material/TextField'
-import UpdateProfileSkills from '../components/dialog/profileSkills'
 
 
 const About = () => {
 	const [open, setOpen] = useState(false)
 	const [checked, setChecked] = useState(false)
+
+	const { user } = useSelector(state => state.user )
 
 	return (
 		<Layout title='about page'>
@@ -36,11 +38,32 @@ const About = () => {
 				{/*<Image src='/images/banner1.jpg' width='2000px' height='2000px' />*/}
 
 				<Button variant='contained' onClick={() => setOpen(true)}>Open Dialog</Button>
-				<UpdateProfileSkills open={open} setOpen={setOpen} />
 
 				<br /> <br />
 
+			<object data="/resume.pdf" type="file"></object>
 
+{/*			<embed
+		    src="/resume.pdf"
+		    type="application/pdf"
+		    frameBorder="0"
+		    scrolling="auto"
+		    height="100%"
+		    width="100%"
+			></embed>
+
+			<iframe
+		    src="/resume.pdf"
+		    frameBorder="0"
+		    scrolling="auto"
+		    height="100%"
+		    width="100%"
+			></iframe>
+*/}
+{/*			<object data="/resume.pdf" type="application/pdf" width="300" height="200">
+				<a href="data/test.pdf">test.pdf</a>
+			</object>
+*/}
 
 
 

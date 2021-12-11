@@ -27,9 +27,10 @@ const userSchema = new Schema({
 		required: true,
 		validate: function() { return this.password === this.confirmPassword }
 	},
-	isAdmin: {
-		type: Boolean,
-		default: false
+	role: {
+		type: String,
+		enum: ['user', 'admin', 'guest'],
+		default: 'user'
 	},
 
 	passwordResetToken: String, 		// required to reset password
@@ -47,7 +48,6 @@ const userSchema = new Schema({
 	},
 	description: {
 		type: String,
-		// required: true,
 		lowercase: true,
 		minLength: 100, 			// for
 		maxLength: 500,
@@ -61,6 +61,104 @@ const userSchema = new Schema({
 		trim: true,
 		default: ['ReactJS', 'Redux', 'Material-UI', 'NodeJS', 'MongoDB', 'ExpressJS'],
 	},
+
+	// Basic Info
+	phone: {
+		type: Number,
+		min: 10000000, 			// for
+		maxLength: 99999999999,
+		default: '01957500605'
+	},
+	age : {
+		type: String,
+		lowercase: true,
+		maxLength: 50,
+		trim: true,
+		default: '28 Yars'
+	},
+	ctc: {
+		type: Number,
+		default: 2.5
+	},
+	location: {
+		address: {
+			type: String,
+			lowercase: true,
+			maxLength: 100,
+			trim: true,
+			default: '315 hazipara mosjid road'
+		},
+		city: {
+			type: String,
+			lowercase: true,
+			maxLength: 100,
+			trim: true,
+			default: 'dhaka'
+		},
+		country: {
+			type: String,
+			lowercase: true,
+			maxLength: 100,
+			trim: true,
+			default: 'bangladesh'
+		},
+	},
+	experience : {
+		type: String,
+		lowercase: true,
+		maxLength: 50,
+		trim: true,
+		default: '6 Yars'
+	},
+	resume : {
+		type: String,
+		default: '/resume.pdf'
+	},
+
+	// Experience Info
+	experiences: {
+		title: {
+			type: String,
+			lowercase: true,
+			trim: true,
+			maxLength: 50,
+			default: 'Pixel Studio',
+		},
+		subheader: {
+			type: String,
+			lowercase: true,
+			trim: true,
+			maxLength: 50,
+			default: 'Ux/UI Designer',
+		},
+		date: {
+			type: Date,
+			default: Date.now
+		},
+		status: {
+			type: String,
+			lowercase: true,
+			trim: true,
+			maxLength: 50,
+			default: 'Present',
+		},
+		location: {
+			type: String,
+			lowercase: true,
+			trim: true,
+			maxLength: 50,
+			default: 'Dhaka, Bangladesh',
+		},
+		avatar: {
+			type: String,
+			default: 'PS'
+		},
+		backgroundColor: {
+			type: String,
+			default: '#42a5f5'
+		}
+	}
+
 
 }, {
 	timestamps: true

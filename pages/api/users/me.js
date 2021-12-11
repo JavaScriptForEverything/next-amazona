@@ -1,11 +1,13 @@
 import '../../../server/models/database'
 import nc from 'next-connect'
 import { onError } from '../../../server/util'
-import { protect, getMe } from '../../../server/controllers/authController'
+import { protect, getMe, updateMe } from '../../../server/controllers/authController'
 
 const handler = nc({ onError })
 
 handler
-		.get(protect, getMe)
+		.use(protect)
+		.get(getMe)
+		.patch(updateMe)
 
 export default handler

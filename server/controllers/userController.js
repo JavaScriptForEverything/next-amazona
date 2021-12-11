@@ -55,3 +55,32 @@ export const signup = catchAsync(async (req, res, next) => {
 })
 
 
+
+/* userReducer.js  > /api/users/index.js	:	handler.get(userController.getAllUser)
+ 		//.	/pages/user/profile.js */
+export const getAllUser = catchAsync(async(req, res, next) => {
+	// const { id } = req.params
+	const users = await User.find()
+
+	res.status(200).json({
+		status: 'success',
+		totalUsers: users?.length,
+		users,
+	})
+})
+
+
+
+/* userReducer.js  > /api/users/[id].js	:	handler.get(userController.getUserById)
+ 		//.	/pages/user/profile.js */
+export const getUserById = catchAsync(async(req, res, next) => {
+	const { id } = req.query
+
+	const user = await User.findById(id)
+	if(!user) return next(appError('No user Found', 404))
+
+	res.status(200).json({
+		status: 'success',
+		user
+	})
+})

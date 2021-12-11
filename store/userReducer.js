@@ -15,8 +15,37 @@ const { reducer, actions } = createSlice({
 		error: '', 								// Must need to empty error on every request
 		loading: false, 					// Required to add loading features
 		authenticated: token && !!token || false,
-		token,
-		isSignedUp: false
+		token: token || '',
+		isSignedUp: false,
+
+		user : { 									// set default user value
+		  _id: '',
+		  username: '',
+		  email: '',
+		  password: '',
+		  isAdmin: false,
+		  title: '',
+		  description: '',
+		  skills: [],
+		  phone: 0,
+		  age: '',
+		  resume: '',
+		  location: {
+		    address: '',
+		    city: '',
+		    country: ''
+		  },
+		  experience: '',
+		  experiences: {
+		    title: '',
+		    subheader: '',
+		    status: '',
+		    location: '',
+		    avatar: '',
+		    backgroundColor: '',
+		    date: ''
+		  }
+		}
 	},
 	reducers: {
 		requested: (state, action) => ({
@@ -44,7 +73,7 @@ const { reducer, actions } = createSlice({
 		},
 		logedOut: (state, action) => {
 			nookies.destroy(null, 'token', { path: '/'})
-			return {...state, loading: false, authenticated: false, isSignedUp: false, user: null, token: undefined }
+			return {...state, loading: false, authenticated: false, isSignedUp: false, user: {}, token: undefined }
 		},
 		signedUp: (state, action) => ({ ...state, loading: false, isSignedUp: !!action.payload }),
 
@@ -55,8 +84,11 @@ const { reducer, actions } = createSlice({
 			...action.payload
 		}),
 		profileUpdated: (state, action) => {
-
-			return { ...state, loading: false }
+			return {
+				...state,
+				loading: false,
+				user: {...action.payload}
+			}
 		},
 		passwordUpdated: (state, action) => {
 
@@ -91,11 +123,16 @@ export const loginMe = (obj) => catchAsyncDispatch(async (dispatch, getStore) =>
 	1. as header: { Authorization : `Bearer ${token}` }
 	2. as header: { cookie : token } */
 export const getUser = (token) => catchAsyncDispatch(async (dispatch) => {
+	dispatch(actions.requested())
 	const { data } = await axios.get(`/api/users/me`, { headers: {Authorization: `Bearer ${token}`} })
 	dispatch(actions.getMe(data))
 }, actions.failed)
 
-
+export const updateProfile = (obj) => catchAsyncDispatch(async (dispatch) => {
+	dispatch(actions.requested())
+	const { data: { user } } = await axios.patch(`/api/users/me`, obj, { headers: {Authorization: `Bearer ${token}`} })
+	dispatch(actions.profileUpdated(user))
+}, actions.failed)
 
 
 
@@ -154,36 +191,37 @@ export const resetPassword = (obj) => catchAsyncDispatch(async (dispatch) => {
 
 
 // Not Used Yet: (Need to fix it)
-export const profileUpdate = (obj) => catchAsyncDispatch(async (dispatch) => {
-	dispatch(actions.requested())
 
-	// const { data } = await axios.patch(`/api/users/update-me`, obj)
-	dispatch(actions.profileUpdated())
-	return console.log('Next time fix it')
+// export const profileUpdate = (obj) => catchAsyncDispatch(async (dispatch) => {
+// 	dispatch(actions.requested())
 
-	// let message = 'Can\' update, something wrong on backend-side'
-	// if( data.status !== 'success' ) return dispatch(showAlert({ open: true, severity: 'error', message}))
+// 	// const { data } = await axios.patch(`/api/users/update-me`, obj)
+// 	dispatch(actions.profileUpdated())
+// 	return console.log('Next time fix it')
 
-	// message = 'Profile updated successfully !!!'
-	// dispatch(showAlert({open: true, severity: 'success', message}))
+// 	// let message = 'Can\' update, something wrong on backend-side'
+// 	// if( data.status !== 'success' ) return dispatch(showAlert({ open: true, severity: 'error', message}))
 
-}, actions.failed)
+// 	// message = 'Profile updated successfully !!!'
+// 	// dispatch(showAlert({open: true, severity: 'success', message}))
 
-export const updatePassword = (obj) => catchAsyncDispatch(async (dispatch) => {
-	dispatch(actions.requested())
+// }, actions.failed)
 
-	const { data } = await axios.patch(`/api/users/update-my-password`, obj)
-	// return console.log('Next time fix it')
+// export const updatePassword = (obj) => catchAsyncDispatch(async (dispatch) => {
+// 	dispatch(actions.requested())
 
-	let message = 'No Token found after update user'
-	if( !data.token ) return dispatch(showAlert({ open: true, severity: 'error', message}))
+// 	const { data } = await axios.patch(`/api/users/update-my-password`, obj)
+// 	// return console.log('Next time fix it')
 
-	message = 'Password updated successfully !!!'
-	dispatch(showAlert({open: true, severity: 'success', message}))
+// 	let message = 'No Token found after update user'
+// 	if( !data.token ) return dispatch(showAlert({ open: true, severity: 'error', message}))
 
-	dispatch(actions.passwordUpdated(data))
+// 	message = 'Password updated successfully !!!'
+// 	dispatch(showAlert({open: true, severity: 'success', message}))
 
-}, actions.failed)
+// 	dispatch(actions.passwordUpdated(data))
+
+// }, actions.failed)
 
 
 

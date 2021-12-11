@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react'
 import { isEmail } from 'validator'
+import { useSelector } from 'react-redux'
 
-import { readAsDataURL } from '../../util'
+import { readAsDataURL } from '../../../util'
 
 import Dialog from '@mui/material/Dialog'
 import Container from '@mui/material/Container'
@@ -29,16 +30,16 @@ const basicInfoObj = {}
 basicInfoItems.forEach(itemObj => basicInfoObj[itemObj.name] = '')
 
 
-const FormDialog = ({ open, setOpen, user={} }) => {
+const FormDialog = ({ open, setOpen }) => {
 	const [ disabled, setDisabled ] = useState(false)
-	const [ loading, setLoading ] = useState(false)
 	const [ isUpdated, setIsUpdated ] = useState(false)
 
 	const [ fields, setFields ] = useState(basicInfoObj)
 	const [ fieldsError, setFieldsError ] = useState(basicInfoObj)
 	const [ file, setFile ] = useState('')
 
-	// console.log(fields)
+	const { loading, error, user } = useSelector(state => state.user)
+	// console.log({ loading, error, user })
 
 	const formValidator = (fieldsObj) => {
 		const errorsObj = {}
@@ -55,7 +56,7 @@ const FormDialog = ({ open, setOpen, user={} }) => {
 	const closeHandler = () => setOpen(false)
 	const changeHandler = async (evt) => {
 		setFields({ ...fields, [evt.target.name]: evt.target.value })
-		if(evt.target.name === 'file') readAsDataURL(evt.target.files[0], setFile)
+		if(evt.target.type === 'file') readAsDataURL(evt.target.files[0], setFile, false) // true: 'image' ? 'file'
 	}
 
 	const resetHandler = (evt) => {
@@ -67,20 +68,14 @@ const FormDialog = ({ open, setOpen, user={} }) => {
 	const submitHandler = (evt) => {
 		evt.preventDefault()
 
-		const isValidated = formValidator(fields)
-		if(!isValidated) return
+		// const isValidated = formValidator(fields)
+		// if(!isValidated) return
 
+		// setIsUpdated(true)
+		// setDisabled(true)
 
-		setLoading(true)
-
-		setTimeout(() => {
-			setLoading(false)
-			console.log({ ...fields, file })
-
-			setIsUpdated(true)
-			setDisabled(true)
-		}, 1000)
-
+		console.log({ ...fields, file })
+		// dispatch(updateProfile({ ...fields, file }))
 	}
 
 	return (

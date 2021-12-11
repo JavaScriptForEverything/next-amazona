@@ -1,6 +1,6 @@
 import crypto from 'crypto'
 
-import { catchAsync, getIdFromToken, setToken, appError, sendMail } from '../util'
+import { catchAsync, getIdFromToken, setToken, appError, sendMail, filterObjectWithExcludedArray } from '../util'
 import User from '../models/userModel'
 
 
@@ -11,8 +11,7 @@ import User from '../models/userModel'
 
 /* protect middleware used with:
 	. /api/users/me.js								:	handler.get(protect, getUser)
-	. /api/users/forgot-password/ 		: handler.patch(protect, resetPassword)
-*/
+	. /api/users/forgot-password/ 		: handler.patch(protect, resetPassword) */
 export const protect = catchAsync(async(req, res, next) => {
 	/* 1. Get Token: Token may comes form
 				1. browser Cookie automatically or
@@ -62,6 +61,28 @@ export const getMe = (req, res, next) => {
 		user: req.user
 	})
 }
+
+
+const excludedFields = [ 'role', '_id', 'password', 'email', 'passwordResetToken', 'passwordResetExpires', 'passwordChangedAt']
+
+/* userReducer.js  > /pages/api/users/me.js	:	handler.patch(protect, updateMe)
+ 		// .	/layout/index.js */
+export const updateMe = catchAsync( async (req, res, next) => {
+	if(req.body.password) return next(appError('Please use /user/update-my-password route'))
+	if(req.body.email) return next(appError('You can\'t change login email'))
+
+	const data = filterObjectWithExcludedArray(req.body, excludedFields )
+	const user = await User.findByIdAndUpdate(req.user.id, data, { new: true, runValidators: true })
+	if(!user) return next(appError('User can\'t update.', 500))
+
+		// console.log( data )
+
+	res.status(201).json({
+		status: 'success',
+		user
+	})
+})
+
 
 
 /* userReducer.js  > /pages/api/users/forgot-password.js	:	handler.post(forgotPassword)
@@ -135,3 +156,7 @@ export const resetPassword = catchAsync( async(req, res, next) => {
 		user: user
 	})
 })
+
+
+
+

@@ -1,5 +1,9 @@
 import { useState, useEffect } from 'react'
 import { isEmail } from 'validator'
+import { useDispatch, useSelector } from 'react-redux'
+import { updateProfile } from '../../../store/userReducer'
+
+import { readAsDataURL } from '../../../util'
 
 import Dialog from '@mui/material/Dialog'
 import Container from '@mui/material/Container'
@@ -11,6 +15,7 @@ import Button from '@mui/material/Button'
 import IconButton from '@mui/material/IconButton'
 import Avatar from '@mui/material/Avatar'
 import Alert from '@mui/material/Alert'
+import CircularProgress from '@mui/material/CircularProgress'
 
 import ClearIcon from '@mui/icons-material/Clear'
 import PersonIcon from '@mui/icons-material/Person'
@@ -22,21 +27,27 @@ const basicInfoItems = [
 	{label: 'Phone', type: 'number', name: 'phone'},
 	{label: 'CTC', type: 'number', name: 'ctc'},
 	{label: 'Location', type: 'text', name: 'location'},
-	{label: 'Email Address', type: 'email', name: 'email'},
+	{label: 'Resume', type: 'file', name: 'resume'},
 ]
 const basicInfoObj = {}
 basicInfoItems.forEach(itemObj => basicInfoObj[itemObj.name] = '')
 
 
 
-const FormDialog = ({ open, setOpen, user={} }) => {
+const FormDialog = ({ open, setOpen }) => {
+	const dispatch = useDispatch()
+
 	const [ disabled, setDisabled ] = useState(false)
 	const [ isUpdated, setIsUpdated ] = useState(false)
 
 	const [ fields, setFields ] = useState(basicInfoObj)
 	const [ fieldsError, setFieldsError ] = useState(basicInfoObj)
+	const [ resume, setResume ] = useState()
 
-	// // console.log(fieldsError)
+	const { error, loading, user } = useSelector(state => state.user)
+
+	// console.log({ error, loading, user })
+
 	// useEffect(() => {
 	// 	if(error) return dispatch(showError())
 	// }, [error])
@@ -57,6 +68,8 @@ const FormDialog = ({ open, setOpen, user={} }) => {
 
 	const closeHandler = () => setOpen(false)
 	const changeHandler = (evt) => {
+		if(evt.target.type === 'file') readAsDataURL(evt.target.files[0], setResume, false)
+
 		setFields({ ...fields, [evt.target.name]: evt.target.value})
 	}
 
@@ -73,7 +86,15 @@ const FormDialog = ({ open, setOpen, user={} }) => {
 
 		setIsUpdated(true)
 		setDisabled(true)
-		console.log(fields)
+
+
+		const location = { 													// str => obj: 'Dhaka Bangladesh'
+		  city: fields.location.split(' ')[0], 			// Dhaka
+		  country: fields.location.split(' ')[1], 	// Bangladesh
+		}
+
+		dispatch(updateProfile({...fields, resume, location }))
+		// console.log({...fields, location })
 	}
 
 	return (
@@ -137,7 +158,7 @@ const FormDialog = ({ open, setOpen, user={} }) => {
 						<Box sx={{display: 'flex', justifyContent: 'flex-end', gap: 1, mt: 3}} >
 							<Button variant='outlined' disabled={!true} onClick={resetHandler} >Reset</Button>
 							<Button variant='contained' type='submit' disabled={disabled} >
-								{ (isUpdated ? 'Updated' : 'Update') }
+								{ (isUpdated ? ( loading ? <CircularProgress size={24} /> : 'Updated') : 'Update') }
 							</Button>
 						</Box>
 					</form>

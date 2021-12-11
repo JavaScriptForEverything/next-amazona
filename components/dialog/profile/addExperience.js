@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { isEmail } from 'validator'
+import { useSelector } from 'react-redux'
 
 import Dialog from '@mui/material/Dialog'
 import Container from '@mui/material/Container'
@@ -29,13 +30,15 @@ basicInfoItems.forEach(itemObj => basicInfoObj[itemObj.name] = '')
 
 
 
-const FormDialog = ({ open, setOpen, user={} }) => {
+const FormDialog = ({ open, setOpen }) => {
 	const [ disabled, setDisabled ] = useState(false)
 	const [ isUpdated, setIsUpdated ] = useState(false)
 
 	const [ fields, setFields ] = useState(basicInfoObj)
 	const [ fieldsError, setFieldsError ] = useState(basicInfoObj)
 
+	const { loading, error, user } = useSelector(state => state.user)
+	// console.log({ loading, error, user })
 	// console.log(fieldsError)
 
 
