@@ -1,11 +1,10 @@
 import { useState, useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import nookies from 'nookies'
-import { updateProfile } from '../../store/userReducer'
+import { updateProfile, experienceFeature } from '../../store/userReducer'
 
 import Layout from '../../layout'
 import { toCapitalize, readAsDataURL } from '../../util'
-import { description } from '../../data/profile'
 import ProfileSkills from '../../components/dialog/profile/skills'
 import ProfileBasicInfo from '../../components/dialog/profile/basicInfo'
 import ProfileSendMail from '../../components/dialog/profile/sendMail'
@@ -65,19 +64,55 @@ const Profile = () => {
 
 	const [ openSkill, setOpenSkill ] = useState(false) 	// profile Skill handler
 	const [ openBasic, setOpenBasic ] = useState(false) 	// profile Basic Info handler
-	const [ openMail, setOpenMail ] = useState(false) 		// profile Basic Send Mail Button handler
-	const [ openAddExperience, setOpenAddExperience ] = useState(false)
+	const [ openMail, setOpenMail ] = useState(false) 		// profile Send Mail Button handler
+	const [ openAddExperience, setOpenAddExperience ] = useState(false) 	// profile Experience button handler
+	const [ experienceId, setExperienceId ] = useState(0) 								// to pass experienceId to AddExpreience Form
 
-	const { user } = useSelector(state => state.user)
-	// console.log(user.resume)
+	const { user, isExperienceAdd } = useSelector(state => state.user)
+	// console.log(experienceId)
+
+	const basic = [
+		{ label: 'Age', value: `${ user.age || 15} Years` },
+		{ label: 'Years of Experience', value: `${user.experience || 1} Years`},
+		{ label: 'Phone', value: user.phone || '01957500605' },
+		{ label: 'CTC', value: `${user.ctc || 2.5} Lac` },
+		{ label: 'Location', value: user.location ? toCapitalize(`${user.location.city} ${user.location.country}`) : 'Dhaka, Bangladesh'  },
+		{ label: 'Email', value: user.email || 'javascriptforeverything@gmail.com'  },
+	]
+	// const experiences = [
+	// 	{
+	// 		title: user.experiences.title,
+	// 		companyName: user.experiences.companyName,
+	// 		joiningDate: user.experiences.joiningDate,
+	// 		currentStatus: user.experiences.currentStatus,
+	// 		jobLocation: user.experiences.jobLocation,
+	// 		logoBackgroundColor: user.experiences.logoBackgroundColor
+	// 	}
+	// ]
+	// const experiences = [
+	// 	{
+	// 		title: 'UX/UI Designer',
+	// 		companyName: 'Pixel Studio',
+	// 		joiningDate: 'Apr 2010',
+	// 		currentStatus: 'Present',
+	// 		jobLocation: 'Dhaka, Bangladesh',
+	// 		logoBackgroundColor: '#42a5f5'
+	// 	},
+	// 	{
+	// 		title: 'Web Designer',
+	// 		companyName: 'Ramasion Studio',
+	// 		joiningDate: 'May 2017',
+	// 		currentStatus: 'Present',
+	// 		jobLocation: 'Dhaka, Bangladesh',
+	// 		logoBackgroundColor: 'lightPink'
+	// 	},
+	// ]
 
 	// update/delete avatar here
 	useEffect(() => {
 		dispatch(updateProfile({ avatar: avatarFile })) 	// update avatar in store + in Database
 		setAvatarOpen(false)
 	}, [avatarFile])
-
-
 
 
 	const avatarMenuCloseHandler = () => setAvatarOpen(false)
@@ -101,48 +136,27 @@ const Profile = () => {
 	const moreVertHandler = (evt) => {
 		setExperienceAnchorEl(evt.currentTarget)
 		setExperienceMenuOpen(true)
+		setExperienceId( evt.currentTarget.dataset.experienceId ) 	// need to update experience by id
 	}
-	const menuItemHandler = (evt, menuItem) => {
-		menuCloseHandler()
+	const menuItemHandler = (evt, menuItem ) => {
+		menuCloseHandler() 		// Close menuItem popup
 
-		// edit and delete item
-		console.log(menuItem)
+		if(menuItem === 'Update') { 	// Handle Menu Update Here
+			setOpenAddExperience(true)
+			dispatch(experienceFeature(false)) 			// Enable UpdateExperienceForm
+		}
+		if(menuItem === 'Delete') { 	// Handle Menu Delele Here
+			dispatch(updateProfile({ experiences: user.experiences.filter(item => item._id !== experienceId)}))
+		}
 	}
 
 	const profileSkillHandler = () => setOpenSkill(true)
 	const basicEditButtonHandler = () => setOpenBasic(true)
 	const sendMailHandler = () => setOpenMail(true)
-	const experienceAddButtonHandler = () => setOpenAddExperience(true)
-
-
-
-
-	const basic = [
-		{ label: 'Age', value: `${ user.age || 15} Years` },
-		{ label: 'Years of Experience', value: `${user.experience || 1} Years`},
-		{ label: 'Phone', value: user.phone || '01957500605' },
-		{ label: 'CTC', value: `${user.ctc || 2.5} Lac` },
-		{ label: 'Location', value: user ? toCapitalize(`${user.location.city} ${user.location.country}`) : 'Dhaka, Bangladesh'  },
-		{ label: 'Email', value: user.email || 'javascriptforeverything@gmail.com'  },
-	]
-	const experiences = [
-		{
-			title: 'Pixel Studio',
-			subheader: 'Ux/UI Designer',
-			date: 'Apr 2010',
-			status: 'Present',
-			location: 'Dhaka, Bangladesh',
-			backgroundColor: '#42a5f5'
-		},
-		{
-			title: 'Ramasion Studio',
-			subheader: 'Web Designer',
-			date: 'May 2017',
-			status: 'Present',
-			location: 'Dhaka, Bangladesh',
-			backgroundColor: 'lightPink'
-		},
-	]
+	const experienceAddButtonHandler = () => {
+		setOpenAddExperience(true)
+		dispatch(experienceFeature(true)) 				// Enable AddExperienceForm
+	}
 
 
 	return (
@@ -152,7 +166,8 @@ const Profile = () => {
 			{ user && <ProfileSkills open={openSkill} setOpen={setOpenSkill} /> }
 			{ user && <ProfileBasicInfo open={openBasic} setOpen={setOpenBasic} /> }
 			{ user && <ProfileSendMail open={openMail} setOpen={setOpenMail} /> }
-			{ user && <ProfileAddExperience open={openAddExperience} setOpen={setOpenAddExperience} /> }
+			{ user && <ProfileAddExperience open={openAddExperience} setOpen={setOpenAddExperience} experienceId={experienceId} /> }
+			{/*{ user && <ProfileAddExperience open={openAddExperience} setOpen={setOpenAddExperience} /> }*/}
 
 			<Container sx={{ my: 3 }} >
 				{/*-----[ start coding bellow here ]------*/}
@@ -188,11 +203,13 @@ const Profile = () => {
 
 									</div>
 								</IconButton>
+
 								<Typography color='primary' sx={{textTransform: 'capitalize'}} >{user.username}</Typography>
 								<Typography variant='caption' >{toCapitalize(user.title) || 'Full Stack Developer'}</Typography>
 								<Typography sx={{ mt: 2 }} variant='body2' color='textSecondary' align='justify' paragraph >
-									{user.description || description}
+									{user.description }
 								</Typography>
+
 							</Grid>
 							<Menu
 								open={avatarOpen}
@@ -232,18 +249,21 @@ const Profile = () => {
 								>{skill}</Button> )}
 							</Grid>
 
-							<Typography variant='h5' sx={{ mt: 4 }} >Add Notes </Typography>
-							<TextField
-								placeholder='Add notes for future feference'
-								fullWidth
-								multiline
-								rows={2}
-							/>
-							<Button
-								variant='contained'
-								fullWidth
-								sx={{ my: 2 }}
-							>Add Notes</Button>
+							<Typography variant='h5' sx={{ mt: 4 }} >Add Description </Typography>
+							<form onSubmit={() => 0}>
+								<TextField
+									placeholder='Add notes for future feference'
+									fullWidth
+									multiline
+									rows={2}
+								/>
+								<Button
+									variant='contained'
+									fullWidth
+									sx={{ my: 2 }}
+									type='submit'
+								>Add Description</Button>
+							</form>
 						</Paper>
 					</Grid>
 
@@ -298,29 +318,31 @@ const Profile = () => {
 								</Grid>
 							</Grid>
 
-							{ experiences.map((item, key) => (
+							{ user.experiences?.map((item, key) => (
 								<Grid key={key} sx={{ my: 3 }}>
 									<Grid container direction='row' alignItems='center'>
 										{/*----- 1st item (left)	-----*/}
 										<Grid item xs>
-											<Avatar sx={{width: 70, height: 70, backgroundColor: item.backgroundColor }} >
-												{item.title.split(' ').map(word => word[0]).join('').toUpperCase()}
+											<Avatar sx={{width: 70, height: 70, backgroundColor: item.logoBackgroundColor }} >
+												{item.companyName?.split(' ')?.map(word => word[0]).join('').toUpperCase()}
 											</Avatar>
 										</Grid>
+
 
 										{/*----- 2nd item (Right)	-----*/}
 										<Grid item xs={9} md={10} container direction='column'>
 											<Grid container justifyContent='space-between' >
-												<Grid item> <Typography color='primary' >{item.title}</Typography> </Grid>
+												<Grid item> <Typography color='primary' >{toCapitalize(item.title)}</Typography> </Grid>
 												<Grid item>
-													<IconButton onClick={moreVertHandler}>
+													<IconButton onClick={moreVertHandler} data-experience-id={item._id}
+													>
 														<MoreVertIcon />
 													</IconButton>
 												</Grid>
 											</Grid>
-											<Typography color='textSecondary' variant='caption'>{item.subheader}</Typography>
+											<Typography variant='caption'>{toCapitalize(item.companyName)}</Typography>
 											<Typography color='textSecondary' variant='caption'>
-											{item.date} - {item.status} | {item.location}</Typography>
+											{item.joiningDate} - {item.currentStatus} | {item.jobLocation}</Typography>
 										</Grid>
 									</Grid>
 
@@ -328,24 +350,29 @@ const Profile = () => {
 										<Grid item xs> </Grid>
 										<Grid item xs={9} md={10}> <Divider sx={{ mt: 1 }} /> </Grid>
 									</Grid>
+
 								</Grid>
 							))}
 						</Paper>
+
+					{/*---------[ Allow menu item to access item._id ]---------*/}
 						<Menu
 							open={experienceMenuOpen}
 							anchorEl={experienceAnchorEl}
 							onClose={menuCloseHandler}
 						>
-							{experiencesInfo.map((item, key, arr) => <MenuItem key={key}
+							{experiencesInfo.map((menuItem, key, arr) => <MenuItem key={key}
 								dense
-								divider={item.label !== arr[arr.length - 1].label}
-								onClick={(evt) => menuItemHandler(evt, item.label)}
+								divider={menuItem.label !== arr[arr.length - 1].label}
+								// data-experience-id={item._id} 	// user.experiences.map((item....))
+								onClick={(evt) => menuItemHandler(evt, menuItem.label)}
 							>
-								<ListItemIcon>{item.icon}</ListItemIcon>
-								<ListItemText>{item.label}</ListItemText>
+								<ListItemIcon>{menuItem.icon}</ListItemIcon>
+								<ListItemText>{menuItem.label}</ListItemText>
 							</MenuItem>
 							)}
 						</Menu>
+
 
 					{/*------[ Right: 3rd block ]------*/}
 					<Grid sx={{ display: 'flex', flexDirection: 'column', gap: 2 }} >

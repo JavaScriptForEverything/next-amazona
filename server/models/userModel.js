@@ -1,6 +1,8 @@
 const { Schema, model, models } = require('mongoose')
 const { isEmail } = require('validator')
 const { hash } = require('bcryptjs')
+const { randomHexColor } = require('../util')
+
 
 const userSchema = new Schema({
 	username: {
@@ -37,7 +39,7 @@ const userSchema = new Schema({
 	passwordResetExpires: Date, 		// required to make token expire after given time
 	passwordChangedAt: Date, 				// required to make token invalid after modify password
 
-	avatar: {
+	avatar: { 											// we make it required in signup controler, by condition check.
 		type: String,
 		default: '/user.jpg'
 	},
@@ -116,7 +118,7 @@ const userSchema = new Schema({
 	},
 
 	// Experience Info
-	experiences: {
+	experiences: [{
 		title: {
 			type: String,
 			lowercase: true,
@@ -124,40 +126,42 @@ const userSchema = new Schema({
 			maxLength: 50,
 			default: 'Pixel Studio',
 		},
-		subheader: {
+		companyName: {
 			type: String,
 			lowercase: true,
 			trim: true,
 			maxLength: 50,
 			default: 'Ux/UI Designer',
 		},
-		date: {
+		joiningDate: {
 			type: Date,
 			default: Date.now
 		},
-		status: {
+		currentStatus: {
 			type: String,
 			lowercase: true,
 			trim: true,
 			maxLength: 50,
 			default: 'Present',
 		},
-		location: {
+		lobLocation: {
 			type: String,
 			lowercase: true,
 			trim: true,
 			maxLength: 50,
 			default: 'Dhaka, Bangladesh',
 		},
-		avatar: {
+		// avatar: {
+		// 	type: String,
+		// 	default: 'PS',
+		// 	set: function() { return this.title.split(' ').map(word => word[0]).join('').toUpperCase() },
+		// },
+		logoBackgroundColor: {
 			type: String,
-			default: 'PS'
-		},
-		backgroundColor: {
-			type: String,
-			default: '#42a5f5'
+			// default: '#42a5f5'
+			default: randomHexColor
 		}
-	}
+	}]
 
 
 }, {

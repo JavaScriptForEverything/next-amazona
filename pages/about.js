@@ -32,6 +32,15 @@ const About = () => {
 
 	const { user } = useSelector(state => state.user )
 
+	const menuItemHandler = function(evt) {
+		// const { myValue } = evt.target.dataset
+		// console.log({ myValue })
+
+		// console.log(event.target.parentElement)
+		// console.log(data)
+	}
+
+
 	return (
 		<Layout title='about page'>
 			<Typography>About Page</Typography>
@@ -41,29 +50,12 @@ const About = () => {
 
 				<br /> <br />
 
-			<object data="/resume.pdf" type="file"></object>
 
-{/*			<embed
-		    src="/resume.pdf"
-		    type="application/pdf"
-		    frameBorder="0"
-		    scrolling="auto"
-		    height="100%"
-		    width="100%"
-			></embed>
-
-			<iframe
-		    src="/resume.pdf"
-		    frameBorder="0"
-		    scrolling="auto"
-		    height="100%"
-		    width="100%"
-			></iframe>
-*/}
-{/*			<object data="/resume.pdf" type="application/pdf" width="300" height="200">
-				<a href="data/test.pdf">test.pdf</a>
-			</object>
-*/}
+				<Menu open={true}
+					data-my-value={'asdf234'}
+				>
+					<MenuItem onClick={menuItemHandler} >Item 3</MenuItem>
+				</Menu>
 
 
 

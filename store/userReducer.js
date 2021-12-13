@@ -1,6 +1,5 @@
 import { createSlice } from '@reduxjs/toolkit'
 import axios from 'axios'
-import absoluteURL from 'next-absolute-url'
 import nookies from 'nookies'
 import { HYDRATE } from 'next-redux-wrapper'
 
@@ -17,6 +16,7 @@ const { reducer, actions } = createSlice({
 		authenticated: token && !!token || false,
 		token: token || '',
 		isSignedUp: false,
+		isExperienceAdd: true,
 
 		user : { 									// set default user value
 		  _id: '',
@@ -36,15 +36,7 @@ const { reducer, actions } = createSlice({
 		    country: ''
 		  },
 		  experience: '',
-		  experiences: {
-		    title: '',
-		    subheader: '',
-		    status: '',
-		    location: '',
-		    avatar: '',
-		    backgroundColor: '',
-		    date: ''
-		  }
+		  experiences: []
 		}
 	},
 	reducers: {
@@ -59,6 +51,7 @@ const { reducer, actions } = createSlice({
 			error: action.payload || ''
 		}),
 
+		experienceFeature: (state, action) => ({ ...state, isExperienceAdd: action.payload}),
 		logedIn: (state, action) => {
 			const { token } = action.payload
 			if(!token) return { ...state, loading: false }
@@ -91,9 +84,7 @@ const { reducer, actions } = createSlice({
 			}
 		},
 		passwordUpdated: (state, action) => {
-
 			const { token } = action.payload
-
 			if(!token) return { ...state, loading: false }
 			// localStorage.setItem('token', token)
 
@@ -134,6 +125,9 @@ export const updateProfile = (obj) => catchAsyncDispatch(async (dispatch) => {
 	dispatch(actions.profileUpdated(user))
 }, actions.failed)
 
+export const experienceFeature = (isExperienceAdd=true) => (dispatch) => {
+	dispatch(actions.experienceFeature(isExperienceAdd))
+}
 
 
 export const logoutMe = () => (dispatch) => dispatch(actions.logedOut())

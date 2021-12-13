@@ -89,8 +89,8 @@ const FormDialog = ({ open, setOpen }) => {
 
 
 		const location = { 													// str => obj: 'Dhaka Bangladesh'
-		  city: fields.location.split(' ')[0], 			// Dhaka
-		  country: fields.location.split(' ')[1], 	// Bangladesh
+		  city: fields?.location?.split(' ')[0], 			// Dhaka
+		  country: fields?.location?.split(' ')[1], 	// Bangladesh
 		}
 
 		dispatch(updateProfile({...fields, resume, location }))

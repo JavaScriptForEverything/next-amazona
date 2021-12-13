@@ -1,6 +1,6 @@
 import { compare } from 'bcryptjs'
 import User from '../models/userModel'
-import { catchAsync, appError, setToken, getIdFromToken, filterObjByArray } from '../util'
+import { catchAsync, appError, setToken, getIdFromToken, filterObjectWithAllowedArray } from '../util'
 
 
 /* userReducer.js  > /pages/api/users/login.js	:	handler.post(login)
@@ -33,13 +33,15 @@ export const login = catchAsync(async (req, res, next) => {
 export const signup = catchAsync(async (req, res, next) => {
 	// 1. filter out un wanted fields
 	const allowedFields = ['username', 'email', 'password', 'confirmPassword', 'avatar']
-	const body = filterObjByArray(req.body, allowedFields)
+	const body = filterObjectWithAllowedArray(req.body, allowedFields)
 
 	// 2. check extra staff
 	// allowedFields.forEach(item => {
 	// 	if(!body[item]) throw next(appError(`${item} field is empty`))
 	// })
-	allowedFields.forEach(item => (!body[item]) && next(appError(`${item} field is empty`)) )
+	allowedFields.forEach(item => {
+		if(!body[item]) throw next(appError(`${item} field is empty`))
+	})
 
 	// 3. password will be hashed before save by pre('save') hook
 	// 4. save to database

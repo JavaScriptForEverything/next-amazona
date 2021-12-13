@@ -2,7 +2,8 @@ import { useEffect } from 'react'
 import axios from 'axios'
 import absoluteUrl from 'next-absolute-url'
 import { useDispatch, useSelector } from 'react-redux'
-import { addItemToCart, showAlert } from '../store/productReducer'
+import { showAlert } from '../store/dialogReducer'
+import { addItemToCart } from '../store/productReducer'
 
 import Link from 'next/link'
 

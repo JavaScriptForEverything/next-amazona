@@ -4,8 +4,9 @@
   "main": "index.js",
   "license": "MIT",
   "scripts": {
-    "start": "NODE_ENV=production next",
     "dev": "next dev",
+    "build" : "next build",
+    "start": " next build && next start",
     "seeder": "node server/models/seeder.js --import"
   },
   "dependencies": {

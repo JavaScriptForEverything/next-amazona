@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { isEmail } from 'validator'
-import { useSelector } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
+import { updateProfile } from '../../../store/userReducer'
 
 import Dialog from '@mui/material/Dialog'
 import Container from '@mui/material/Container'
@@ -12,34 +13,38 @@ import Button from '@mui/material/Button'
 import IconButton from '@mui/material/IconButton'
 import Avatar from '@mui/material/Avatar'
 import Alert from '@mui/material/Alert'
+import CircularProgress from '@mui/material/CircularProgress'
 
 import ClearIcon from '@mui/icons-material/Clear'
 import PersonIcon from '@mui/icons-material/Person'
 
 
-const basicInfoItems = [
-	{label: 'Company Name', type: 'text', name: 'name'},
+const experiences = [
 	{label: 'Job Title', type: 'text', name: 'title'},
+	{label: 'Company Name', type: 'text', name: 'companyName'},
 	{label: 'Joining Date', type: 'date', name: 'joiningDate'},
 	{label: 'Current Status', type: 'text', name: 'currentStatus'},
 	{label: 'Job Location', type: 'text', name: 'location'},
 	{label: 'Logo Color', type: 'color', name: 'logoBackgroundColor'},
 ]
-const basicInfoObj = {}
-basicInfoItems.forEach(itemObj => basicInfoObj[itemObj.name] = '')
+const experienceObj = {}
+experiences.forEach(itemObj => experienceObj[itemObj.name] = '')
 
 
 
-const FormDialog = ({ open, setOpen }) => {
+// if update=true then used as update form else update as add Form
+const FormDialog = ({ open, setOpen, experienceId }) => {
+	const dispatch = useDispatch()
+
 	const [ disabled, setDisabled ] = useState(false)
 	const [ isUpdated, setIsUpdated ] = useState(false)
 
-	const [ fields, setFields ] = useState(basicInfoObj)
-	const [ fieldsError, setFieldsError ] = useState(basicInfoObj)
+	const [ fields, setFields ] = useState(experienceObj)
+	const [ fieldsError, setFieldsError ] = useState(experienceObj)
 
-	const { loading, error, user } = useSelector(state => state.user)
+	const { loading, error, user, isExperienceAdd } = useSelector(state => state.user)
 	// console.log({ loading, error, user })
-	// console.log(fieldsError)
+	// console.log(user.experiences[0])
 
 
 	const formValidator = (fieldsObj) => {
@@ -52,19 +57,21 @@ const FormDialog = ({ open, setOpen }) => {
 
 		setFieldsError(errorsObj)
 		return Object.values(errorsObj).every((field) => field === '' )
-
-		// return errorsObj
 	}
 
-	const closeHandler = () => setOpen(false)
+
 	const changeHandler = (evt) => {
 		setFields({ ...fields, [evt.target.name]: evt.target.value})
 	}
 
-	const resetHandler = (evt) => {
-		setFields(basicInfoObj) 		// evt.target.form.reset() 		// reset form
+	const resetHandler = () => {
+		setFields(experienceObj) 		// evt.target.form.reset() 		// reset form
 		setIsUpdated(false)
 		setDisabled(false)
+	}
+	const closeHandler = () => {
+		resetHandler()
+		setOpen(false)
 	}
 	const submitHandler = (evt) => {
 		evt.preventDefault()
@@ -74,7 +81,15 @@ const FormDialog = ({ open, setOpen }) => {
 
 		setIsUpdated(true)
 		setDisabled(true)
-		console.log(fields)
+
+		if(isExperienceAdd) { 	// handle add features
+			dispatch(updateProfile({ experiences: user.experiences.concat(fields) }))
+
+		} else { 			// handle update features
+			dispatch(updateProfile({ experiences: user.experiences
+				.map(item => item._id === experienceId ? { ...item, ...fields } : {...item} )}))
+		}
+
 	}
 
 	return (
@@ -112,13 +127,19 @@ const FormDialog = ({ open, setOpen }) => {
 						 { <PersonIcon color='primary' />}
 						</Avatar>
 
-						<Typography variant='h6' sx={{ textTransform: 'uppercase'}} >Add Experience</Typography>
+						<Typography variant='h6' sx={{ textTransform: 'uppercase'}} >
+							{isExperienceAdd ? 'Add Experience' : 'Update Experience'}
+						</Typography>
 					</Box>
 
-					{isUpdated && <Alert sx={{mb: 2}} severity='success' color='info'>Experience added successfully</Alert> }
+					{isUpdated && (
+					<Alert sx={{mb: 2}} severity='success' color='info'>
+						Experience {isExperienceAdd ? 'added' : 'Updated'} successfully
+					</Alert>
+					)}
 
 					<form onSubmit={submitHandler} noValidate >
-						{ basicInfoItems.map(({label, name, type}, key) => <TextField key={key}
+						{ experiences.map(({label, name, type}, key) => <TextField key={key}
 							label={label}
 							placeholder={label}
 							InputLabelProps={{shrink: true}}
@@ -143,7 +164,10 @@ const FormDialog = ({ open, setOpen }) => {
 						<Box sx={{display: 'flex', justifyContent: 'flex-end', gap: 1, mt: 3}} >
 							<Button variant='outlined' disabled={!true} onClick={resetHandler} >Reset</Button>
 							<Button variant='contained' type='submit' disabled={disabled} >
-								{ (isUpdated ? 'Updated' : 'Update') }
+								{/*{ (isUpdated ? ( loading ? <CircularProgress size={24}/> : 'Updated') : 'Update') }*/}
+								{ loading ? <CircularProgress size={24}/> : (
+									isExperienceAdd ? (isUpdated ? 'Added' : 'Add') : (isUpdated ? 'Updated' :	'Update')
+								)}
 							</Button>
 						</Box>
 					</form>

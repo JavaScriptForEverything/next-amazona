@@ -28,20 +28,6 @@ export const onError = (err, req, res, next) => { 		// like express global Error
 export const setToken = (_id) => sign( {_id}, process.env.TOKEN_SALT, { expiresIn: process.env.TOKEN_EXPIRES })
 export const getIdFromToken = (token) => verify(token, process.env.TOKEN_SALT)
 
-export const sendMail = async ({ from='<next.amazona.gmail.com>', to, subject, text }) => {
-	const transport = nodemailer.createTransport({
-	  host: "smtp.mailtrap.io",
-	  port: 2525,
-	  auth: {
-	    user: "64bac243db47d8",
-	    pass: "f7eee6e8aa7885"
-	  }
-	})
-
-	await transport.sendMail({ from, to, subject, text })
-}
-
-
 export const filterObjectWithExcludedArray = (obj, filteredField) => {
 	const tempObj = JSON.parse(JSON.stringify(obj))
 	Object.keys(obj).forEach(item => filteredField.includes(item) && delete tempObj[item] )
@@ -55,3 +41,31 @@ export const filterObjectWithAllowedArray = (obj, allowedItems) => {
 
 	return newObj
 }
+
+// Replace every Zero with random number + always return 6 digit long hex code
+export const randomHexColor = "#000000".replace(/0/g,() => (~~(Math.random()*16)).toString(16) )
+
+// ---------------[ SendMail ]-----------
+const stripeCrediential = {
+	  host: process.env.MAILTRAP_HOST,
+	  port: process.env.MAILTRAP_PORT,
+	  auth: {
+	    user: process.env.MAILTRAP_USER,
+	    pass: process.env.MAILTRAP_PASS,
+	  }
+	}
+const sendGridCrediential = {
+	  service: 'SendGrid',
+	  auth: {
+	    user: process.env.SENDGRID_USER,
+	    pass: process.env.SENDGRID_PASS,
+	  }
+	}
+const transportOptions = process.env.NODE_ENV === 'production' ? sendGridCrediential : stripeCrediential
+export const sendMail = async ({ from='<next.amazona.gmail.com>', to, subject, text }) => {
+	const transport = nodemailer.createTransport(transportOptions)
+
+	await transport.sendMail({ from, to, subject, text })
+}
+
+
