@@ -1,6 +1,14 @@
 import { compare } from 'bcryptjs'
 import User from '../models/userModel'
-import { catchAsync, appError, setToken, getIdFromToken, filterObjectWithAllowedArray } from '../util'
+import { isEmail } from 'validator'
+import {
+	catchAsync,
+	appError,
+	setToken,
+	getIdFromToken,
+	filterObjectWithAllowedArray,
+	sendMail
+} from '../util'
 
 
 /* userReducer.js  > /pages/api/users/login.js	:	handler.post(login)
@@ -85,4 +93,31 @@ export const getUserById = catchAsync(async(req, res, next) => {
 		status: 'success',
 		user
 	})
+})
+
+
+
+/* userReducer.js  > /api/users/send-mail.js	:	handler.post(protect, userMailTo)
+ 		/components/dialog/profile/sendMail.js */
+export const userMailTo = catchAsync(async(req, res, next) => {
+	let { email, subject, message, file } = req.body
+
+	if(!isEmail(email)) return next(appError('Receipence must be valid email address'))
+	if(!subject || !message) return next(appError('subject or message field empty'))
+
+	message = message
+	if(file) message = `${message} \bfile: ${file}`
+
+
+	try {
+		await sendMail({ from: req.user.email, to: email, subject, message })
+		res.status(200).json({
+			status: 'success',
+			message: 'mail is sent successfully'
+		})
+
+	} catch(err) {
+		throw next(appError(err.message, 403))
+	}
+
 })

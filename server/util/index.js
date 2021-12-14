@@ -61,7 +61,8 @@ const sendGridCrediential = {
 	    pass: process.env.SENDGRID_PASS,
 	  }
 	}
-const transportOptions = process.env.NODE_ENV === 'production' ? sendGridCrediential : stripeCrediential
+// const transportOptions = process.env.NODE_ENV === 'production' ? sendGridCrediential : stripeCrediential
+const transportOptions = stripeCrediential 	// SendGrid account disabled after some time
 export const sendMail = async ({ from='<next.amazona.gmail.com>', to, subject, text }) => {
 	const transport = nodemailer.createTransport(transportOptions)
 

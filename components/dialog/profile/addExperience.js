@@ -24,7 +24,7 @@ const experiences = [
 	{label: 'Company Name', type: 'text', name: 'companyName'},
 	{label: 'Joining Date', type: 'date', name: 'joiningDate'},
 	{label: 'Current Status', type: 'text', name: 'currentStatus'},
-	{label: 'Job Location', type: 'text', name: 'location'},
+	{label: 'Job Location', type: 'text', name: 'jobLocation'},
 	{label: 'Logo Color', type: 'color', name: 'logoBackgroundColor'},
 ]
 const experienceObj = {}
@@ -44,7 +44,15 @@ const FormDialog = ({ open, setOpen, experienceId }) => {
 
 	const { loading, error, user, isExperienceAdd } = useSelector(state => state.user)
 	// console.log({ loading, error, user })
-	// console.log(user.experiences[0])
+	// console.log(user.experiences)
+
+
+
+	// set user value for update form
+	useEffect(() => {
+	const currentObj = user.experiences.find(item => item._id === experienceId)
+		if(!isExperienceAdd && currentObj) setFields({ ...fields, ...currentObj, joiningDate: new Date(currentObj.joiningDate) })
+	}, [experienceId])
 
 
 	const formValidator = (fieldsObj) => {
@@ -143,15 +151,11 @@ const FormDialog = ({ open, setOpen, experienceId }) => {
 							label={label}
 							placeholder={label}
 							InputLabelProps={{shrink: true}}
-							// InputProps={{
-							// 	inputProps: {
-
-							// 	}
-							// }}
 							fullWidth
 							required
 							sx={key !== 0 ? {mt: 2} : {}}
 							margin='dense'
+							autoFocus={key === 0}
 
 							type={type}
 							name={name}

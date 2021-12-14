@@ -51,11 +51,6 @@ const About = () => {
 				<br /> <br />
 
 
-				<Menu open={true}
-					data-my-value={'asdf234'}
-				>
-					<MenuItem onClick={menuItemHandler} >Item 3</MenuItem>
-				</Menu>
 
 
 

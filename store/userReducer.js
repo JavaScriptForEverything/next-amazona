@@ -16,7 +16,9 @@ const { reducer, actions } = createSlice({
 		authenticated: token && !!token || false,
 		token: token || '',
 		isSignedUp: false,
-		isExperienceAdd: true,
+		isExperienceAdd: true, 		// to enable add/update experience form
+		edit: '', 								// to make edit dialog based on it value
+		message: '', 							// email sent message
 
 		user : { 									// set default user value
 		  _id: '',
@@ -52,6 +54,8 @@ const { reducer, actions } = createSlice({
 		}),
 
 		experienceFeature: (state, action) => ({ ...state, isExperienceAdd: action.payload}),
+		profileEdited: (state, action) => ({ ...state, edit: action.payload}),
+
 		logedIn: (state, action) => {
 			const { token } = action.payload
 			if(!token) return { ...state, loading: false }
@@ -91,6 +95,12 @@ const { reducer, actions } = createSlice({
 			return { ...state, loading: false, authenticated: true }
 		},
 
+		mailSended: (state, action) => ({
+			...state,
+			loading: false,
+			message: action.payload
+		})
+
 
 	}, // End of Reducer
 	extraReducers: {
@@ -119,7 +129,9 @@ export const getUser = (token) => catchAsyncDispatch(async (dispatch) => {
 	dispatch(actions.getMe(data))
 }, actions.failed)
 
-export const updateProfile = (obj) => catchAsyncDispatch(async (dispatch) => {
+/* every place used this function we have to pass token too, but as we use cookie,
+ 	and backend check 3 place for token, luckyly browser send cooke that why our code wouldn't throw error */
+export const updateProfile = (obj, token) => catchAsyncDispatch(async (dispatch) => {
 	dispatch(actions.requested())
 	const { data: { user } } = await axios.patch(`/api/users/me`, obj, { headers: {Authorization: `Bearer ${token}`} })
 	dispatch(actions.profileUpdated(user))
@@ -128,6 +140,19 @@ export const updateProfile = (obj) => catchAsyncDispatch(async (dispatch) => {
 export const experienceFeature = (isExperienceAdd=true) => (dispatch) => {
 	dispatch(actions.experienceFeature(isExperienceAdd))
 }
+export const editFeature = (value='') => (dispatch) => {
+	dispatch(actions.profileEdited(value))
+}
+
+
+// /components/dialog/profile/sendMail.js
+export const userMailTo = (obj, token) => catchAsyncDispatch(async (dispatch) => {
+	dispatch(actions.requested())
+	const { data: { message } } = await axios.post('/api/users/send-mail', obj, { headers: { Authorization: `Bearer ${token}`} })
+
+	dispatch(actions.mailSended(message))
+
+}, actions.failed)
 
 
 export const logoutMe = () => (dispatch) => dispatch(actions.logedOut())
@@ -171,11 +196,6 @@ export const resetPassword = (obj) => catchAsyncDispatch(async (dispatch) => {
 	dispatch(showAlert({ open: true, severity: 'success', message}))
 	dispatch(actions.tokenSent())
 }, actions.failed)
-
-
-
-
-
 
 
 

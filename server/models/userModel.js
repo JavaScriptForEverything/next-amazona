@@ -66,9 +66,9 @@ const userSchema = new Schema({
 
 	// Basic Info
 	phone: {
-		type: Number,
-		min: 10000000, 			// for
-		maxLength: 99999999999,
+		type: String,
+		minLength: 10,
+		maxLength: 12,
 		default: '01957500605'
 	},
 	age : {
@@ -79,8 +79,8 @@ const userSchema = new Schema({
 		default: '28 Yars'
 	},
 	ctc: {
-		type: Number,
-		default: 2.5
+		type: String,
+		default: '2.5 Lac'
 	},
 	location: {
 		address: {

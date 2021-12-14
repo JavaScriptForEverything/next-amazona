@@ -90,7 +90,13 @@ const Cart = () => {
 										<IconButton onClick={(evt) => addHandler(evt, cart)}><AddIcon color='primary' /></IconButton>
 									</TableCell>
 									<TableCell></TableCell>
-									<TableCell align='right'>${cart.price}</TableCell>
+									<TableCell align='right'>
+										{cart.price.toLocaleString('en-us', {
+											style: 'currency',
+											currency: 'usd',
+											currencyDisplay: 'symbol'
+										})}
+									</TableCell>
 									<TableCell align='right'>
 										<IconButton onClick={(evt) => clickHandler(evt, cart)}>
 											<DeleteIcon />
@@ -107,8 +113,11 @@ const Cart = () => {
 						<List>
 							<ListItem>
 								<Typography variant='h5'> Subtotal
-									({cartItems.reduce((total, item, index) => total + index, 1)} items):
-										${totalPrice}
+									({cartItems.reduce((total, item, index) => total + index, 1)} items) : {totalPrice.toLocaleString('en-us', {
+											style: 'currency',
+											currency: 'usd',
+											currencyDisplay: 'symbol'
+										})}
 									{/*${cartItems.reduce((total, item, index) => total + item.price * item.quantity, 0)}*/}
 								</Typography>
 							</ListItem>

@@ -1,8 +1,12 @@
 import { useState, useEffect } from 'react'
 import { isEmail } from 'validator'
-import { useSelector } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
+import { userMailTo } from '../../../store/userReducer'
+import { showAlert } from '../../../store/dialogReducer'
 
 import { readAsDataURL } from '../../../util'
+import nookies from 'nookies'
+
 
 import Dialog from '@mui/material/Dialog'
 import Container from '@mui/material/Container'
@@ -31,6 +35,9 @@ basicInfoItems.forEach(itemObj => basicInfoObj[itemObj.name] = '')
 
 
 const FormDialog = ({ open, setOpen }) => {
+	const dispatch = useDispatch()
+	const { token } = nookies.get(null)
+
 	const [ disabled, setDisabled ] = useState(false)
 	const [ isUpdated, setIsUpdated ] = useState(false)
 
@@ -38,8 +45,13 @@ const FormDialog = ({ open, setOpen }) => {
 	const [ fieldsError, setFieldsError ] = useState(basicInfoObj)
 	const [ file, setFile ] = useState('')
 
-	const { loading, error, user } = useSelector(state => state.user)
+	const { loading, error, user, message } = useSelector(state => state.user)
 	// console.log({ loading, error, user })
+
+	useEffect(() => {
+		if(error) return dispatch(showAlert({ open: true, severity: 'error', message: error}))
+	}, [error])
+
 
 	const formValidator = (fieldsObj) => {
 		const errorsObj = {}
@@ -68,14 +80,14 @@ const FormDialog = ({ open, setOpen }) => {
 	const submitHandler = (evt) => {
 		evt.preventDefault()
 
-		// const isValidated = formValidator(fields)
-		// if(!isValidated) return
+		const isValidated = formValidator(fields)
+		if(!isValidated) return
 
-		// setIsUpdated(true)
-		// setDisabled(true)
+		setIsUpdated(true)
+		setDisabled(true)
 
 		console.log({ ...fields, file })
-		// dispatch(updateProfile({ ...fields, file }))
+		dispatch(userMailTo({ ...fields, file }, token ))
 	}
 
 	return (

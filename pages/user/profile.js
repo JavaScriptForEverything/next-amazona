@@ -1,7 +1,8 @@
+import nookies from 'nookies'
+
 import { useState, useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import nookies from 'nookies'
-import { updateProfile, experienceFeature } from '../../store/userReducer'
+import { updateProfile, experienceFeature, editFeature } from '../../store/userReducer'
 
 import Layout from '../../layout'
 import { toCapitalize, readAsDataURL } from '../../util'
@@ -9,6 +10,7 @@ import ProfileSkills from '../../components/dialog/profile/skills'
 import ProfileBasicInfo from '../../components/dialog/profile/basicInfo'
 import ProfileSendMail from '../../components/dialog/profile/sendMail'
 import ProfileAddExperience from '../../components/dialog/profile/addExperience'
+import ProfileEdit from '../../components/dialog/profile/edit'
 
 import Container from '@mui/material/Container'
 import Paper from '@mui/material/Paper'
@@ -68,16 +70,18 @@ const Profile = () => {
 	const [ openAddExperience, setOpenAddExperience ] = useState(false) 	// profile Experience button handler
 	const [ experienceId, setExperienceId ] = useState(0) 								// to pass experienceId to AddExpreience Form
 
-	const { user, isExperienceAdd } = useSelector(state => state.user)
-	// console.log(experienceId)
+	const [ openEdit, setOpenEdit ] = useState(false) 								// to pass experienceId to AddExpreience Form
+
+	const { user, isExperienceAdd, edit } = useSelector(state => state.user)
+	// console.log(edit)
 
 	const basic = [
-		{ label: 'Age', value: `${ user.age || 15} Years` },
-		{ label: 'Years of Experience', value: `${user.experience || 1} Years`},
-		{ label: 'Phone', value: user.phone || '01957500605' },
-		{ label: 'CTC', value: `${user.ctc || 2.5} Lac` },
-		{ label: 'Location', value: user.location ? toCapitalize(`${user.location.city} ${user.location.country}`) : 'Dhaka, Bangladesh'  },
-		{ label: 'Email', value: user.email || 'javascriptforeverything@gmail.com'  },
+		{ label: 'Age', value: user.age  },
+		{ label: 'Years of Experience', value: user.experience },
+		{ label: 'Phone', value: user.phone },
+		{ label: 'CTC', value: user.ctc },
+		{ label: 'Location', value: user.location && toCapitalize(`${user.location.city} ${user.location.country}`)  },
+		{ label: 'Email', value: user.email },
 	]
 	// const experiences = [
 	// 	{
@@ -159,6 +163,19 @@ const Profile = () => {
 	}
 
 
+	const usernameHandler = (evt) => {
+		setOpenEdit(true)
+		dispatch(editFeature('username'))
+	}
+	const titleHandler = (evt) => {
+		setOpenEdit(true)
+		dispatch(editFeature('title'))
+	}
+	const descriptionHandler = (evt) => {
+		setOpenEdit(true)
+		dispatch(editFeature('description'))
+	}
+
 	return (
 		<Layout>
 
@@ -167,7 +184,7 @@ const Profile = () => {
 			{ user && <ProfileBasicInfo open={openBasic} setOpen={setOpenBasic} /> }
 			{ user && <ProfileSendMail open={openMail} setOpen={setOpenMail} /> }
 			{ user && <ProfileAddExperience open={openAddExperience} setOpen={setOpenAddExperience} experienceId={experienceId} /> }
-			{/*{ user && <ProfileAddExperience open={openAddExperience} setOpen={setOpenAddExperience} /> }*/}
+			{ user && <ProfileEdit open={openEdit} setOpen={setOpenEdit} /> }
 
 			<Container sx={{ my: 3 }} >
 				{/*-----[ start coding bellow here ]------*/}
@@ -178,35 +195,36 @@ const Profile = () => {
 						<Paper sx={{ p: 2 }} >
 							<Grid container direction='column' alignItems='center' >
 								<IconButton onClick={profileAvatarClickHandler} component='section' >
-									<div style={{
-										position: 'relative'
-									}}>
-
-									<Avatar
-										src={user.avatar}
-										alt={user.avatar}
-										title={user.username || 'user avatar'}
-										sx={{ width: 150, height: 150, mb: 1 }}
-									/>
-									<div style={{
-										position: 'absolute',
-										bottom: 10,
-										left: 0,
-									}}>
-										<Button
-											color='inherit'
-											size='small'
-											variant='contained'
-											startIcon={<EditIcon />}
-										>Edit</Button>
-									</div>
-
+									<div style={{position: 'relative'}}>
+										<Avatar
+											src={user.avatar}
+											alt={user.avatar}
+											title={user.username}
+											sx={{ width: 150, height: 150, mb: 1 }}
+										/>
+										<div style={{position: 'absolute', bottom: 10, left: 0, }}>
+											<Button
+												color='inherit'
+												size='small'
+												variant='contained'
+												startIcon={<EditIcon />}
+											>Edit</Button>
+										</div>
 									</div>
 								</IconButton>
 
-								<Typography color='primary' sx={{textTransform: 'capitalize'}} >{user.username}</Typography>
-								<Typography variant='caption' >{toCapitalize(user.title) || 'Full Stack Developer'}</Typography>
-								<Typography sx={{ mt: 2 }} variant='body2' color='textSecondary' align='justify' paragraph >
+								<Typography color='primary' sx={{textTransform: 'capitalize'}}
+									title='Double Click to Edit'
+									onDoubleClick={usernameHandler}
+								>{user.username}</Typography>
+								<Typography variant='caption'
+									title='Double Click to Edit'
+									onDoubleClick={titleHandler}
+								>{toCapitalize(user.title) || 'Full Stack Developer'}</Typography>
+								<Typography sx={{ mt: 2 }} variant='body2' color='textSecondary' align='justify' paragraph
+									title='Double Click to Edit'
+									onDoubleClick={descriptionHandler}
+								>
 									{user.description }
 								</Typography>
 
@@ -242,7 +260,7 @@ const Profile = () => {
 							<Divider sx={{ mb: 2 }} />
 
 							<Grid item container sx={{ gap: 1 }} >
-								{user.skills.map(skill => <Button key={skill}
+								{user?.skills?.map(skill => <Button key={skill}
 									variant='outlined'
 									size='small'
 									sx={{ py:.5, px: 2, borderRadius: 4, textTransform: 'Capitalize' }}
@@ -332,7 +350,7 @@ const Profile = () => {
 										{/*----- 2nd item (Right)	-----*/}
 										<Grid item xs={9} md={10} container direction='column'>
 											<Grid container justifyContent='space-between' >
-												<Grid item> <Typography color='primary' >{toCapitalize(item.title)}</Typography> </Grid>
+												<Grid item> <Typography color='primary' >{toCapitalize(item.companyName)}</Typography> </Grid>
 												<Grid item>
 													<IconButton onClick={moreVertHandler} data-experience-id={item._id}
 													>
@@ -340,9 +358,13 @@ const Profile = () => {
 													</IconButton>
 												</Grid>
 											</Grid>
-											<Typography variant='caption'>{toCapitalize(item.companyName)}</Typography>
+											<Typography variant='caption'>{toCapitalize(item.title)}</Typography>
 											<Typography color='textSecondary' variant='caption'>
-											{item.joiningDate} - {item.currentStatus} | {item.jobLocation}</Typography>
+											{new Date(item.joiningDate).toLocaleString('en-us', {
+													year: 'numeric',
+													month: '2-digit'
+												})
+											} - {item.currentStatus} | {item.jobLocation}</Typography>
 										</Grid>
 									</Grid>
 
