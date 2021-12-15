@@ -33,6 +33,7 @@ import NoSsr from '@mui/material/NoSsr'
 import Divider from '@mui/material/Divider'
 
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart'
+import VpnKeyIcon from '@mui/icons-material/VpnKey'
 import DashboardIcon from '@mui/icons-material/Dashboard'
 import LogoutIcon from '@mui/icons-material/Logout'
 
@@ -43,7 +44,7 @@ const navItems = [
 ]
 
 const menuItems = [
-	// { label: 'Profile', path: '/user/profile' },
+	{ label: 'Update Password', path: '/user/update-my-password', icon: <VpnKeyIcon /> },
 	{ label: 'Dashboard', path: '/user/account', icon: <DashboardIcon /> },
 	{ label: 'Logout', path: '/user/logout', icon: <LogoutIcon /> },
 ]

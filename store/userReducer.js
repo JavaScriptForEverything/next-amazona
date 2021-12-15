@@ -63,7 +63,7 @@ const { reducer, actions } = createSlice({
 			nookies.set(null, 'token', token, {
 				maxAge: 30 * 24 * 60 * 60,
 				secure: true, 			// https only except localhost
-				// httpOnly: true, 	// remove from document.cookie to read by javascript
+				// httpOnly: true, 	// [Only Server can do it] remove from document.cookie to read by javascript
 				sameSite: 'strict' 	// Stop CORS
 			})
 			return { ...state, loading: false, authenticated: true, token }
@@ -137,6 +137,13 @@ export const updateProfile = (obj, token) => catchAsyncDispatch(async (dispatch)
 	dispatch(actions.profileUpdated(user))
 }, actions.failed)
 
+export const updateMyPassword = (obj, token) => catchAsyncDispatch(async (dispatch) => {
+	dispatch(actions.requested())
+	const { data } = await axios.patch(`/api/users/update-my-password`, obj, { headers: {Authorization: `Bearer ${token}`} })
+	dispatch(actions.logedIn(data))
+}, actions.failed)
+
+
 export const experienceFeature = (isExperienceAdd=true) => (dispatch) => {
 	dispatch(actions.experienceFeature(isExperienceAdd))
 }
@@ -164,10 +171,10 @@ export const signUpMe = (obj) => catchAsyncDispatch(async (dispatch) => {
 
 
 // Forgot Password function
-export const forgotPassword = (obj) => catchAsyncDispatch(async (dispatch) => {
+export const forgotPassword = (obj, token) => catchAsyncDispatch(async (dispatch) => {
 	dispatch(actions.requested())
 
-	const { data }  = await axios.post('/api/users/forgot-password', obj)
+	const { data }  = await axios.post('/api/users/forgot-password', obj, { headers: { Authorization: `Bearer ${token}`} })
 	// console.log({data, status})
 
 	const message = 'No token found'
@@ -181,13 +188,13 @@ export const forgotPassword = (obj) => catchAsyncDispatch(async (dispatch) => {
 
 
 // Reset Password function
-export const resetPassword = (obj) => catchAsyncDispatch(async (dispatch) => {
+export const resetPassword = (obj, token) => catchAsyncDispatch(async (dispatch) => {
 	dispatch(actions.requested())
 
 	// we used patch request on Backend, to this route, don't know why ?
 	// Perhapse 2 route matches same signeture.
 	// const { data } = await axios.post(`/api/users/reset-password/`, obj.token)
-	const { data } = await axios.patch(`/api/users/forgot-password/`, obj)
+	const { data } = await axios.patch(`/api/users/forgot-password/`, obj, { headers: { Authorization: `Bearer ${token}`} })
 	console.log( data )
 
 	if( !data ) return dispatch(showAlert({ open: true, severity: 'error', message}))

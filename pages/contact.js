@@ -19,6 +19,7 @@ const listItems = [
 	{ label: 'Profile', path: '/user/profile' },
 	{ label: 'Dashboard', path: '/user/account' },
 	{ label: 'Reset Password', path: '/user/reset-password' },
+	{ label: 'Update Password', path: '/user/update-my-password' },
 	{ label: 'Cart', path: '/cart' },
 	{ label: 'Shipping', path: '/shipping' },
 	{ label: 'Login or Signup', path: '/login' },

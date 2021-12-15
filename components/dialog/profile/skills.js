@@ -121,7 +121,7 @@ const FormDialog = ({ open, setOpen }) => {
 
 					<form onSubmit={submitHandler} noValidate >
 						<Autocomplete
-							options={checked ? optionsItems : user.skills}
+							options={checked ? optionsItems : ( user.skills ? user.skills : [])}
 							getOptionLabel={option => option}
 							renderInput={params => <TextField {...params}
 								label={ checked ? 'Add Skill' : 'Remove Skill'}

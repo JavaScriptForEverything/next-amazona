@@ -1,4 +1,5 @@
 import crypto from 'crypto'
+import bcript from 'bcryptjs'
 
 import { catchAsync, getIdFromToken, setToken, appError, sendMail, filterObjectWithExcludedArray } from '../util'
 import User from '../models/userModel'
@@ -80,6 +81,35 @@ export const updateMe = catchAsync( async (req, res, next) => {
 	res.status(201).json({
 		status: 'success',
 		user
+	})
+})
+
+/* userReducer.js  > /pages/api/users/update-my-password.js	:	handler.patch(protect, updateMyPassword)
+ 		.	/user/update-my-password.js */
+export const updateMyPassword = catchAsync( async (req, res, next) => {
+	const { currentPassword, password, confirmPassword } = req.body
+
+	if(!currentPassword) return next(appError('currentPassword field is empty'))
+	if(currentPassword === password) return next(appError('Please asign new password'))
+
+
+	const user = await User.findById(req.user._id).select('+password')
+
+	// user password, hashedPassword
+	const isAuthenticated = await bcript.compare(currentPassword, user.password)
+	if(!isAuthenticated) return next(appError('your currentPassword is incorrect'))
+
+	// save so that password hashed by pre() hook
+	user.password = password
+	user.confirmPassword = confirmPassword
+	user.passwordChangedAt = new Date() 				// this line expire old token in 	protect() middleware
+	const updatedUser = await user.save({ validateBeforeSave: true })
+
+	const token = setToken(updatedUser._id)
+
+	res.status(201).json({
+		status: 'success',
+		token
 	})
 })
 

@@ -362,7 +362,7 @@ const Profile = () => {
 											<Typography color='textSecondary' variant='caption'>
 											{new Date(item.joiningDate).toLocaleString('en-us', {
 													year: 'numeric',
-													month: '2-digit'
+													month: 'short'
 												})
 											} - {item.currentStatus} | {item.jobLocation}</Typography>
 										</Grid>
