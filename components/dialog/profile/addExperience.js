@@ -50,7 +50,7 @@ const FormDialog = ({ open, setOpen, experienceId }) => {
 
 	// set user value for update form
 	useEffect(() => {
-	const currentObj = user.experiences.find(item => item._id === experienceId)
+	const currentObj = user?.experiences.find(item => item._id === experienceId)
 		if(!isExperienceAdd && currentObj) setFields({ ...fields, ...currentObj, joiningDate: new Date(currentObj.joiningDate) })
 	}, [experienceId])
 

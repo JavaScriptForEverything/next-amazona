@@ -177,7 +177,7 @@ const Profile = () => {
 	}
 
 	return (
-		<Layout>
+		<Layout title={`Profile Page | ${user.username} `}>
 
 			{/*-----[ dialog/models ]------*/}
 			{ user && <ProfileSkills open={openSkill} setOpen={setOpenSkill} /> }
@@ -267,7 +267,7 @@ const Profile = () => {
 								>{skill}</Button> )}
 							</Grid>
 
-							<Typography variant='h5' sx={{ mt: 4 }} >Add Description </Typography>
+							<Typography variant='h5' sx={{ mt: 4 }} >Add Notes </Typography>
 							<form onSubmit={() => 0}>
 								<TextField
 									placeholder='Add notes for future feference'
@@ -280,7 +280,7 @@ const Profile = () => {
 									fullWidth
 									sx={{ my: 2 }}
 									type='submit'
-								>Add Description</Button>
+								>Add Notes</Button>
 							</form>
 						</Paper>
 					</Grid>
@@ -398,26 +398,13 @@ const Profile = () => {
 
 					{/*------[ Right: 3rd block ]------*/}
 					<Grid sx={{ display: 'flex', flexDirection: 'column', gap: 2 }} >
-							<Accordion>
-								<AccordionSummary expandIcon={<ExpandMoreIcon />}>Education</AccordionSummary>
-								<AccordionDetails>
-									<Typography variant='h5' paragraph >Experience</Typography>
-								</AccordionDetails>
-							</Accordion>
 
-							<Accordion>
-								<AccordionSummary expandIcon={<ExpandMoreIcon />}>Accomplishment</AccordionSummary>
-								<AccordionDetails>
-									<Typography variant='h5' paragraph >Experience</Typography>
-								</AccordionDetails>
-							</Accordion>
-
-							<Accordion>
-								<AccordionSummary expandIcon={<ExpandMoreIcon />}>Certification</AccordionSummary>
-								<AccordionDetails>
-									<Typography variant='h5' paragraph >Experience</Typography>
-								</AccordionDetails>
-							</Accordion>
+						<Accordion>
+							<AccordionSummary expandIcon={<ExpandMoreIcon />}>Certification</AccordionSummary>
+							<AccordionDetails>
+								<Typography variant='h5' paragraph >Certificate</Typography>
+							</AccordionDetails>
+						</Accordion>
 
 					</Grid>
 

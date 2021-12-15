@@ -41,3 +41,4 @@
 		. Profile 	: /user/profile
 		. Dashboard	: /user/dashboard
 		. resetPassword : /user/reset-password (forgot-password + reset-password)
+		. updatePassword 	: /user/update-my-password

@@ -67,14 +67,13 @@ const UserPasswordUpdate = ({ history }) => {
 
 
 	return (
-		<Layout title={ value ? 'Reset Password Page' : 'Forgot Password Page'}>
+		<Layout title={'Update Password Page'}>
 			<Box sx={{ mt: 3, p: 3 }} >
 				<Container maxWidth='xs' component='main'  >
 					<Paper sx={{ p: 2 }} >
 						<Tabs value={value} onChange={tabHandler} sx={{ borderBottom: 1, borderColor: 'divider', mb: 3 }} >
 							<Tab label='Update Password'  />
 						</Tabs>
-
 
 						{/*-----[ Update Password Form ]-----*/}
 						<TabPanel value={value} index={0} >
