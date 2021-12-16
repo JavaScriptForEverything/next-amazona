@@ -104,7 +104,7 @@ const FormDialog = ({ open, setOpen }) => {
 							border: (theme) => `1px solid ${theme.palette.primary.main}`,
 							backgroundColor: 'transparent'
 						}}
-							src={user.avatar}
+							src={user.avatar ? user.avatar.secure_url : ''}
 						>
 						 { <PersonIcon color='primary' />}
 						</Avatar>

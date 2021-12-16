@@ -43,9 +43,12 @@ const UserPasswordUpdate = ({ history }) => {
 	const [ updateFields, setUpdateFields ] = useState({currentPassword: '', password: '', confirmPassword: ''})
 	const [ updateFieldErrors, setUpdateFieldErrors ] = useState({})
 
-	const { error, loading } = useSelector(state => state.user)
+	const { error, message, loading } = useSelector(state => state.user)
 
-	useEffect(() => error && dispatch(showAlert({open: true, severity: 'error', message: error})), [error])
+	useEffect(() => {
+		if(error) return dispatch(showAlert({open: true, severity: 'error', message: error}) )
+		if(message) return dispatch(showAlert({open: true, severity: 'success', message }) )
+	}, [error, message])
 
 
 	const tabHandler = (evt, newValue) => setValue(newValue)
@@ -55,10 +58,7 @@ const UserPasswordUpdate = ({ history }) => {
 		const isValidated = formValidator(updateFields, setUpdateFieldErrors)
 		if(!isValidated) return
 
-		// console.log(updateFields)
 		dispatch(updateMyPassword(updateFields, token))
-
-		// redirect to
 		router.push('/login')
 	}
 

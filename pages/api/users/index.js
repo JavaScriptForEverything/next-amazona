@@ -8,5 +8,6 @@ const handler = nc({ onError })
 handler
 	.use(protect)
 	.get(userController.getAllUser) 	// this route must be protected & restricted to user 'admin' only
+	.post(userController.uploadImage) // just for testing
 
 export default handler

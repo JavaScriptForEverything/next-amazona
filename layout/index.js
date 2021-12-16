@@ -140,7 +140,7 @@ const Layout = ({ title, description, children }) => {
 						<NoSsr>
 						{ authenticated ? (
 							<IconButton color='inherit' onClick={menuHandler} sx={{ ml: 2 }} >
-								<StyledAvatar sx={{ width: '2rem', height: '2rem' }} src={user?.avatar} />
+								<StyledAvatar sx={{ width: '2rem', height: '2rem' }} src={user.avatar ? user.avatar.secure_url : ''} />
 								<Typography sx={{ ml: 1, display: {xs: 'none', sm: 'block'} }}>
 									{user?.username?.split(' ').shift()} </Typography>
 							</IconButton>
@@ -163,7 +163,7 @@ const Layout = ({ title, description, children }) => {
 							<Box sx={{display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 0.5, my: 2 }} >
 							<IconButton onClick={f =>router.push('/user/profile')} >
 								<StyledAvatar
-									src={user?.avatar}
+									src={user.avatar ? user.avatar.secure_url : ''}
 									alt={`${user?.title}-${user?.username}`}
 								/>
 							</IconButton>

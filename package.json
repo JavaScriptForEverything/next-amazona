@@ -5,7 +5,7 @@
   "license": "MIT",
   "scripts": {
     "dev": "next dev",
-    "build" : "next build",
+    "build": "next build",
     "start": " next build && next start",
     "seeder": "node server/models/seeder.js --import"
   },
@@ -19,6 +19,7 @@
     "@stripe/stripe-js": "^1.21.1",
     "axios": "^0.24.0",
     "bcryptjs": "^2.4.3",
+    "cloudinary": "^1.27.1",
     "cookie": "^0.4.1",
     "countries-list": "^2.6.1",
     "jsonwebtoken": "^8.5.1",

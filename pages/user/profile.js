@@ -6,6 +6,7 @@ import { updateProfile, experienceFeature, editFeature } from '../../store/userR
 
 import Layout from '../../layout'
 import { toCapitalize, readAsDataURL } from '../../util'
+import { description } from '../../data/profile'
 import ProfileSkills from '../../components/dialog/profile/skills'
 import ProfileBasicInfo from '../../components/dialog/profile/basicInfo'
 import ProfileSendMail from '../../components/dialog/profile/sendMail'
@@ -21,6 +22,8 @@ import TextField from '@mui/material/TextField'
 import Button from '@mui/material/Button'
 import IconButton from '@mui/material/IconButton'
 import Divider from '@mui/material/Divider'
+import CircularProgress from '@mui/material/CircularProgress'
+
 
 import Menu from '@mui/material/Menu'
 import MenuItem from '@mui/material/MenuItem'
@@ -60,6 +63,7 @@ const Profile = () => {
 	const [ avatarOpen, setAvatarOpen ] = useState(false)
 	const [ avatarAnchorEl, setAvatarAnchorEl ] = useState()
 	const [ avatarFile, setAvatarFile ] = useState()
+	const [ uploadAvatar, setUploadAvatar ] = useState(false)
 
 	const [ experienceMenuOpen, setExperienceMenuOpen ] = useState(false)
 	const [ experienceAnchorEl, setExperienceAnchorEl ] = useState()
@@ -72,50 +76,25 @@ const Profile = () => {
 
 	const [ openEdit, setOpenEdit ] = useState(false) 								// to pass experienceId to AddExpreience Form
 
-	const { user, isExperienceAdd, edit } = useSelector(state => state.user)
-	// console.log(edit)
+	const { loading, user, isExperienceAdd, edit } = useSelector(state => state.user)
+	// console.log({ resume: user.resume })
 
 	const basic = [
 		{ label: 'Age', value: user.age  },
-		{ label: 'Years of Experience', value: user.experience },
+		{ label: 'Years of Experience', value: user?.experience },
 		{ label: 'Phone', value: user.phone },
 		{ label: 'CTC', value: user.ctc },
 		{ label: 'Location', value: user.location && toCapitalize(`${user.location.city} ${user.location.country}`)  },
 		{ label: 'Email', value: user.email },
 	]
-	// const experiences = [
-	// 	{
-	// 		title: user.experiences.title,
-	// 		companyName: user.experiences.companyName,
-	// 		joiningDate: user.experiences.joiningDate,
-	// 		currentStatus: user.experiences.currentStatus,
-	// 		jobLocation: user.experiences.jobLocation,
-	// 		logoBackgroundColor: user.experiences.logoBackgroundColor
-	// 	}
-	// ]
-	// const experiences = [
-	// 	{
-	// 		title: 'UX/UI Designer',
-	// 		companyName: 'Pixel Studio',
-	// 		joiningDate: 'Apr 2010',
-	// 		currentStatus: 'Present',
-	// 		jobLocation: 'Dhaka, Bangladesh',
-	// 		logoBackgroundColor: '#42a5f5'
-	// 	},
-	// 	{
-	// 		title: 'Web Designer',
-	// 		companyName: 'Ramasion Studio',
-	// 		joiningDate: 'May 2017',
-	// 		currentStatus: 'Present',
-	// 		jobLocation: 'Dhaka, Bangladesh',
-	// 		logoBackgroundColor: 'lightPink'
-	// 	},
-	// ]
 
 	// update/delete avatar here
 	useEffect(() => {
-		dispatch(updateProfile({ avatar: avatarFile })) 	// update avatar in store + in Database
-		setAvatarOpen(false)
+		if( uploadAvatar) {
+			dispatch(updateProfile({ avatar: avatarFile })) 	// update avatar in store + in Database
+			setUploadAvatar(false)
+			setAvatarOpen(false)
+		}
 	}, [avatarFile])
 
 
@@ -132,6 +111,7 @@ const Profile = () => {
 	}
 	const inputFileChangeHandler = (evt) => {
 		readAsDataURL(evt.target.files[0], setAvatarFile)
+		setUploadAvatar(true)
 	}
 
 
@@ -150,7 +130,7 @@ const Profile = () => {
 			dispatch(experienceFeature(false)) 			// Enable UpdateExperienceForm
 		}
 		if(menuItem === 'Delete') { 	// Handle Menu Delele Here
-			dispatch(updateProfile({ experiences: user.experiences.filter(item => item._id !== experienceId)}))
+			dispatch(updateProfile({ experiences: user?.experiences.filter(item => item._id !== experienceId)}))
 		}
 	}
 
@@ -196,12 +176,14 @@ const Profile = () => {
 							<Grid container direction='column' alignItems='center' >
 								<IconButton onClick={profileAvatarClickHandler} component='section' >
 									<div style={{position: 'relative'}}>
-										<Avatar
-											src={user.avatar}
-											alt={user.avatar}
-											title={user.username}
-											sx={{ width: 150, height: 150, mb: 1 }}
-										/>
+										{loading ? <CircularProgress size={150} thickness={.5} disableShrink /> : (
+											<Avatar
+												src={user.avatar ? user.avatar.secure_url : ''}
+												alt={user.avatar ? user.avatar.secure_url : ''}
+												title={user.username}
+												sx={{ width: 150, height: 150, mb: 1 }}
+											/>
+										)}
 										<div style={{position: 'absolute', bottom: 10, left: 0, }}>
 											<Button
 												color='inherit'
@@ -225,7 +207,7 @@ const Profile = () => {
 									title='Double Click to Edit'
 									onDoubleClick={descriptionHandler}
 								>
-									{user.description }
+									{user.description || description }
 								</Typography>
 
 							</Grid>
@@ -241,6 +223,7 @@ const Profile = () => {
 										dense
 										divider={ label !== items[items.length - 1].label}
 										component={ items[0].label === label ? 'label' : 'li'}
+										disabled={user.avatar && key === 0 ? true : false}
 									>
 										<ListItemIcon>{icon}</ListItemIcon>
 										<ListItemText>{label}</ListItemText>
@@ -304,14 +287,15 @@ const Profile = () => {
 									</Grid>
 								))}
 
+
 								<Grid item sx={{ display: 'flex', gap: 2, my: 3 }}  >
 									<Button
 										variant='contained'
 										sx={{ textTransform: 'Capitalize' }}
 										startIcon={<FileDownloadIcon />}
-										// component='a' href='/resume.pdf' download
 										component='a' href={user.resume} download='resume.pdf'
-										>Download Resume</Button>
+										disabled={!user.resume }
+									>Download Resume</Button>
 									<Button
 										variant='outlined'
 										sx={{ textTransform: 'Capitalize' }}
@@ -336,7 +320,7 @@ const Profile = () => {
 								</Grid>
 							</Grid>
 
-							{ user.experiences?.map((item, key) => (
+							{ user?.experiences?.map((item, key) => (
 								<Grid key={key} sx={{ my: 3 }}>
 									<Grid container direction='row' alignItems='center'>
 										{/*----- 1st item (left)	-----*/}

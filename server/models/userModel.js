@@ -39,9 +39,13 @@ const userSchema = new Schema({
 	passwordResetExpires: Date, 		// required to make token expire after given time
 	passwordChangedAt: Date, 				// required to make token invalid after modify password
 
-	avatar: { 											// we make it required in signup controler, by condition check.
-		type: String,
-		default: '/user.jpg'
+	// avatar: { 											// we make it required in signup controler, by condition check.
+	// 	type: String,
+	// 	default: '/user.jpg'
+	// },
+	avatar: {
+		public_id: String,
+		secure_url: String
 	},
 	title: {
 		type: String,
@@ -54,7 +58,7 @@ const userSchema = new Schema({
 		minLength: 100, 			// for
 		maxLength: 500,
 		trim: true,
-		default: 'Lorem ipsum dolor sit amet consectetur adipisicing elit. Et inventore soluta quae tempore reprehenderit accusantium aliquam nisi facere similique omnis cum architecto perspiciatis aperiam eaque nulla possimus perferendis officia, quibusdam?',
+		// default: 'user description...',
 	},
 	skills: {
 		type: [String],
@@ -114,7 +118,6 @@ const userSchema = new Schema({
 	},
 	resume : {
 		type: String,
-		default: '/resume.pdf'
 	},
 
 	// Experience Info

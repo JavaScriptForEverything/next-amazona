@@ -45,7 +45,7 @@ const { reducer, actions } = createSlice({
 		requested: (state, action) => ({
 			...state,
 			loading: true,
-			error: ''  										// empty error before new request
+			error: '',  										// empty error before new request
 		}),
 		failed: (state, action) => ({
 			...state,
@@ -87,13 +87,14 @@ const { reducer, actions } = createSlice({
 				user: {...action.payload}
 			}
 		},
-		passwordUpdated: (state, action) => {
-			const { token } = action.payload
-			if(!token) return { ...state, loading: false }
-			// localStorage.setItem('token', token)
-
-			return { ...state, loading: false, authenticated: true }
-		},
+		passwordUpdated: (state, action) => ({
+			...state,
+			loading: false,
+			authenticated: false,
+			token: '',
+			user: {},
+			message: action.payload
+		}),
 
 		mailSended: (state, action) => ({
 			...state,
@@ -139,8 +140,10 @@ export const updateProfile = (obj, token) => catchAsyncDispatch(async (dispatch)
 
 export const updateMyPassword = (obj, token) => catchAsyncDispatch(async (dispatch) => {
 	dispatch(actions.requested())
-	const { data } = await axios.patch(`/api/users/update-my-password`, obj, { headers: {Authorization: `Bearer ${token}`} })
-	dispatch(actions.logedIn(data))
+	const { data: { message } } = await axios.patch(`/api/users/update-my-password`, obj, { headers: {Authorization: `Bearer ${token}`} })
+
+	nookies.destroy(null, 'token')
+	dispatch(actions.passwordUpdated(message))
 }, actions.failed)
 
 

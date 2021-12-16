@@ -49,7 +49,7 @@ const Login = () => {
 	const [signupFields, setSignupFields] = useState({username: '', email: '', password: '', confirmPassword: '', avatar: ''})
 	const [signupFieldErrors, setSignupFieldErrors] = useState({})
 
-	const { error, authenticated, isSignedUp, user } = useSelector(state => state.user)
+	const { error, loading, authenticated, isSignedUp, user } = useSelector(state => state.user)
 	// console.log('login Page: ', user)
 
 	const tabHandler = (evt, newValue) => setValue(newValue)
@@ -263,7 +263,7 @@ const Login = () => {
 										color='primary'
 										type='submit'
 										fullWidth
-									>{false ? <CircularProgress size={24} style={{color: 'white'}} /> : 'Sign Up'}</Button>
+									>{loading ? <CircularProgress size={24} style={{color: 'white'}} /> : 'Sign Up'}</Button>
 								</form>
 							</TabPanel>
 

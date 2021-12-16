@@ -46,6 +46,19 @@ const FormDialog = ({ open, setOpen }) => {
 	const [ resume, setResume ] = useState()
 
 	const { error, loading, user } = useSelector(state => state.user)
+	// console.log(user.location)
+
+	const updateBasicInfoObj = {
+	  age: user.age,
+	  experience: user.experience,
+	  phone: user.phone,
+	  ctc: user.ctc,
+	  location: user.location && `${user.location.city} ${user.location.country}`,
+	  resume: user.resume
+	}
+	useEffect(() => { 								// fill data from store
+		setFields(updateBasicInfoObj)
+	}, [])
 
 	useEffect(() => {
 		if(error) return dispatch(showAlert({ open: true, severity: 'error', message: error}))
@@ -128,7 +141,7 @@ const FormDialog = ({ open, setOpen }) => {
 							border: (theme) => `1px solid ${theme.palette.primary.main}`,
 							backgroundColor: 'transparent'
 						}}
-							src={user.avatar}
+							src={user.avatar ? user.avatar.secure_url : ''}
 						>
 						 { <PersonIcon color='primary' />}
 						</Avatar>
@@ -145,6 +158,7 @@ const FormDialog = ({ open, setOpen }) => {
 							InputLabelProps={{shrink: true}}
 							fullWidth
 							required
+							// required={ type !== 'file' }
 							sx={key !== 0 ? {mt: 2} : {}}
 							margin='dense'
 							autoFocus={key === 0}
@@ -154,6 +168,7 @@ const FormDialog = ({ open, setOpen }) => {
 							value={fields[name]}
 							onChange={changeHandler}
 							error={!fields[name] || !!fieldsError[name]}
+							// error={ type !== 'file' && !fields[name] || !!fieldsError[name]}
 							helperText={fieldsError[name]}
 
 						/>)}

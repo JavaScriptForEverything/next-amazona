@@ -1,10 +1,15 @@
 import crypto from 'crypto'
 import bcript from 'bcryptjs'
+import cloudinary from 'cloudinary'
 
 import { catchAsync, getIdFromToken, setToken, appError, sendMail, filterObjectWithExcludedArray } from '../util'
 import User from '../models/userModel'
 
-
+cloudinary.config({
+	cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+	api_key: process.env.CLOUDINARY_API_KEY,
+	api_secret: process.env.CLOUDINARY_API_SECRET
+})
 
 
 
@@ -73,10 +78,27 @@ export const updateMe = catchAsync( async (req, res, next) => {
 	if(req.body.email) return next(appError('You can\'t change login email'))
 
 	const data = filterObjectWithExcludedArray(req.body, excludedFields )
+
+
+	// ------[ upload avatar ]---------
+	if(data.avatar) {
+		// delete old image before upload
+		req.user.avatar.public_id && await cloudinary.v2.uploader.destroy(req.user.avatar.public_id)
+
+		const { public_id, secure_url } = await cloudinary.v2.uploader.upload(req.body.avatar, {
+			folder: 'next-amazona/users'
+		})
+		data.avatar = { public_id, secure_url } 	// modify avatar String to Object
+	}
+	// delete avatar
+	if( !data.avatar && req.user.avatar.public_id) 	await cloudinary.v2.uploader.destroy(req.user.avatar.public_id)
+
+
+
+
 	const user = await User.findByIdAndUpdate(req.user.id, data, { new: true, runValidators: true })
 	if(!user) return next(appError('User can\'t update.', 500))
 
-		// console.log( data )
 
 	res.status(201).json({
 		status: 'success',
@@ -105,11 +127,9 @@ export const updateMyPassword = catchAsync( async (req, res, next) => {
 	user.passwordChangedAt = new Date() 				// this line expire old token in 	protect() middleware
 	const updatedUser = await user.save({ validateBeforeSave: true })
 
-	const token = setToken(updatedUser._id)
-
 	res.status(201).json({
 		status: 'success',
-		token
+		message: 'Password Update Successful, please re-loagin'
 	})
 })
 

@@ -11,6 +11,17 @@ import {
 } from '../util'
 
 
+import cloudinary from 'cloudinary'
+
+cloudinary.config({
+	cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+	api_key: process.env.CLOUDINARY_API_KEY,
+	api_secret: process.env.CLOUDINARY_API_SECRET
+})
+
+
+
+
 /* userReducer.js  > /pages/api/users/login.js	:	handler.post(login)
  		.	/pages/login.js */
 export const login = catchAsync(async (req, res, next) => {
@@ -50,6 +61,12 @@ export const signup = catchAsync(async (req, res, next) => {
 	allowedFields.forEach(item => {
 		if(!body[item]) throw next(appError(`${item} field is empty`))
 	})
+
+	// 5. upload image in cloudinary
+	const { public_id, secure_url } = await cloudinary.v2.uploader.upload(body.avatar, {
+		folder: 'next-amazona/users'
+	})
+	body.avatar = { public_id, secure_url } 		// body => { ..., avatar: {public_id, secure_url } }
 
 	// 3. password will be hashed before save by pre('save') hook
 	// 4. save to database
@@ -120,4 +137,21 @@ export const userMailTo = catchAsync(async(req, res, next) => {
 		throw next(appError(err.message, 403))
 	}
 
+})
+
+
+
+
+// only for testing purpose, not connected with project
+export const uploadImage = catchAsync( async (req, res, next) => {
+	const { file } = req.body
+
+	const data = await cloudinary.v2.uploader.upload(file, {
+		folder: 'next-amazona/users'
+	})
+
+	res.status(200).json({
+		status: 'success',
+		doc: data
+	})
 })
