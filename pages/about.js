@@ -25,6 +25,7 @@ import Switch from '@mui/material/Switch'
 
 import TextField from '@mui/material/TextField'
 
+import Cart from './cart'
 
 const About = () => {
 	const [open, setOpen] = useState(false)
@@ -50,6 +51,7 @@ const About = () => {
 
 				<br /> <br />
 
+				<Cart />
 
 
 

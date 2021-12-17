@@ -76,7 +76,7 @@ const Profile = () => {
 
 	const [ openEdit, setOpenEdit ] = useState(false) 								// to pass experienceId to AddExpreience Form
 
-	const { loading, user, isExperienceAdd, edit } = useSelector(state => state.user)
+	const { user, isExperienceAdd, edit } = useSelector(state => state.user)
 	// console.log({ resume: user.resume })
 
 	const basic = [
@@ -89,10 +89,10 @@ const Profile = () => {
 	]
 
 	// update/delete avatar here
-	useEffect(() => {
-		if( uploadAvatar) {
-			dispatch(updateProfile({ avatar: avatarFile })) 	// update avatar in store + in Database
-			setUploadAvatar(false)
+	useEffect(async() => {
+		if( uploadAvatar) { 	// use await so that setUploadAvatar set value after 	dispatch(updateProfile(...))
+			await dispatch(updateProfile({ avatar: avatarFile })) 	// update avatar in store + in Database
+			await setUploadAvatar(false)
 			setAvatarOpen(false)
 		}
 	}, [avatarFile])
@@ -166,7 +166,8 @@ const Profile = () => {
 			{ user && <ProfileAddExperience open={openAddExperience} setOpen={setOpenAddExperience} experienceId={experienceId} /> }
 			{ user && <ProfileEdit open={openEdit} setOpen={setOpenEdit} /> }
 
-			<Container sx={{ my: 3 }} >
+			{/*<Container sx={{ my: 3 }} >*/}
+			<Container>
 				{/*-----[ start coding bellow here ]------*/}
 
 				<Grid container spacing={2} >
@@ -176,7 +177,7 @@ const Profile = () => {
 							<Grid container direction='column' alignItems='center' >
 								<IconButton onClick={profileAvatarClickHandler} component='section' >
 									<div style={{position: 'relative'}}>
-										{loading ? <CircularProgress size={150} thickness={.5} disableShrink /> : (
+										{uploadAvatar ? <CircularProgress size={150} thickness={.5} disableShrink /> : (
 											<Avatar
 												src={user.avatar ? user.avatar.secure_url : ''}
 												alt={user.avatar ? user.avatar.secure_url : ''}
@@ -336,8 +337,7 @@ const Profile = () => {
 											<Grid container justifyContent='space-between' >
 												<Grid item> <Typography color='primary' >{toCapitalize(item.companyName)}</Typography> </Grid>
 												<Grid item>
-													<IconButton onClick={moreVertHandler} data-experience-id={item._id}
-													>
+													<IconButton onClick={moreVertHandler} data-experience-id={item._id} >
 														<MoreVertIcon />
 													</IconButton>
 												</Grid>

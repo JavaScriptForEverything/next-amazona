@@ -71,7 +71,8 @@ const Login = () => {
 		const isValidated = formValidator(loginFields, setLoginFieldErrors)
 		if(!isValidated) return
 
-		dispatch(loginMe(loginFields))
+		await dispatch(loginMe(loginFields))
+		await router.push(redirect || '/user/profile')
 	}
 
 	// -----------[ Sign Up Form ]-----------
@@ -108,6 +109,7 @@ const Login = () => {
 										type='email'
 										fullWidth
 										required
+										autoFocus
 										InputProps={{
 											startAdornment: <InputAdornment position='start'><EmailIcon /></InputAdornment>
 										}}
@@ -168,6 +170,7 @@ const Login = () => {
 										type='text'
 										fullWidth
 										required
+										autoFocus
 										InputProps={{
 											startAdornment: <InputAdornment position='start'><PersonIcon /></InputAdornment>
 										}}

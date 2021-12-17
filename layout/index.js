@@ -36,6 +36,7 @@ import ShoppingCartIcon from '@mui/icons-material/ShoppingCart'
 import VpnKeyIcon from '@mui/icons-material/VpnKey'
 import DashboardIcon from '@mui/icons-material/Dashboard'
 import LogoutIcon from '@mui/icons-material/Logout'
+import PersonIcon from '@mui/icons-material/Person'
 
 const navItems = [
 	{label: 'Amazona', path: '/'},
@@ -44,8 +45,9 @@ const navItems = [
 ]
 
 const menuItems = [
+	{ label: 'Dashboard', path: '/user/dashboard', icon: <DashboardIcon /> },
+	{ label: 'Profile', path: '/user/profile', icon: <PersonIcon /> },
 	{ label: 'Update Password', path: '/user/update-my-password', icon: <VpnKeyIcon /> },
-	{ label: 'Dashboard', path: '/user/account', icon: <DashboardIcon /> },
 	{ label: 'Logout', path: '/user/logout', icon: <LogoutIcon /> },
 ]
 
@@ -111,10 +113,11 @@ const Layout = ({ title, description, children }) => {
 			</Head>
 
 
-			{/*------[ Show Alert ]--------*/}
-			<Snackbar />
 
+			<Snackbar /> 				{/*------[ Show Alert ]--------*/}
 			<CssBaseline />
+
+			{/*------[ Head Section ]--------*/}
 			<AppBar position='relative'>
 				<Toolbar>
 					{/*------[ Toolbar: Left side ]--------*/}
@@ -197,7 +200,10 @@ const Layout = ({ title, description, children }) => {
 
 
 
-			<Container sx={{ minHeight: '80vh' }} > { children } </Container>
+			{/*------[ Middle Section ]--------*/}
+			<Container sx={{ minHeight: '80vh', my: 3 }} > { children } </Container>
+
+			{/*------[ Footer Section ]--------*/}
 			<Typography component='footer' align='center' > All Right Reserved amazona </Typography>
 
 		</ThemeProvider>

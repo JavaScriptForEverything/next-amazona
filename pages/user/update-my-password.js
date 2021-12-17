@@ -85,6 +85,7 @@ const UserPasswordUpdate = ({ history }) => {
 									type={!currentPasswordVisibility ? 'text' : 'password'}
 									fullWidth
 									required
+									autoFocus
 									InputProps={{
 										startAdornment: <InputAdornment position='start'> <LockIcon /> </InputAdornment>,
 										endAdornment: <InputAdornment position='end'>

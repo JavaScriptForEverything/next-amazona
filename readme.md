@@ -1,4 +1,4 @@
-# Stripe Next MaterialUI Redux Mongoose JWT(Token) SendMail
+# Stripe Next MaterialUI Redux Mongoose JWT(Token) SendMail Cloudinary
 
 <img
 	width = "100%"
@@ -20,6 +20,7 @@
 	. JsonWebToken
 	. Stripe Payment Method
 	. send Mail (development: mailtrap, in Production: sendGrid)
+	. upload image in Cloudinary (PDF in cloudinary download blocked)
 
 
 	. Do next:
@@ -41,4 +42,4 @@
 		. Profile 	: /user/profile
 		. Dashboard	: /user/dashboard
 		. resetPassword : /user/reset-password (forgot-password + reset-password)
-		. updatePassword 	: /user/update-my-password
+		. updatePassword: /user/update-my-password
