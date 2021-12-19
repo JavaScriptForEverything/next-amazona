@@ -64,7 +64,7 @@ export const formValidator = (obj, errorStateUpdateMethod, requireLength=4) => {
 	if(obj.password && obj.confirmPassword && obj.password !== obj.confirmPassword) errorObj.confirmPassword = 'Confirm Password not matched'
 
 	Object.entries(obj).forEach(([key, value]) => {
-		if(value.trim() === '')  errorObj[key] = `'${key}' field is empty`
+		if(`${value}`.trim() === '')  errorObj[key] = `'${key}' field is empty`
 	})
 
 	errorStateUpdateMethod(errorObj)
@@ -92,3 +92,34 @@ export const readAsDataURL = (file, setMethod, isImage=true) => {
 }
 
 
+// File Size
+export const humanReadableFileSize = (bytes, si=true, dp=1) => {
+  const thresh = si ? 1000 : 1024;
+
+  if (Math.abs(bytes) < thresh) {
+    return bytes + ' B';
+  }
+
+  const units = si
+    ? ['kB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB']
+    : ['KiB', 'MiB', 'GiB', 'TiB', 'PiB', 'EiB', 'ZiB', 'YiB'];
+  let u = -1;
+  const r = 10**dp;
+
+  do {
+    bytes /= thresh;
+    ++u;
+  } while (Math.round(Math.abs(bytes) * r) / r >= thresh && u < units.length - 1);
+
+
+  return bytes.toFixed(dp) + ' ' + units[u];
+}
+
+// console.log(humanReadableFileSize(1551859712))  // 1.4 GiB
+// console.log(humanReadableFileSize(5000, true))  // 5.0 kB
+// console.log(humanReadableFileSize(5000, false))  // 4.9 KiB
+// console.log(humanReadableFileSize(-10000000000000000000000000000))  // -8271.8 YiB
+// console.log(humanReadableFileSize(999949, true))  // 999.9 kB
+// console.log(humanReadableFileSize(999950, true))  // 1.0 MB
+// console.log(humanReadableFileSize(999950, true, 2))  // 999.95 kB
+// console.log(humanReadableFileSize(999500, true, 0))  // 1 MB

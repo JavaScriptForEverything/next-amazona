@@ -4,12 +4,15 @@ import { useSelector } from 'react-redux'
 
 
 import Layout from '../../layout'
+import Dashboard from '../../components/dashboard/dashboard'
+import Products from '../../components/dashboard/products'
+import Orders from '../../components/dashboard/orders'
+import Customers from '../../components/dashboard/customers'
+import Settings from '../../components/dashboard/settings'
 
 import Box from '@mui/material/Box'
 import Grid from '@mui/material/Grid'
 import Paper from '@mui/material/Paper'
-import Tabs from '@mui/material/Tabs'
-import Tab from '@mui/material/Tab'
 import Typography from '@mui/material/Typography'
 // import TextField from '@mui/material/TextField'
 import Button from '@mui/material/Button'
@@ -26,14 +29,15 @@ import SettingsIcon from '@mui/icons-material/Settings'
 
 
 const leftPanelItems = [
-	{ label: 'Dashboard', component: '<Dashboard />', icon: <DashboardIcon />},
-	{ label: 'Products', 	component: '<Products />', 	icon: <ShoppingBagIcon />},
-	{ label: 'Orders', 		component: '<Orders />', 		icon: <ListAltIcon />},
-	{ label: 'Customers', component: '<Customers />', icon: <PeopleIcon />},
-	{ label: 'Settings', 	component: '<Settings />', 	icon: <SettingsIcon />},
+	{ label: 'Dashboard', component: <Dashboard />, icon: <DashboardIcon />},
+	{ label: 'Products', 	component: <Products />, 	icon: <ShoppingBagIcon />},
+	{ label: 'Orders', 		component: <Orders />, 		icon: <ListAltIcon />},
+	{ label: 'Customers', component: <Customers />, icon: <PeopleIcon />},
+	{ label: 'Settings', 	component: <Settings />, 	icon: <SettingsIcon />},
 ]
 
-const Dashboard = () => {
+
+const DashboardComponent = () => {
 	const [ selected, setSelected ] = useState(0)
 
 	const { user } = useSelector(state => state.user)
@@ -48,7 +52,9 @@ const Dashboard = () => {
 	return (
 		<Layout title={`Dashboard of '${user.username}'`} >
 
+
 			<Grid container spacing={2}>
+			{/*-------[ left side panel ]-------*/}
 				<Grid item xs={3}>
 					<Paper sx={{ py: 1 }}>
 						<List sx={{ mx: { xs: 2, sm: 0 } }}>
@@ -60,30 +66,29 @@ const Dashboard = () => {
 								data-list-value={key}
 								selected={key === selected}
 							>
-								<ListItemIcon>{nav.icon}</ListItemIcon>
+								<ListItemIcon title={nav.label}>{nav.icon}</ListItemIcon>
 								<ListItemText sx={{ display: {xs: 'none', sm: 'block'} }} primary={nav.label} />
 							</ListItem>
 						))}
-
 						</List>
 					</Paper>
-
 				</Grid>
+
+			{/*-------[ Right side panel ]-------*/}
 				<Grid item xs={9}>
-					<Paper sx={{ px: 2, py: 1 }}>
 						{leftPanelItems.map((item, key, arr) => (
 							<Box key={item.label} >
 								{ key === selected && item.component }
 							</Box>
 						))}
-					</Paper>
 				</Grid>
 			</Grid>
+
 
 		</Layout>
 	)
 }
-export default Dashboard
+export default DashboardComponent
 
 
 export const getServerSideProps = (ctx) => {

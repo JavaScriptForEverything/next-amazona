@@ -1,4 +1,5 @@
 const { Schema, model, models } = require('mongoose')
+const slug = require('slugify')
 // used common Module system so that we can use in 	/server/models/seeder.js file
 
 const productSchema = new Schema({
@@ -9,9 +10,7 @@ const productSchema = new Schema({
 		minLength: 5,
 		lowercase: true,
 	},
-	slug: {
-		type: String,
-	},
+	slug: String, 							// must be present to save from .pre('save')
 	category: {
 		type: String,
 		required: true,
@@ -33,12 +32,12 @@ const productSchema = new Schema({
 	},
 	inStock: {
 		type: Number,
-		required: true,
+		// required: true,
 		min: 0,
 	},
 	quantity: {
 		type: Number,
-		required: true,
+		// required: true,
 		min: 1,
 	},
 	numReviews: {
@@ -51,13 +50,24 @@ const productSchema = new Schema({
 		maxLength: 5000,
 		trim: true
 	},
-	image: {
-		type: String,
-		required: true,
-	},
+	images: [{
+		public_id: {
+			type: String,
+			required: true
+		},
+		secure_url: {
+			type: String,
+			required: true
+		}
+	}],
 
 }, {
 	timestamps: true
+})
+
+productSchema.pre('save', function(next) {
+	this.slug = slug(this.name, { lower: true })
+	next()
 })
 
 module.exports = models.Product || model('Product', productSchema)

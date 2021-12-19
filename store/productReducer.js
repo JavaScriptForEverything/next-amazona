@@ -1,16 +1,16 @@
 import { createSlice } from '@reduxjs/toolkit'
 // import { HYDRATE } from 'next-redux-wrapper'
-// import axios from 'axios'
+import axios from 'axios'
 // import absoluteUrl from 'next-absolute-url'
 
-// import { catchAsyncDispatch } from '../util'
+import { catchAsyncDispatch } from '../util'
 
 
 const { reducer, actions } = createSlice({
 	name: 'product',
 	initialState: {
-		// products: [],
-		// product: {}
+		products: [],
+		product: {},
 
 		loading: false,
 		error: '',
@@ -20,7 +20,7 @@ const { reducer, actions } = createSlice({
 		totalPrice: 0,
 	},
 	reducers: {
-		requested: (state, action) => ({ ...state, loading: true }),
+		requested: (state, action) => ({ ...state, loading: true, error: '' }),
 		failed: (state, action) => ({...state, loading: false, error: action.payload, }),
 		cartItemAdded: (state, action) => {
 			localStorage.setItem('cartItems', JSON.stringify(state.cartItems.concat(action.payload)) )
@@ -52,7 +52,15 @@ const { reducer, actions } = createSlice({
 		totalPrice: (state, action) => ({
 			...state,
 			totalPrice: state.cartItems?.reduce((total, item) => total + item.price*item.quantity, state.shippingCharge)
+		}),
+
+
+		productAdded: (state, action) => ({
+			...state,
+			loading: false,
+			product: action.payload
 		})
+
 	},
 
 	// extraReducers: {
@@ -82,6 +90,16 @@ export const removeCartItems = () => (dispatch) => {
 export const getTotalPrice = () => (dispatch) => {
 	dispatch(actions.totalPrice())
 }
+
+
+
+export const addProduct = (obj, token) => catchAsyncDispatch( async (dispatch) => {
+	dispatch(actions.requested())
+	const { data: { product } } = await axios.post('/api/products', obj, { headers: {Authorization: `Bearer ${token}`} })
+	dispatch(actions.productAdded(product))
+}, actions.failed)
+
+
 
 
 

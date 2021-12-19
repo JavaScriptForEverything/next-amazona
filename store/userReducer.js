@@ -19,6 +19,7 @@ const { reducer, actions } = createSlice({
 		isExperienceAdd: true, 		// to enable add/update experience form
 		edit: '', 								// to make edit dialog based on it value
 		message: '', 							// email sent message
+		search: '', 							// to store input search
 
 		user : { 									// set default user value
 		  _id: '',
@@ -100,6 +101,12 @@ const { reducer, actions } = createSlice({
 			...state,
 			loading: false,
 			message: action.payload
+		}),
+
+		searched: (state, action) => ({
+			...state,
+			loading: false,
+			search: action.payload
 		})
 
 
@@ -209,6 +216,12 @@ export const resetPassword = (obj, token) => catchAsyncDispatch(async (dispatch)
 
 
 
+// Search
+export const dispatchSearch = (obj) => catchAsyncDispatch(async (dispatch) => {
+	dispatch(actions.requested())
+	// const { data } = await axios.post('/api/users/signup', obj)
+	dispatch(actions.searched(obj))
+}, actions.failed)
 
 
 

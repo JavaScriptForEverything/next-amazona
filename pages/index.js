@@ -34,6 +34,8 @@ const Home = ({ products }) => {
 		dispatch(addItemToCart(product))
 	}
 
+	console.log( products )
+
 	return (
 		<Layout>
 			<Typography variant='h4'>Home Page</Typography>
@@ -45,7 +47,7 @@ const Home = ({ products }) => {
 						<Card>
 							<Link href={`/product/${product.slug}`}>
 							<CardActionArea>
-								<CardMedia component='img'src={product.image} />
+								<CardMedia component='img'src={product.images[0].secure_url} />
 							</CardActionArea>
 							</Link>
 							<CardContent>
@@ -71,7 +73,7 @@ export default Home
 export const getServerSideProps = async ({req}) => {
 
 	const { origin } = absoluteUrl(req)
-	const { data } = await axios.get(`${origin}/api/products`)
+	const { data: { products } } = await axios.get(`${origin}/api/products`)
 
-	return { props: { products: data.products }}
+	return { props: { products }}
 }
