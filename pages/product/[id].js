@@ -25,6 +25,8 @@ const Product = ({ product }) => {
 	const dispatch = useDispatch()
 	const { cartItems } = useSelector(state => state.product)
 
+	if(!product) return 'No product found'
+
 	const addToCartHandler = (evt, product) => {
 		const	itemFound = cartItems.some(item => item._id === product._id )
 
@@ -47,15 +49,15 @@ const Product = ({ product }) => {
 
 			<Grid container spacing={1}>
 				<Grid item xs={12} md={6} >
-					<Image
-						src={product.image}
-						alt={product.image}
+{/*					<Image
+						src={product.images[0]}
+						alt={product.name}
 						title={product.name}
 						width={400}
 						height={400}
 						layout='responsive'
 					/>
-				</Grid>
+*/}				</Grid>
 				<Grid item xs={12} md={3}>
 					<List>
 						<ListItem>
@@ -102,7 +104,9 @@ export default Product
 
 export const getServerSideProps = async ({ req, params }) => {
 	const { origin } = absoluteUrl(req)
-	const { data } = await axios.get(`${origin}/api/products/${params.slug}`)
+	const { data: { product } } = await axios.get(`${origin}/api/products/${params.id}`)
 
-	return { props: { product: data.product }}
+	console.log(product)
+
+	return { props: { product }}
 }

@@ -30,11 +30,11 @@ const categories = ['pant', 'shirt']
 
 const inputItems = [
 	{ label: 'Product Name', 	type: 'text', 	name: 'name' },
+	{ label: 'Quantity', 			type: 'number', name: 'quantity' },
 	{ label: 'Brand', 				type: 'text', 	name: 'brand', 		options: brands },
 	{ label: 'Category', 			type: 'text', 	name: 'category', options: categories },
 	{ label: 'Price', 				type: 'number', name: 'price' },
 	{ label: 'Description', 	type: 'text', 	name: 'description' },
-	// { label: 'Image', 				type: 'text', 	name: 'image' },
 ]
 const inputItemsObj = {}
 inputItems.forEach(item => inputItemsObj[item.name] = '')
@@ -92,6 +92,7 @@ const Products = () => {
 			[evt.target.name]: evt.target.value,
  			[evt.target.id.split('-').shift()]: newValue
 		})
+		setAdded(false)
 	}
 	const resetHandler = () => {
 		setAdded(false)
@@ -108,9 +109,7 @@ const Products = () => {
 
 
 		await dispatch(addProduct({ ...fields, images: uploadImages }, token))
-		await !error && setAdded(true)
-		setFields(inputItemsObj) 				// clear the form data
-		setUploadImages([]) 						// clear the images
+		await setAdded(true)
 	}
 
 	return (

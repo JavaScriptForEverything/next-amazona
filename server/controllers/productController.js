@@ -16,6 +16,7 @@ export const getAllProducts = catchAsync( async (req, res, next) => {
 
 	res.status(200).json({
 		status: 'success',
+		total: products.length,
 		products
 	})
 })
@@ -31,18 +32,6 @@ export const getProductBySlug = catchAsync( async (req, res, next) => {
 		product
 	})
 })
-export const getProductById = catchAsync( async (req, res, next) => {
-	// const { id } = req.query
-
-	console.log(req.query)
-	// const product = await Product.findById(id)
-	// if(!product) return next(appError('No product found.', 404))
-
-	res.status(200).json({
-		status: 'success',
-		// product
-	})
-})
 
 
 
@@ -55,20 +44,24 @@ export const addProduct = catchAsync( async (req, res, next) => {
 	const body = filterObjectWithAllowedArray(req.body, ['name', 'brand', 'category', 'description', 'images', 'price'])
 
 
-	// 2. upload image to cloudinary
-	const multipleImagesPromise = body.images.map(image => cloudinary.v2.uploader.upload(image, {
-			folder: 'next-amazona/products'
-		})
-	)
+	let images = []
+	if(body.images?.length) {
+		// 2. upload image to cloudinary
+		const multipleImagesPromise = body.images.map(image => cloudinary.v2.uploader.upload(image, {
+				folder: 'next-amazona/products'
+			})
+		)
 
-	// 3. after upload, return only public_id & secure_url property
-	let images = await Promise.all(multipleImagesPromise)
-			images = images.map(image => ({ public_id: image.public_id, secure_url: image.secure_url}))
+		// 3. after upload, return only public_id & secure_url property
+		images = await Promise.all(multipleImagesPromise)
+		images = images.map(image => ({ public_id: image.public_id, secure_url: image.secure_url}))
 
-	if(!images.length) return next(appError('Please add images [atleast one]', 404))
+		if(!images.length) return next(appError('Please add images [atleast one]', 404))
+	}
+
 
 	// 4. pass filtered body & override images with cloudinary { public_id, secure_url }
-	const product = await Product.create({ ...body, images})
+	const product = await Product.create({ ...body, images, user: req.user._id})
 	if(!product) return next(appError('No product found.', 404))
 
 	// 5. Finally response back to client & client store data in redux store then use from store.
@@ -78,3 +71,25 @@ export const addProduct = catchAsync( async (req, res, next) => {
 	})
 })
 
+
+export const getProductById = catchAsync(async (req, res, next) => {
+
+	const product = await Product.findById(req.query.id)
+	if(!product) return next(appError('No product found.', 404))
+	// console.log(req.query)
+
+	res.status(200).json({
+		status: 'success',
+		product
+	})
+})
+
+export const deleteProductById = catchAsync(async (req, res, next) => {
+
+	const product = await Product.findByIdAndDelete(req.query.id)
+	if(!product) return next(appError('No product found.', 404))
+
+	res.status(204).json({
+		status: 'success',
+	})
+})
