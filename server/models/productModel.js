@@ -34,7 +34,7 @@ const productSchema = new Schema({
 	price: {
 		type: Number,
 		required: true,
-		set: val => val.toFixed(2)
+		// set: val => val.toFixed(2)
 		// type: String,
 		// set: val => val.toLocaleString('en-US', {
 		// 	style: 'currency',
@@ -60,6 +60,13 @@ const productSchema = new Schema({
 	// 		required: true
 	// 	}
 	// }],
+	coverImage: {
+		public_id: String,
+		secure_url: {
+			type: String,
+			default: '/images/coverImage.jpg'
+		}
+	},
 	images: [{
 		public_id: String,
 		secure_url: String,
@@ -76,6 +83,10 @@ const productSchema = new Schema({
 	numReviews: [{
 		type: String,
 	}],
+	ratings: {
+		type: Number,
+		default: 4
+	},
 
 }, {
 	timestamps: true
@@ -83,6 +94,8 @@ const productSchema = new Schema({
 
 
 productSchema.pre('save', function(next) {
+	this.price = +this.price
+	this.quantity = +this.quantity
 	this.slug = slug(this.name, { lower: true })
 	next()
 })

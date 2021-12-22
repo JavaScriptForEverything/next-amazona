@@ -31,42 +31,45 @@ import InputAdornment from '@mui/material/InputAdornment'
 
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown'
 import SearchIcon from '@mui/icons-material/Search'
+import ListIcon from '@mui/icons-material/List'
+import GridViewIcon from '@mui/icons-material/GridView'
 
-const buttons = [
-	{ label: 'Button-1', name: 'btn-1', checked: true },
-	{ label: 'Button-2', name: 'btn-2', checked: false },
-	{ label: 'Button-3', name: 'btn-3', checked: true },
+const buttonsOfGroup = [
+	{ icon: <ListIcon />, 		checked: false },
+	{ icon: <GridViewIcon />, checked: false },
 ]
 
 const About = () => {
-	const [ checked, setChecked ] = useState([])
+	// const [ buttons, setButtons ] = useState([])
+	const [ button, setButton ] = useState(0)
 
-	console.log(checked)
-
-	const clickedHandler = (evt, id) => {
-		setChecked( buttons.map((item, index) => index === id ? [...checked, !item] : [...checked] ))
+	// const clickHandler = (evt, id) => {
+	// 	setButtons( buttonsOfGroup.map((button, key) => key === id ?
+	// 		{...button, checked: !button.checked} : button))
+	// }
+	const clickHandler = (evt, id) => {
+		setButton(id)
 	}
 
 	return (
 		<Layout title='about page'>
 			<Typography>About Page</Typography>
-				{/*<Image src='/images/banner1.jpg' width='2000px' height='2000px' />*/}
 
-
-				<ButtonGroup>
-					<Button variant='contained'>Left</Button>
-					<Button><ArrowDropDownIcon /></Button>
-				</ButtonGroup>
-
-				{buttons.map((item, key) => (
-					<Button key={key}
-						variant={checked[key] ? 'contained' : 'outlined'}
-						onClick={ evt => clickedHandler(evt, key)}
-					>Button {key + 1}</Button>
-				))}
-
-
-
+{/*			<ButtonGroup>
+				{buttonsOfGroup.map(({icon}, key) => <Button key={key}
+					// variant={buttons[key]?.checked ? 'contained' : 'outlined'}
+					// variant={ !buttons.length && key === 0 ? 'contained' : (buttons[key]?.checked ? 'contained' : 'outlined')}
+					variant={ !buttons[key] && key === 0 ? 'contained' : (buttons[key]?.checked ? 'contained' : 'outlined')}
+					onClick={(evt) => clickHandler(evt, key)}
+				>{icon}</Button>)}
+			</ButtonGroup>
+*/}
+			<ButtonGroup>
+				{buttonsOfGroup.map(({icon}, key) => <Button key={key}
+					variant={key === button ? 'contained' : 'outlined'}
+					onClick={(evt) => clickHandler(evt, key)}
+				>{icon}</Button>)}
+			</ButtonGroup>
 
 		</Layout>
 	)

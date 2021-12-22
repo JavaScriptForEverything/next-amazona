@@ -43,7 +43,6 @@ export const addProduct = catchAsync( async (req, res, next) => {
 	// 1. filter body
 	const body = filterObjectWithAllowedArray(req.body, ['name', 'brand', 'category', 'description', 'images', 'price'])
 
-
 	let images = []
 	if(body.images?.length) {
 		// 2. upload image to cloudinary

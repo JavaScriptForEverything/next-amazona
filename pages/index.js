@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import nookies from 'nookies'
 import absoluteUrl from 'next-absolute-url'
 import axios from 'axios'
@@ -40,6 +40,7 @@ import FormControlLabel from '@mui/material/FormControlLabel'
 import Checkbox from '@mui/material/Checkbox'
 import Slider from '@mui/material/Slider'
 import Badge from '@mui/material/Badge'
+import Rating from '@mui/material/Rating'
 import Pagination from '@mui/material/Pagination'
 
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
@@ -47,13 +48,7 @@ import ListIcon from '@mui/icons-material/List'
 import GridViewIcon from '@mui/icons-material/GridView'
 import SearchIcon from '@mui/icons-material/Search'
 
-const filterByOptions = [
-	'Latest Items',
-	'Most Popular',
-	'Trending',
-	'Chepest'
-]
-
+const filterByOptions = ['Latest Items', 'Most Popular', 'Trending', 'Chepest']
 const sliderInputs = [
 	{ label: '$0', 		name: 'min' },
 	{ label: '$100', 	name: 'max' },
@@ -61,20 +56,29 @@ const sliderInputs = [
 const sliderInputsObj = {}
 sliderInputs.forEach((item, index) => sliderInputsObj[item.name] = index * 100 )
 
+const groupButtons = [
+	{ icon: <ListIcon />, 		title: 'List View' },
+	{ icon: <GridViewIcon />,	title: 'Grid View' },
+]
+
+
 const Home = ({ products }) => {
 	const dispatch = useDispatch()
 	const router = useRouter()
 
-	const [ filterBy, setFilterBy ] = useState(filterByOptions[0])
-	const [ inputSearchValue, setInputSearchValue ] = useState('')
-	const [ checkboxes, setCheckboxes ] = useState([])
-	const [ sliderValue, setSliderValue ] = useState([0, 100])
+	const [ inputSearchValue, setInputSearchValue ] = useState('') 				// filter-search
+	const [ checkboxes, setCheckboxes ] = useState([]) 										// filter-checkbox
+	const [ sliderValue, setSliderValue ] = useState([0, 100]) 						// filter-slider
 	const [ sliderFields, setSliderFields ] = useState(sliderInputsObj)
+	const [ filterBy, setFilterBy ] = useState(filterByOptions[0]) 				// filter-Autocomplete
+	const [ view, setView ] = useState(1) 																// filter-ButtonGroup
 
-	const [ page, setPage ] = useState(1)
+	const [ page, setPage ] = useState(1) 																// bottom page nagivation
 
 	const { error, cartItems } = useSelector(state => state.product)
-	// console.log( cartItems )
+
+
+
 
 	const brands = [ 										// this values froms from redux store
 		{ name: 'adidas', 	value: 42},
@@ -85,13 +89,12 @@ const Home = ({ products }) => {
 	]
 
 
-	const filterByChangeHandler = (evt, newValue) => {
-		setFilterBy(newValue)
-	}
-	const filterBySubmitHandler = (evt) => {
-		evt.preventDefault()
+	const addToCartHandler = (evt, product) => {
+		const isFound = cartItems.find(cart => cart._id === product._id)
+		if(isFound) return dispatch(showAlert({ open: true, severity: 'info', message: 'This product all ready added into cart'}))
 
-		console.log({ filterBy })
+		dispatch(addItemToCart(product))
+		dispatch(showAlert({ open: true, severity: 'success', message: 'added to cart'}))
 	}
 
 
@@ -101,9 +104,8 @@ const Home = ({ products }) => {
 	const inputSearchSubmitHandler = (evt) => {
 		evt.preventDefault()
 
-		console.log({ inputSearchValue })
+		router.push(`?search=${inputSearchValue}`)
 	}
-
 
 	const checkboxOnChangeHandler = (evt, checkedId) => {
 		setCheckboxes( checkboxes.map((checkbox, key, arr) => key === checkedId ? [...arr, !checkbox] : [...arr] ))
@@ -115,20 +117,20 @@ const Home = ({ products }) => {
 		evt.preventDefault()
 
 		const currentValue = sliderValue.map(item => item * (sliderFields.max - sliderFields.min))
-
-		console.log({ currentValue })
+		router.push(`?price=${currentValue}`)
 	}
 
+	const filterSizeClickHandler = (evt, item) => router.push(`?size=${item}`)
 
-	const addToCartHandler = (evt, product) => {
-		const isFound = cartItems.find(cart => cart._id === product._id)
-		if(isFound) return dispatch(showAlert({ open: true, severity: 'info', message: 'This product all ready added into cart'}))
 
-		dispatch(addItemToCart(product))
-		dispatch(showAlert({ open: true, severity: 'success', message: 'added to cart'}))
-		// console.log(id)
+
+
+	const filterByChangeHandler = (evt, newValue) => {
+		setFilterBy(newValue)
+		router.push(`?common=${newValue}`)
 	}
 
+	const groupButtonsHandler = (evt, id) => setView(id)
 
 	const pageHandler = (evt, newValue) => {
 		setPage(newValue)
@@ -138,8 +140,6 @@ const Home = ({ products }) => {
 
 	return (
 		<Layout>
-
-
 			<Header />
 			<Grid container spacing={2} sx={{ my: 2 }} >
 				{/*-------[ Left Side ]--------*/}
@@ -235,7 +235,9 @@ const Home = ({ products }) => {
 							</AccordionSummary>
 							<AccordionDetails>
 								<ButtonGroup>
-									{['SX', 'SM', 'LG', 'XXL'].map(item => <Button key={item}>{item}</Button> )}
+									{['sx', 'sm', 'lg', 'xxl'].map(item => <Button key={item}
+										onClick={(evt) => filterSizeClickHandler(evt, item)}
+									>{item}</Button> )}
 								</ButtonGroup>
 							</AccordionDetails>
 						</Accordion>
@@ -253,68 +255,107 @@ const Home = ({ products }) => {
 
 					}}>
 						<Typography sx={{ flexGrow: 1 }}>{products.length} Items found</Typography>
-
-						<form noValidate onSubmit={filterBySubmitHandler}>
-							<Autocomplete
-								options={filterByOptions}
-								getOptionLabel={option => option}
-								renderInput={ params => <TextField {...params}
-									label='Filter By'
-									sx={{ minWidth: '200px' }}
-								/>}
-								value={filterBy}
-								onChange={filterByChangeHandler}
-							/>
-						</form>
-
+						<Autocomplete
+							options={filterByOptions}
+							getOptionLabel={option => option}
+							renderInput={ params => <TextField {...params}
+								label='Filter By'
+								sx={{ minWidth: '200px' }}
+							/>}
+							value={filterBy}
+							onChange={filterByChangeHandler}
+						/>
 						<ButtonGroup>
-							<Button> <ListIcon /> </Button>
-							<Button variant={ true ? 'contained' : 'outlined'}> <GridViewIcon /> </Button>
+							{groupButtons.map(({icon, title}, key) => <Button key={key}
+								variant={view === key ? 'contained' : 'outlined'}
+								onClick={(evt) => groupButtonsHandler(evt, key)}
+								title={title}
+							> {icon}
+							</Button>)}
 						</ButtonGroup>
 					</Box>
 
-					<Divider sx={{ my: 2 }} />
+					{/*<Divider sx={{ my: 2 }} />*/}
 
-					<Grid container spacing={2}>
-						{products.map((product, key) => (
-						<Grid key={key} item xs={12} sm={6} md={4} >
-							<Card>
-								<Link href={`/product/${product._id}`} passHref>
-									<CardActionArea sx={{
-										position: 'relative'
-									}}>
-										<CardMedia
-											component='img'
-											src='/images/banner1.jpg'
-										/>
-										<Badge
-											color='error'
-											badgeContent='New'
-											sx={{
-												position: 'absolute',
-												top: 20,
-												left: 30,
-											}}
-										/>
-									</CardActionArea>
-								</Link>
+					{view === 0 ? (// List View component
+						<Paper sx={{ p: 1 }}>
+							<Grid container spacing={2}>
+								{products.map((product, key) => [
+									<Grid key={key} item xs={12} sm={3} >
+										<Link href={`/product/${product._id}`} passHref>
+											<CardActionArea sx={{position: 'relative'}} sx={{ minHeight: 150 }} >
+												<CardMedia
+													component='img'
+													src={product.coverImage?.secure_url || '/images/coverImage.jpg'}
+													height={150}
+												/>
+												<Badge color='error' badgeContent='New' sx={{position: 'absolute', top: 20, left: 30, }} />
+											</CardActionArea>
+										</Link>
+									</Grid>,
 
-								<CardContent>
-									<Typography color='primary'>{product.name}</Typography>
-									<Typography>${product.price.toFixed(2)}</Typography>
-								</CardContent>
+									<Grid key={`${key}-${key}`} item xs={12} sm={6} >
+										<Typography color='primary'>{product.name}</Typography>
+										<Box sx={{
+											display: 'flex',
+											gap: 2,
+											alignItems: 'center',
+										}}>
+											<Typography>
+												<Rating
+													name='product rating'
+													defaultValue={product.ratings || 4}
+													precision={.5}
+													readOnly
+												/>
+											</Typography>
 
-								<CardActions>
-									<Button
-										variant='contained'
-										fullWidth
-										onClick={(evt) => addToCartHandler(evt, product)}
-									>Add To Cart</Button>
-								</CardActions>
-							</Card>
+											<Typography color='primary'> {product.ratings || 4}/5 </Typography>
+										</Box>
+										<Typography color='textSecondary'>{product.description}</Typography>
+										<Typography sx={{ mt: 3 }}>${product.price.toFixed(2)}</Typography>
+									</Grid>,
+
+									<Grid key={`${key}-${key}-${key}`} item xs={12} sm={3} >
+										<Button variant='contained'fullWidth onClick={(evt) => addToCartHandler(evt, product)} >Add To Cart</Button>
+									</Grid>,
+
+								])}
+							</Grid>
+						</Paper>
+
+					) : (// Grid View component
+
+						<Grid container spacing={2}>
+							{products.map((product, key) => (
+							<Grid key={key} item xs={12} sm={6} md={4} >
+								<Card>
+									<Link href={`/product/${product._id}`} passHref>
+										<CardActionArea sx={{position: 'relative'}}>
+											<CardMedia
+												component='img'
+												src={product.coverImage?.secure_url || '/images/coverImage.jpg'}
+												height={150}
+											/>
+											<Badge color='error'badgeContent='New'sx={{position: 'absolute', top: 20, left: 30, }} />
+										</CardActionArea>
+									</Link>
+
+									<CardContent>
+										<Typography color='primary'>{product.name}</Typography>
+										<Typography>${product.price.toFixed(2)}</Typography>
+									</CardContent>
+
+									<CardActions>
+										<Button variant='contained'fullWidth onClick={(evt) => addToCartHandler(evt, product)} >Add To Cart</Button>
+									</CardActions>
+								</Card>
+							</Grid>
+							))}
 						</Grid>
-						))}
-					</Grid>
+					)}
+
+
 
 				</Grid>
 			</Grid>
@@ -337,11 +378,12 @@ export default Home
 
 export const getServerSideProps = async (ctx) => {
 	const { token } = nookies.get(ctx)
+	console.log({ query: ctx.query })
 
 	const { origin } = absoluteUrl(ctx.req)
 	const { data: { products } } = await axios.get(`${origin}/api/products`, {
-		headers: { Authorization: `Bearer ${token}`}
+		headers: { Authorization: `Bearer ${token}` }
 	})
 
-	return { props: { products }}
+	return { props: { products } }
 }
