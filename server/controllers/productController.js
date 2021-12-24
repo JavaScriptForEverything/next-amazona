@@ -1,4 +1,4 @@
-import { catchAsync, appError, filterObjectWithAllowedArray } from '../util'
+import { catchAsync, appError, filterObjectWithAllowedArray, filterObjectWithExcludedArray } from '../util'
 import Product from '../models/productModel'
 import cloudinary from 'cloudinary'
 
@@ -9,13 +9,69 @@ cloudinary.config({
 })
 
 
+
+
+const apiFeatures = (Model, queryObj) => {
+	let query = Model.find()
+
+	// 1. Allow field range filtering
+	const fields = filterObjectWithExcludedArray(queryObj, ['page', 'limit', 'sort', 'fields', 'search', 'common'])
+	const tempObj = {}
+
+	Object.entries(fields).forEach(([key, value]) => {
+		const arr = value.split(',')
+
+		if(arr.length === 2) {
+			tempObj[key] = { $gte: value.split(',')[0], $lte: value.split(',')[1] }
+
+		} else {
+			tempObj[key] = value
+		}
+	})
+	query = query.find(tempObj)
+
+
+	// 2. pagination
+	const pagination = function() {
+		const page = +queryObj.page || 1
+		const limit = +queryObj.limit || 4
+		const skip = (page - 1) * limit
+
+		this.query = this.query.skip(skip).limit(limit)
+		return this
+	}
+
+	// 3. sorting
+	const sort = function() {
+		this.query = this.query.sort(queryObj.sort?.split(',').join(' '))
+		return this
+	}
+
+	// 4. filter by fields
+	const filter = function() {
+		this.query = this.query.select(queryObj.fields?.split(',').join(' '))
+		return this
+	}
+
+	// 5. search
+	const search = function() {
+		const searchObj = queryObj.search ? { name: { $regex: queryObj.search, $options: 'i' }} : {}
+		this.query = this.query.find(searchObj)
+
+		return this
+	}
+
+
+	return { pagination, sort, search, filter, query }
+}
+
+
+
+
+
+
 export const getAllProducts = catchAsync( async (req, res, next) => {
-	const { page } = req.query
-
-	console.log(req.query)
-
-	const products = await Product.find()
-
+	const products = await apiFeatures(Product, req.query).pagination().sort().search().filter().query
 	if(!products) return next(appError('No product found.', 404))
 
 	res.status(200).json({

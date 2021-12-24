@@ -87,6 +87,11 @@ const productSchema = new Schema({
 		type: Number,
 		default: 4
 	},
+	size: {
+		type: String,
+		default: 'xs',
+		enum: ['xs', 'sm', 'lg', 'xxl']
+	}
 
 }, {
 	timestamps: true
@@ -101,14 +106,14 @@ productSchema.pre('save', function(next) {
 })
 
 
-// without await, if try to use await it will crush my application
-productSchema.pre(/^find/, function(next) {
-	this.populate({
-		path: 'user',
-		select: 'username email role',
-	})
-	next()
-})
+// // without await, if try to use await it will crush my application
+// productSchema.pre(/^find/, function(next) {
+// 	this.populate({
+// 		path: 'user',
+// 		select: 'username email role',
+// 	})
+// 	next()
+// })
 
 
 

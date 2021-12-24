@@ -5,7 +5,7 @@ import axios from 'axios'
 import { useDispatch, useSelector } from 'react-redux'
 import { showAlert } from '../store/dialogReducer'
 import { addItemToCart } from '../store/productReducer'
-import { filterPush } from '../util'
+import { filterPush, shorter } from '../util'
 
 import Link from 'next/link'
 import { useRouter } from 'next/router'
@@ -138,6 +138,10 @@ const Home = ({ products }) => {
 		filterPush(router, 'size', item)
 	}
 
+	const ratingsClickHandler = (evt, ratings) => {
+		filterPush(router, 'ratings', ratings)
+	}
+
 
 
 
@@ -182,6 +186,28 @@ const Home = ({ products }) => {
 									/>
 								</form>
 
+							</AccordionDetails>
+						</Accordion>
+
+						<Divider />
+
+						<Accordion defaultExpanded={false}>
+							<AccordionSummary expandIcon={<ExpandMoreIcon />}>
+								<Typography color='primary'> Ratings</Typography>
+							</AccordionSummary>
+							<AccordionDetails>
+									{products.map((product, key) => <ListItem key={key}
+										sx={{cursor: 'pointer'}}
+										onClick={evt => ratingsClickHandler(evt, product.ratings)}
+									>
+										<Rating
+											size='small'
+											name='product rating'
+											defaultValue={product.ratings}
+											precision={.2}
+											readOnly
+										/>
+									</ListItem> )}
 							</AccordionDetails>
 						</Accordion>
 
@@ -251,7 +277,7 @@ const Home = ({ products }) => {
 							</AccordionSummary>
 							<AccordionDetails>
 								<ButtonGroup>
-									{['sx', 'sm', 'lg', 'xxl'].map(item => <Button key={item}
+									{['xs', 'sm', 'lg', 'xxl'].map(item => <Button key={item}
 										onClick={(evt) => filterSizeClickHandler(evt, item)}
 									>{item}</Button> )}
 								</ButtonGroup>
@@ -319,8 +345,9 @@ const Home = ({ products }) => {
 										}}>
 											<Typography>
 												<Rating
+													size='small'
 													name='product rating'
-													defaultValue={product.ratings || 4}
+													defaultValue={product.ratings}
 													precision={.5}
 													readOnly
 												/>
@@ -368,6 +395,24 @@ const Home = ({ products }) => {
 
 									<CardContent>
 										<Typography color='primary'>{product.name}</Typography>
+										<Box sx={{
+											display: 'flex',
+											gap: 2,
+											alignItems: 'center',
+										}}>
+											<Typography>
+												<Rating
+													size='small'
+													name='product rating'
+													defaultValue={product.ratings}
+													precision={.5}
+													readOnly
+												/>
+											</Typography>
+
+											<Typography color='primary'> {product.ratings || 4}/5 </Typography>
+										</Box>
+										<Typography color='textSecondary' align='justify'>{shorter(product.description, 100)}</Typography>
 										<Typography variant='h6' sx={{ my: 3 }} >${product.price.toFixed(2)}</Typography>
 									</CardContent>
 
@@ -404,14 +449,20 @@ export default Home
 export const getServerSideProps = async (ctx) => {
 	const { token } = nookies.get(ctx)
 
-	let { page, limit, search, price, common, brand } = ctx.query
+	let { page, limit, sort, fields, search, price, ratings, common, brand, size, category } = ctx.query
 
 	let query = `page=${page || 1}`
-	if(limit) 	query = `${query}&limit=${limit || 4}`
-	if(search) 	query = `${query}&search=${search}`
-	if(common) 	query = `${query}&common=${common}`
-	if(price) 	query = `${query}&price=${price}`
-	if(brand) 	query = `${query}&brand=${brand}`
+	if(limit) 		query = `${query}&limit=${limit || 4}`
+	if(sort) 			query = `${query}&sort=${sort}`
+	if(fields) 		query = `${query}&fields=${fields}`
+	if(search) 		query = `${query}&search=${search}`
+
+	if(price) 		query = `${query}&price=${price}`
+	if(ratings) 	query = `${query}&ratings=${ratings}`
+	if(brand) 		query = `${query}&brand=${brand}`
+	if(category) 	query = `${query}&category=${category}`
+	if(size) 	query = `${query}&size=${size}`
+	if(common) 		query = `${query}&common=${common}`
 
 	const { origin } = absoluteUrl(ctx.req)
 	const { data: { products } } = await axios.get(`${origin}/api/products?${query}`, {
@@ -420,3 +471,5 @@ export const getServerSideProps = async (ctx) => {
 
 	return { props: { products } }
 }
+
+
