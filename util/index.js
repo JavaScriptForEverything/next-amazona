@@ -114,12 +114,12 @@ export const humanReadableFileSize = (bytes, si=true, dp=1) => {
 
   return bytes.toFixed(dp) + ' ' + units[u];
 }
-
 // console.log(humanReadableFileSize(1551859712))  // 1.4 GiB
-// console.log(humanReadableFileSize(5000, true))  // 5.0 kB
-// console.log(humanReadableFileSize(5000, false))  // 4.9 KiB
-// console.log(humanReadableFileSize(-10000000000000000000000000000))  // -8271.8 YiB
-// console.log(humanReadableFileSize(999949, true))  // 999.9 kB
-// console.log(humanReadableFileSize(999950, true))  // 1.0 MB
-// console.log(humanReadableFileSize(999950, true, 2))  // 999.95 kB
-// console.log(humanReadableFileSize(999500, true, 0))  // 1 MB
+
+
+export const filterPush = (router, key, value ) => {
+	const search = value ? { [key]: value } : delete router.query[key]
+	const query = Object.assign(router.query, search )
+	const searchParams = new URLSearchParams( query ).toString()
+	router.push(`?${searchParams}`)
+}

@@ -5,6 +5,7 @@ import axios from 'axios'
 import { useDispatch, useSelector } from 'react-redux'
 import { showAlert } from '../store/dialogReducer'
 import { addItemToCart } from '../store/productReducer'
+import { filterPush } from '../util'
 
 import Link from 'next/link'
 import { useRouter } from 'next/router'
@@ -62,21 +63,28 @@ const groupButtons = [
 ]
 
 
+
 const Home = ({ products }) => {
 	const dispatch = useDispatch()
 	const router = useRouter()
 
+	const [ view, setView ] = useState(1) 																// filter-ButtonGroup
 	const [ inputSearchValue, setInputSearchValue ] = useState('') 				// filter-search
 	const [ checkboxes, setCheckboxes ] = useState([]) 										// filter-checkbox
 	const [ sliderValue, setSliderValue ] = useState([0, 100]) 						// filter-slider
 	const [ sliderFields, setSliderFields ] = useState(sliderInputsObj)
 	const [ filterBy, setFilterBy ] = useState(filterByOptions[0]) 				// filter-Autocomplete
-	const [ view, setView ] = useState(1) 																// filter-ButtonGroup
 
 	const [ page, setPage ] = useState(1) 																// bottom page nagivation
 
 	const { error, cartItems } = useSelector(state => state.product)
 
+
+	// Make view parmanent
+	useEffect(() => { // convert to number and only 1 if not zeor|false
+		const currentView = +localStorage.getItem('view')	?? 1
+		setView(currentView)
+	}, [view])
 
 
 
@@ -88,7 +96,11 @@ const Home = ({ products }) => {
 		{ name: 'ramond', 	value: 42},
 	]
 
-
+	// view handler
+	const groupButtonsHandler = (evt, id) => {
+		setView(id)
+		localStorage.setItem('view', id)
+	}
 	const addToCartHandler = (evt, product) => {
 		const isFound = cartItems.find(cart => cart._id === product._id)
 		if(isFound) return dispatch(showAlert({ open: true, severity: 'info', message: 'This product all ready added into cart'}))
@@ -98,18 +110,19 @@ const Home = ({ products }) => {
 	}
 
 
-	const inputSearchHandler = (evt) => {
-		setInputSearchValue(evt.target.value)
+	const checkboxOnChangeHandler = (evt, checkedId, brand) => {
+		setCheckboxes( checkboxes.map((checkbox, key, arr) => key === checkedId ? [...arr, !checkbox] : [...arr] ))
+		// router.push(`?brand=${brand}`)
 	}
+
+
+	const inputSearchHandler = (evt) => setInputSearchValue(evt.target.value)
 	const inputSearchSubmitHandler = (evt) => {
 		evt.preventDefault()
 
-		router.push(`?search=${inputSearchValue}`)
+		filterPush(router, 'search', inputSearchValue)
 	}
 
-	const checkboxOnChangeHandler = (evt, checkedId) => {
-		setCheckboxes( checkboxes.map((checkbox, key, arr) => key === checkedId ? [...arr, !checkbox] : [...arr] ))
-	}
 
 	const sliderOnChangeHandler = (evt, newValue) => setSliderValue(newValue)
 	const sliderInputHandler = (evt, name) => setSliderFields({ ...sliderFields, [name]: evt.target.value })
@@ -117,26 +130,29 @@ const Home = ({ products }) => {
 		evt.preventDefault()
 
 		const currentValue = sliderValue.map(item => item * (sliderFields.max - sliderFields.min))
-		router.push(`?price=${currentValue}`)
+
+		filterPush(router, 'price', currentValue)
 	}
 
-	const filterSizeClickHandler = (evt, item) => router.push(`?size=${item}`)
+	const filterSizeClickHandler = (evt, item) => {
+		filterPush(router, 'size', item)
+	}
 
 
 
 
 	const filterByChangeHandler = (evt, newValue) => {
 		setFilterBy(newValue)
-		router.push(`?common=${newValue}`)
+		filterPush(router, 'common', newValue)
 	}
-
-	const groupButtonsHandler = (evt, id) => setView(id)
 
 	const pageHandler = (evt, newValue) => {
 		setPage(newValue)
 
-		router.push(`/?page=${newValue}`)
+		filterPush(router, 'page', newValue)
 	}
+
+
 
 	return (
 		<Layout>
@@ -184,7 +200,7 @@ const Home = ({ products }) => {
 													label={<ListItemText>{brand.name}</ListItemText>}
 													control={ <Checkbox
 														checked={checkboxes[key]}
-														onChange={(evt) => checkboxOnChangeHandler(evt, key)}
+														onChange={(evt) => checkboxOnChangeHandler(evt, key, brand.name)}
 													/>}
 												/>
 											</ListItemIcon>
@@ -312,12 +328,21 @@ const Home = ({ products }) => {
 
 											<Typography color='primary'> {product.ratings || 4}/5 </Typography>
 										</Box>
-										<Typography color='textSecondary'>{product.description}</Typography>
-										<Typography sx={{ mt: 3 }}>${product.price.toFixed(2)}</Typography>
+										<Typography color='textSecondary' align='justify'>{product.description}</Typography>
 									</Grid>,
 
 									<Grid key={`${key}-${key}-${key}`} item xs={12} sm={3} >
-										<Button variant='contained'fullWidth onClick={(evt) => addToCartHandler(evt, product)} >Add To Cart</Button>
+										<Box sx={{
+											display: 'flex',
+											flexDirection: 'column',
+											height: '100%',
+											justifyContent: 'center',
+											gap: 3,
+											p: 2
+										}}>
+											<Typography  variant='h6' >${product.price.toFixed(2)}</Typography>
+											<Button variant='contained'fullWidth onClick={(evt) => addToCartHandler(evt, product)} >Add To Cart</Button>
+										</Box>
 									</Grid>,
 
 								])}
@@ -343,7 +368,7 @@ const Home = ({ products }) => {
 
 									<CardContent>
 										<Typography color='primary'>{product.name}</Typography>
-										<Typography>${product.price.toFixed(2)}</Typography>
+										<Typography variant='h6' sx={{ my: 3 }} >${product.price.toFixed(2)}</Typography>
 									</CardContent>
 
 									<CardActions>
@@ -378,10 +403,18 @@ export default Home
 
 export const getServerSideProps = async (ctx) => {
 	const { token } = nookies.get(ctx)
-	console.log({ query: ctx.query })
+
+	let { page, limit, search, price, common, brand } = ctx.query
+
+	let query = `page=${page || 1}`
+	if(limit) 	query = `${query}&limit=${limit || 4}`
+	if(search) 	query = `${query}&search=${search}`
+	if(common) 	query = `${query}&common=${common}`
+	if(price) 	query = `${query}&price=${price}`
+	if(brand) 	query = `${query}&brand=${brand}`
 
 	const { origin } = absoluteUrl(ctx.req)
-	const { data: { products } } = await axios.get(`${origin}/api/products`, {
+	const { data: { products } } = await axios.get(`${origin}/api/products?${query}`, {
 		headers: { Authorization: `Bearer ${token}` }
 	})
 

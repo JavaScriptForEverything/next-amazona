@@ -10,6 +10,10 @@ cloudinary.config({
 
 
 export const getAllProducts = catchAsync( async (req, res, next) => {
+	const { page } = req.query
+
+	console.log(req.query)
+
 	const products = await Product.find()
 
 	if(!products) return next(appError('No product found.', 404))

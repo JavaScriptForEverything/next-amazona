@@ -28,6 +28,14 @@ import Switch from '@mui/material/Switch'
 import TextField from '@mui/material/TextField'
 import InputAdornment from '@mui/material/InputAdornment'
 
+import NoSsr from '@mui/material/NoSsr'
+import Table from '@mui/material/Table'
+import TableHead from '@mui/material/TableHead'
+import TableBody from '@mui/material/TableBody'
+import TableRow from '@mui/material/TableRow'
+import TableCell from '@mui/material/TableRow'
+
+import MoreVertIcon from '@mui/icons-material/MoreVert'
 
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown'
 import SearchIcon from '@mui/icons-material/Search'
@@ -55,21 +63,20 @@ const About = () => {
 		<Layout title='about page'>
 			<Typography>About Page</Typography>
 
-{/*			<ButtonGroup>
-				{buttonsOfGroup.map(({icon}, key) => <Button key={key}
-					// variant={buttons[key]?.checked ? 'contained' : 'outlined'}
-					// variant={ !buttons.length && key === 0 ? 'contained' : (buttons[key]?.checked ? 'contained' : 'outlined')}
-					variant={ !buttons[key] && key === 0 ? 'contained' : (buttons[key]?.checked ? 'contained' : 'outlined')}
-					onClick={(evt) => clickHandler(evt, key)}
-				>{icon}</Button>)}
-			</ButtonGroup>
-*/}
-			<ButtonGroup>
-				{buttonsOfGroup.map(({icon}, key) => <Button key={key}
-					variant={key === button ? 'contained' : 'outlined'}
-					onClick={(evt) => clickHandler(evt, key)}
-				>{icon}</Button>)}
-			</ButtonGroup>
+			<NoSsr>
+			</NoSsr>
+
+			<Table>
+				<TableHead>
+					<TableRow sx={{display: 'flex', justifyContent: 'space-between'}}>
+						<TableCell component='th'>One</TableCell>
+						<TableCell component='th'>One</TableCell>
+						<TableCell component='th'>One</TableCell>
+					</TableRow>
+				</TableHead>
+			</Table>
+
+
 
 		</Layout>
 	)
