@@ -43,6 +43,13 @@ const productSchema = new Schema({
 		// 	minimumFractionDigits: 2
 		// })
 	},
+	summary: {
+		type: String,
+		required: true,
+		minLength: 10,
+		maxLength: 150,
+		trim: true
+	},
 	description: {
 		type: String,
 		required: true,

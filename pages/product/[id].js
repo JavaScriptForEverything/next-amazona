@@ -1,4 +1,5 @@
 import axios from 'axios'
+import nookies from 'nookies'
 import absoluteUrl from 'next-absolute-url'
 import { useDispatch, useSelector } from 'react-redux'
 import { showAlert } from '../../store/dialogReducer'
@@ -102,9 +103,13 @@ const Product = ({ product }) => {
 export default Product
 
 
-export const getServerSideProps = async ({ req, params }) => {
-	const { origin } = absoluteUrl(req)
-	const { data: { product } } = await axios.get(`${origin}/api/products/${params.id}`)
+export const getServerSideProps = async (ctx) => {
+	const { token } = nookies.get(ctx)
+
+	const { origin } = absoluteUrl(ctx.req)
+	const { data: { product } } = await axios.get(`${origin}/api/products/${ctx.params.id}`, {
+		headers: { Authorization: `Bearer ${token}`}
+	})
 
 	console.log(product)
 

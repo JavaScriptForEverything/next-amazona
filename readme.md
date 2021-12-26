@@ -21,11 +21,9 @@
 	. Stripe Payment Method
 	. send Mail (development: mailtrap, in Production: sendGrid)
 	. upload image in Cloudinary (PDF in cloudinary download blocked)
-
+	. Pagination + Filter + Search + Rating...
 
 	. Do next:
-		. Pagination
-		. Filter + Search
 		. CRUD Product (By Form or By 3-dot menu)
 
 

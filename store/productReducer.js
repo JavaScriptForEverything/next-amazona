@@ -9,8 +9,9 @@ import { catchAsyncDispatch } from '../util'
 const { reducer, actions } = createSlice({
 	name: 'product',
 	initialState: {
-		products: [],
-		product: {},
+		// products: [],
+		// product: {},
+		brands: [],
 
 		loading: false,
 		error: '',
@@ -59,6 +60,11 @@ const { reducer, actions } = createSlice({
 			...state,
 			loading: false,
 			product: action.payload
+		}),
+		getBrands: (state, action) => ({
+			...state,
+			loading: false,
+			brands:  action.payload
 		})
 
 	},
@@ -93,10 +99,20 @@ export const getTotalPrice = () => (dispatch) => {
 
 
 
+// getAllProduct will be dispatched here instead of /pages/product.js getServerSideProps
+// getProduct will be dispatched here instead of /pages/product/[id].js getServerSideProps
+
 export const addProduct = (obj, token) => catchAsyncDispatch( async (dispatch) => {
 	dispatch(actions.requested())
 	const { data: { product } } = await axios.post('/api/products', obj, { headers: {Authorization: `Bearer ${token}`} })
 	dispatch(actions.productAdded(product))
+}, actions.failed)
+
+
+export const getProductBrands = (token) => catchAsyncDispatch( async (dispatch) => {
+	dispatch(actions.requested())
+	const { data: { brands } } = await axios.get('/api/products/brand', { headers: {Authorization: `Bearer ${token}`} })
+	dispatch(actions.getBrands(brands))
 }, actions.failed)
 
 

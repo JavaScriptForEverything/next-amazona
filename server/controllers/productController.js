@@ -1,6 +1,7 @@
-import { catchAsync, appError, filterObjectWithAllowedArray, filterObjectWithExcludedArray } from '../util'
-import Product from '../models/productModel'
+import { Types } from 'mongoose'
 import cloudinary from 'cloudinary'
+import Product from '../models/productModel'
+import { catchAsync, appError, filterObjectWithAllowedArray, filterObjectWithExcludedArray } from '../util'
 
 cloudinary.config({
 	cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
@@ -15,7 +16,7 @@ const apiFeatures = (Model, queryObj) => {
 	let query = Model.find()
 
 	// 1. Allow field range filtering
-	const fields = filterObjectWithExcludedArray(queryObj, ['page', 'limit', 'sort', 'fields', 'search', 'common'])
+	const fields = filterObjectWithExcludedArray(queryObj, ['page', 'limit', 'sort', 'fields', 'search', 'brand', 'common'])
 	const tempObj = {}
 
 	Object.entries(fields).forEach(([key, value]) => {
@@ -61,8 +62,20 @@ const apiFeatures = (Model, queryObj) => {
 		return this
 	}
 
+	const handleBrandFilter = function() {
+		const brand = queryObj.brand?.split(',') || []
 
-	return { pagination, sort, search, filter, query }
+		if (brand.length) this.query = this.query.find({ brand : { $in: [...brand]} } )
+
+		// // Query.prototype.aggregate() is not mongoose method, but find is
+		// if(brand.length) this.query = this.query.aggregate([
+		// 	{$match: { brand : { $in: [...brand]} } }
+		// ])
+
+		return this
+	}
+
+	return { query, pagination, sort, search, filter, handleBrandFilter }
 }
 
 
@@ -70,9 +83,20 @@ const apiFeatures = (Model, queryObj) => {
 
 
 
+/* /pages/index.js  > /pages/api/products/index.js	:	handler.get(getAllProducts)
+ 		.	/pages/index.js  */
 export const getAllProducts = catchAsync( async (req, res, next) => {
-	const products = await apiFeatures(Product, req.query).pagination().sort().search().filter().query
+	const products = await apiFeatures(Product, req.query)
+		.pagination()
+		.sort()
+		.search()
+		.filter()
+		.handleBrandFilter()
+		.query
+
 	if(!products) return next(appError('No product found.', 404))
+
+	// console.log({ brand: req.query.brand })
 
 	res.status(200).json({
 		status: 'success',
@@ -80,20 +104,6 @@ export const getAllProducts = catchAsync( async (req, res, next) => {
 		products
 	})
 })
-export const getProductBySlug = catchAsync( async (req, res, next) => {
-	const { slug } = req.query
-
-	const product = await Product.findOne({ slug })
-
-	if(!product) return next(appError('No product found.', 404))
-
-	res.status(200).json({
-		status: 'success',
-		product
-	})
-})
-
-
 
 
 /* productReducer.js  > /pages/api/products/index.js	:	handler.post(protect, addProduct)
@@ -131,11 +141,15 @@ export const addProduct = catchAsync( async (req, res, next) => {
 })
 
 
-export const getProductById = catchAsync(async (req, res, next) => {
 
-	const product = await Product.findById(req.query.id)
+/* (directly in /pages/product/[id].js)  > /pages/api/products/[id].js	:	handler.get(getProductBy)
+ 		.	we will move it  to productReducer latter  */
+export const getProductBy = catchAsync(async (req, res, next) => {
+
+	const isObjectId = Types.ObjectId.isValid(req.query.id)
+	const product = isObjectId ? await Product.findById(req.query.id) : await Product.findOne({ slug: req.query.id })
+
 	if(!product) return next(appError('No product found.', 404))
-	// console.log(req.query)
 
 	res.status(200).json({
 		status: 'success',
@@ -150,5 +164,21 @@ export const deleteProductById = catchAsync(async (req, res, next) => {
 
 	res.status(204).json({
 		status: 'success',
+	})
+})
+
+
+
+/* productReducer.js  > /pages/api/products/brand.js	:	handler.get(getBrands)
+ 		.	/pages/index.js  */
+export const getBrands = catchAsync( async (req, res, next) => {
+
+	const brands = await Product.aggregate([
+		{ $group: { _id: '$brand', count: { $sum: 1 } } }
+	])
+
+	res.status(202).json({
+		status: 'success',
+		brands,
 	})
 })

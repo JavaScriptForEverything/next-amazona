@@ -4,7 +4,7 @@ import absoluteUrl from 'next-absolute-url'
 import axios from 'axios'
 import { useDispatch, useSelector } from 'react-redux'
 import { showAlert } from '../store/dialogReducer'
-import { addItemToCart } from '../store/productReducer'
+import { addItemToCart, getProductBrands } from '../store/productReducer'
 import { filterPush, shorter } from '../util'
 
 import Link from 'next/link'
@@ -18,6 +18,7 @@ import Box from '@mui/material/Box'
 import Grid from '@mui/material/Grid'
 import Paper from '@mui/material/Paper'
 import Card from '@mui/material/Card'
+import CardHeader from '@mui/material/CardHeader'
 import CardActionArea from '@mui/material/CardActionArea'
 import CardMedia from '@mui/material/CardMedia'
 import CardContent from '@mui/material/CardContent'
@@ -45,9 +46,13 @@ import Rating from '@mui/material/Rating'
 import Pagination from '@mui/material/Pagination'
 
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
+import MoreVertIcon from '@mui/icons-material/MoreVert'
 import ListIcon from '@mui/icons-material/List'
 import GridViewIcon from '@mui/icons-material/GridView'
 import SearchIcon from '@mui/icons-material/Search'
+
+
+const { token } = nookies.get(null)
 
 const filterByOptions = ['Latest Items', 'Most Popular', 'Trending', 'Chepest']
 const sliderInputs = [
@@ -70,14 +75,24 @@ const Home = ({ products }) => {
 
 	const [ view, setView ] = useState(1) 																// filter-ButtonGroup
 	const [ inputSearchValue, setInputSearchValue ] = useState('') 				// filter-search
-	const [ checkboxes, setCheckboxes ] = useState([]) 										// filter-checkbox
 	const [ sliderValue, setSliderValue ] = useState([0, 100]) 						// filter-slider
 	const [ sliderFields, setSliderFields ] = useState(sliderInputsObj)
 	const [ filterBy, setFilterBy ] = useState(filterByOptions[0]) 				// filter-Autocomplete
+	// const [ checkboxes, setCheckboxes ] = useState([]) 										// filter-checkbox
 
 	const [ page, setPage ] = useState(1) 																// bottom page nagivation
 
-	const { error, cartItems } = useSelector(state => state.product)
+	const { error, cartItems, brands } = useSelector(state => state.product)
+	const [ brandsObj, setBrandsObj ] = useState([]) 										// filter-checkbox
+
+
+
+	// get brands from backend
+	useEffect(() => dispatch(getProductBrands(token)), [])
+
+	useEffect(() => {
+		setBrandsObj(brands.map(item => ({...item, brand: item._id, checked: false})))
+	}, [brands])
 
 
 	// Make view parmanent
@@ -87,20 +102,13 @@ const Home = ({ products }) => {
 	}, [view])
 
 
-
-	const brands = [ 										// this values froms from redux store
-		{ name: 'adidas', 	value: 42},
-		{ name: 'niki', 		value: 24},
-		{ name: 'oliver', 	value: 26},
-		{ name: 'zara', 		value: 42},
-		{ name: 'ramond', 	value: 42},
-	]
-
 	// view handler
 	const groupButtonsHandler = (evt, id) => {
 		setView(id)
 		localStorage.setItem('view', id)
 	}
+
+
 	const addToCartHandler = (evt, product) => {
 		const isFound = cartItems.find(cart => cart._id === product._id)
 		if(isFound) return dispatch(showAlert({ open: true, severity: 'info', message: 'This product all ready added into cart'}))
@@ -110,19 +118,34 @@ const Home = ({ products }) => {
 	}
 
 
-	const checkboxOnChangeHandler = (evt, checkedId, brand) => {
-		setCheckboxes( checkboxes.map((checkbox, key, arr) => key === checkedId ? [...arr, !checkbox] : [...arr] ))
-		// router.push(`?brand=${brand}`)
+	const brandOnChangeHandler = (evt, brandId ) => {
+		const currentArr = brandsObj.map( (item, id) => id === brandId ? ({...item, checked: !item.checked}) : item )
+		setBrandsObj(currentArr)
+
+		// get an array of single property of Object which is a child of an array
+		const tempArr = currentArr.map((item) => item.checked ? item.brand : '' )
+
+		// Remove falsy value from an array
+		tempArr = tempArr.filter(Boolean)
+
+		// send brand value as array [converted to string] to Backend Server
+			// if true allow multiple search together => in that case I have to add checkbox & clear button for every search
+		false ? filterPush(router, 'brand', tempArr) : router.push(`?brand=${tempArr}`)
 	}
+
+
 
 
 	const inputSearchHandler = (evt) => setInputSearchValue(evt.target.value)
 	const inputSearchSubmitHandler = (evt) => {
 		evt.preventDefault()
 
-		filterPush(router, 'search', inputSearchValue)
+		false ? filterPush(router, 'search', inputSearchValue) : router.push(`?search=${inputSearchValue}`)
 	}
 
+	const ratingsClickHandler = (evt, ratings) => {
+		false ? filterPush(router, 'ratings', ratings) : router.push(`?ratings=${ratings}`)
+	}
 
 	const sliderOnChangeHandler = (evt, newValue) => setSliderValue(newValue)
 	const sliderInputHandler = (evt, name) => setSliderFields({ ...sliderFields, [name]: evt.target.value })
@@ -131,29 +154,24 @@ const Home = ({ products }) => {
 
 		const currentValue = sliderValue.map(item => item * (sliderFields.max - sliderFields.min))
 
-		filterPush(router, 'price', currentValue)
+		false ? filterPush(router, 'price', currentValue) : router.push(`?price=${currentValue}`)
 	}
 
 	const filterSizeClickHandler = (evt, item) => {
-		filterPush(router, 'size', item)
+		false ? filterPush(router, 'size', item) : router.push(`?size=${item}`)
 	}
-
-	const ratingsClickHandler = (evt, ratings) => {
-		filterPush(router, 'ratings', ratings)
-	}
-
-
-
 
 	const filterByChangeHandler = (evt, newValue) => {
 		setFilterBy(newValue)
-		filterPush(router, 'common', newValue)
+
+		console.log({ value: newValue })
+		// false ? filterPush(router, 'common', newValue) : router.push(`?common=${newValue}`)
 	}
 
 	const pageHandler = (evt, newValue) => {
 		setPage(newValue)
 
-		filterPush(router, 'page', newValue)
+		false ? filterPush(router, 'page', newValue) : router.push(`?page=${newValue}`)
 	}
 
 
@@ -165,45 +183,37 @@ const Home = ({ products }) => {
 				{/*-------[ Left Side ]--------*/}
 				<Grid item xs={12} md={3}>
 					<Paper>
-						<Accordion defaultExpanded={false}>
-							<AccordionSummary expandIcon={<ExpandMoreIcon />}>
-								<Typography color='primary'> Product Type </Typography>
-							</AccordionSummary>
-							<AccordionDetails>
-								<form noValidate onSubmit={inputSearchSubmitHandler}>
-									<TextField
-										placeholder='Searcing...'
-										fullWidth
-										autoFocus
-										margin='dense'
-										InputProps={{
-											endAdornment: <InputAdornment position='end'>
-												<IconButton onClick={inputSearchSubmitHandler}> <SearchIcon color='primary' /> </IconButton>
-											</InputAdornment>
-										}}
-										onChange={inputSearchHandler}
-										value={inputSearchValue}
-									/>
-								</form>
-
-							</AccordionDetails>
-						</Accordion>
+						<form noValidate onSubmit={inputSearchSubmitHandler}>
+							<TextField
+								placeholder='Searcing...'
+								fullWidth
+								autoFocus
+								margin='dense'
+								InputProps={{
+									endAdornment: <InputAdornment position='end'>
+										<IconButton onClick={inputSearchSubmitHandler}> <SearchIcon color='primary' /> </IconButton>
+									</InputAdornment>
+								}}
+								onChange={inputSearchHandler}
+								value={inputSearchValue}
+							/>
+						</form>
 
 						<Divider />
 
-						<Accordion defaultExpanded={false}>
+						<Accordion defaultExpanded={true}>
 							<AccordionSummary expandIcon={<ExpandMoreIcon />}>
 								<Typography color='primary'> Ratings</Typography>
 							</AccordionSummary>
 							<AccordionDetails>
-									{products.map((product, key) => <ListItem key={key}
+									{[1, 2, 3, 4, 5].reverse().map((value, key) => <ListItem key={key}
 										sx={{cursor: 'pointer'}}
-										onClick={evt => ratingsClickHandler(evt, product.ratings)}
+										onClick={evt => ratingsClickHandler(evt, value)}
 									>
 										<Rating
 											size='small'
 											name='product rating'
-											defaultValue={product.ratings}
+											defaultValue={value}
 											precision={.2}
 											readOnly
 										/>
@@ -213,20 +223,20 @@ const Home = ({ products }) => {
 
 						<Divider />
 
-						<Accordion defaultExpanded={false}>
+						<Accordion defaultExpanded={true}>
 							<AccordionSummary expandIcon={<ExpandMoreIcon />}>
 								<Typography color='primary'> Brands </Typography>
 							</AccordionSummary>
 							<AccordionDetails>
 								<List >
-									{brands.map((brand, key) => (
-										<ListItem key={key} secondaryAction={brand.value} disableGutters dense >
+									{brandsObj.map(({brand, checked, count}, key) => (
+										<ListItem key={key} secondaryAction={count} disableGutters dense >
 											<ListItemIcon>
 												<FormControlLabel
-													label={<ListItemText>{brand.name}</ListItemText>}
+													label={<ListItemText>{brand}</ListItemText>}
 													control={ <Checkbox
-														checked={checkboxes[key]}
-														onChange={(evt) => checkboxOnChangeHandler(evt, key, brand.name)}
+														checked={checked}
+														onChange={(evt) => brandOnChangeHandler(evt, key)}
 													/>}
 												/>
 											</ListItemIcon>
@@ -271,7 +281,7 @@ const Home = ({ products }) => {
 
 						<Divider />
 
-						<Accordion defaultExpanded={false}>
+						<Accordion defaultExpanded={true}>
 							<AccordionSummary expandIcon={<ExpandMoreIcon />}>
 								<Typography color='primary'>Size</Typography>
 							</AccordionSummary>
@@ -324,7 +334,7 @@ const Home = ({ products }) => {
 							<Grid container spacing={2}>
 								{products.map((product, key) => [
 									<Grid key={key} item xs={12} sm={3} >
-										<Link href={`/product/${product._id}`} passHref>
+										<Link href={`/product/${product.slug}`} passHref>
 											<CardActionArea sx={{position: 'relative'}} sx={{ minHeight: 150 }} >
 												<CardMedia
 													component='img'
@@ -382,7 +392,11 @@ const Home = ({ products }) => {
 							{products.map((product, key) => (
 							<Grid key={key} item xs={12} sm={6} md={4} >
 								<Card>
-									<Link href={`/product/${product._id}`} passHref>
+									<CardHeader
+										title={product.name}
+										action={<IconButton><MoreVertIcon /></IconButton>}
+									/>
+									<Link href={`/product/${product.slug}`} passHref>
 										<CardActionArea sx={{position: 'relative'}}>
 											<CardMedia
 												component='img'
@@ -394,30 +408,22 @@ const Home = ({ products }) => {
 									</Link>
 
 									<CardContent>
-										<Typography color='primary'>{product.name}</Typography>
-										<Box sx={{
-											display: 'flex',
-											gap: 2,
-											alignItems: 'center',
-										}}>
+										<Typography color='textSecondary' align='justify'>{shorter(product.description, 100)}</Typography>
+										<Box sx={{display: 'flex', gap: 2, alignItems: 'center', }}>
 											<Typography>
-												<Rating
-													size='small'
-													name='product rating'
-													defaultValue={product.ratings}
-													precision={.5}
-													readOnly
-												/>
+												<Rating size='small' name='product rating' defaultValue={product.ratings} precision={.5} readOnly />
 											</Typography>
-
 											<Typography color='primary'> {product.ratings || 4}/5 </Typography>
 										</Box>
-										<Typography color='textSecondary' align='justify'>{shorter(product.description, 100)}</Typography>
 										<Typography variant='h6' sx={{ my: 3 }} >${product.price.toFixed(2)}</Typography>
 									</CardContent>
 
-									<CardActions>
+{/*									<CardActions>
 										<Button variant='contained'fullWidth onClick={(evt) => addToCartHandler(evt, product)} >Add To Cart</Button>
+									</CardActions>
+*/}
+									<CardActions sx={{display: 'flex', justifyContent: 'flex-end', my: 1 }} >
+										<Button onClick={() => router.push(`/product/${product.slug}`)} variant='contained'>Details</Button>
 									</CardActions>
 								</Card>
 							</Grid>
@@ -456,13 +462,13 @@ export const getServerSideProps = async (ctx) => {
 	if(sort) 			query = `${query}&sort=${sort}`
 	if(fields) 		query = `${query}&fields=${fields}`
 	if(search) 		query = `${query}&search=${search}`
+	if(brand) 		query = `${query}&brand=${brand}`
 
 	if(price) 		query = `${query}&price=${price}`
 	if(ratings) 	query = `${query}&ratings=${ratings}`
-	if(brand) 		query = `${query}&brand=${brand}`
 	if(category) 	query = `${query}&category=${category}`
 	if(size) 	query = `${query}&size=${size}`
-	if(common) 		query = `${query}&common=${common}`
+	// if(common) 		query = `${query}&common=${common}`
 
 	const { origin } = absoluteUrl(ctx.req)
 	const { data: { products } } = await axios.get(`${origin}/api/products?${query}`, {

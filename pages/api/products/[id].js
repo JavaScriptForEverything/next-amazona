@@ -6,7 +6,7 @@ import nc from 'next-connect'
 
 const handler = nc({ onError })
 handler
-	.get(productController.getProductById)
+	.get(productController.getProductBy)
 	.delete(protect, productController.deleteProductById)
 
 export default handler
