@@ -85,6 +85,7 @@ const Home = ({ products }) => {
 	const { error, cartItems, brands } = useSelector(state => state.product)
 	const [ brandsObj, setBrandsObj ] = useState([]) 										// filter-checkbox
 
+	console.log(products.length)
 
 
 	// get brands from backend
@@ -408,7 +409,7 @@ const Home = ({ products }) => {
 									</Link>
 
 									<CardContent>
-										<Typography color='textSecondary' align='justify'>{shorter(product.description, 100)}</Typography>
+										<Typography color='textSecondary' align='justify' paragraph>{shorter(product.description, 100)}</Typography>
 										<Box sx={{display: 'flex', gap: 2, alignItems: 'center', }}>
 											<Typography>
 												<Rating size='small' name='product rating' defaultValue={product.ratings} precision={.5} readOnly />
@@ -430,8 +431,6 @@ const Home = ({ products }) => {
 							))}
 						</Grid>
 					)}
-
-
 
 				</Grid>
 			</Grid>

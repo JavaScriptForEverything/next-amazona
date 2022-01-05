@@ -11,14 +11,35 @@ export const catchAsyncDispatch = (fn, showError=f=>f) => (dispatch, getStore) =
 })
 
 
+// make word's first character Capitalize
 export const toCapitalize = (str) => str && str.replace(/\b./g, match => match.toUpperCase())
 
+// limit description's length
 export const shorter = (content, length=250) => {
 	if(content.length > length) return content.substr(0, length) + '...'
 	return content
 }
 
+// copy id's last 8 digits only By start from last 8th chars
+export const idFormatter = (id) => `...${id.substr(id.length-8, 8)}`
 
+// format date
+export const dateFormatter = (date) => {
+	const dateObj = new Date(date)
+	return dateObj.toLocaleString('en-US', {
+		year: 'numeric',
+		month: 'short',
+		day: 'numeric'
+	})
+}
+
+// price formatter
+export const priceFormatter = (price) => {
+	return price.toLocaleString('en-US', {
+		style: 'currency',
+		currency: 'usd',
+	})
+}
 
 // // Filter Object By Array
 // export const filterObjectByArray = (arr, obj) => {

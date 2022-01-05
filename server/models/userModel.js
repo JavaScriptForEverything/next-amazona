@@ -58,7 +58,7 @@ const userSchema = new Schema({
 		minLength: 100, 			// for
 		maxLength: 500,
 		trim: true,
-		// default: 'user description...',
+		default: 'user description... Lorem ipsum dolor sit amet consectetur adipisicing elit. Et inventore soluta quae tempore',
 	},
 	skills: {
 		type: [String],
@@ -154,18 +154,11 @@ const userSchema = new Schema({
 			maxLength: 50,
 			default: 'Dhaka, Bangladesh',
 		},
-		// avatar: {
-		// 	type: String,
-		// 	default: 'PS',
-		// 	set: function() { return this.title.split(' ').map(word => word[0]).join('').toUpperCase() },
-		// },
 		logoBackgroundColor: {
 			type: String,
-			// default: '#42a5f5'
-			default: randomHexColor
+			default: randomHexColor  				// default: '#42a5f5'
 		}
 	}]
-
 
 }, {
 	timestamps: true
