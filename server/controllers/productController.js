@@ -1,7 +1,13 @@
 import { Types } from 'mongoose'
 import cloudinary from 'cloudinary'
 import Product from '../models/productModel'
-import { catchAsync, appError, filterObjectWithAllowedArray, filterObjectWithExcludedArray } from '../util'
+import {
+	catchAsync,
+	appError,
+	filterObjectWithAllowedArray,
+	filterObjectWithExcludedArray,
+	apiFeatures
+} from '../util'
 
 cloudinary.config({
 	cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
@@ -10,73 +16,6 @@ cloudinary.config({
 })
 
 
-
-
-const apiFeatures = (Model, queryObj) => {
-	let query = Model.find()
-
-	// 1. Allow field range filtering
-	const fields = filterObjectWithExcludedArray(queryObj, ['page', 'limit', 'sort', 'fields', 'search', 'brand', 'common'])
-	const tempObj = {}
-
-	Object.entries(fields).forEach(([key, value]) => {
-		const arr = value.split(',')
-
-		if(arr.length === 2) {
-			tempObj[key] = { $gte: value.split(',')[0], $lte: value.split(',')[1] }
-
-		} else {
-			tempObj[key] = value
-		}
-	})
-	query = query.find(tempObj)
-
-
-	// 2. pagination
-	const pagination = function() {
-		const page = +queryObj.page || 1
-		const limit = +queryObj.limit || 4
-		const skip = (page - 1) * limit
-
-		this.query = this.query.skip(skip).limit(limit)
-		return this
-	}
-
-	// 3. sorting
-	const sort = function() {
-		this.query = this.query.sort(queryObj.sort?.split(',').join(' '))
-		return this
-	}
-
-	// 4. filter by fields
-	const filter = function() {
-		this.query = this.query.select(queryObj.fields?.split(',').join(' '))
-		return this
-	}
-
-	// 5. search
-	const search = function() {
-		const searchObj = queryObj.search ? { name: { $regex: queryObj.search, $options: 'i' }} : {}
-		this.query = this.query.find(searchObj)
-
-		return this
-	}
-
-	const handleBrandFilter = function() {
-		const brand = queryObj.brand?.split(',') || []
-
-		if (brand.length) this.query = this.query.find({ brand : { $in: [...brand]} } )
-
-		// // Query.prototype.aggregate() is not mongoose method, but find is
-		// if(brand.length) this.query = this.query.aggregate([
-		// 	{$match: { brand : { $in: [...brand]} } }
-		// ])
-
-		return this
-	}
-
-	return { query, pagination, sort, search, filter, handleBrandFilter }
-}
 
 
 

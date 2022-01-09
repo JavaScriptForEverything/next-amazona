@@ -141,7 +141,8 @@ const Home = ({ products }) => {
 	const inputSearchSubmitHandler = (evt) => {
 		evt.preventDefault()
 
-		false ? filterPush(router, 'search', inputSearchValue) : router.push(`?search=${inputSearchValue}`)
+		// false ? filterPush(router, 'search', inputSearchValue) : router.push(`?search=${inputSearchValue}`)
+		false ? filterPush(router, 'search', ['name', inputSearchValue]) : router.push(`?search=${['name', inputSearchValue]}`)
 	}
 
 	const ratingsClickHandler = (evt, ratings) => {

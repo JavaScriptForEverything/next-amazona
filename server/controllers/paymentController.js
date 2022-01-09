@@ -1,5 +1,5 @@
 import { Stripe } from 'stripe'
-import { catchAsync, appError } from '../util'
+import { catchAsync, appError, apiFeatures } from '../util'
 import Payment from '../models/paymentModel'
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY)
@@ -38,5 +38,33 @@ export const createPaymentIntent = catchAsync(async (req, res, next) => {
 		status: 'success',
 		clientSecret: client_secret,
 		payment
+	})
+})
+
+
+
+/* paymentReducer.js  > /pages/api/payments/index.js	:	handler.get(protect, getOrders)
+ 		.	/pages/users/dashboard.js 	=> /components/dashboard/orders.js */
+export const getOrders = catchAsync(async (req, res, next) => {
+
+	const orders = await apiFeatures(Payment, req.query)
+		.pagination()
+		.sort()
+		.search()
+		.filter()
+		.handleBrandFilter()
+		.query
+
+	let countPage = await Payment.countDocuments()
+			countPage = countPage / req.query.limit
+			countPage = countPage && Math.ceil(countPage)
+
+	if(!orders) return next(appError('No orders found.', 404))
+
+	res.status(200).json({
+		status: 'success',
+		total: orders.length,
+		orders,
+		countPage
 	})
 })

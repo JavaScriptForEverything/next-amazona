@@ -26,40 +26,40 @@ import DeleteIcon from '@mui/icons-material/Delete'
 
 const header = ['Order No', 'Date', 'Name', 'Email', 'Price', 'Status', 'Actions']
 
-const orders = [
-	{
-		"_id" : ("61a4e1f9e106d75825079906"), 				// id
-		"createdAt" : ("2021-11-29T14:21:45.862Z"), 	// Date
-		"shipping" : {
-			"username" : "riajul islam", 								// name
-			"email" : "abc@gmail.com", 									// email
-		},
-		"payment" : {
-			"amount" : 215,															// price with currency
-			"currency" : "bdt"
-		},
-		"isPaid" : false,  														// status
-		// "actions" my button 												// <Button>
-	},
-	{
-		"_id" : ("61b37f79bdb7b3879d8c20d0"),
-		"createdAt" : ("2021-12-10T16:25:29.260Z"),
-		"shipping" : {
-			"username" : "riajul islam",
-			"email" : "abc@gmail.com",
-		},
-		"payment" : {
-			"amount" : 123,
-			"currency" : "bdt"
-		},
-		"isPaid" : true,
-	}
-]
+// const orders = [
+// 	{
+// 		"_id" : ("61a4e1f9e106d75825079906"), 				// id
+// 		"createdAt" : ("2021-11-29T14:21:45.862Z"), 	// Date
+// 		"shipping" : {
+// 			"username" : "riajul islam", 								// name
+// 			"email" : "abc@gmail.com", 									// email
+// 		},
+// 		"payment" : {
+// 			"amount" : 215,															// price with currency
+// 			"currency" : "bdt"
+// 		},
+// 		"isPaid" : false,  														// status
+// 		// "actions" my button 												// <Button>
+// 	},
+// 	{
+// 		"_id" : ("61b37f79bdb7b3879d8c20d0"),
+// 		"createdAt" : ("2021-12-10T16:25:29.260Z"),
+// 		"shipping" : {
+// 			"username" : "riajul islam",
+// 			"email" : "abc@gmail.com",
+// 		},
+// 		"payment" : {
+// 			"amount" : 123,
+// 			"currency" : "bdt"
+// 		},
+// 		"isPaid" : true,
+// 	}
+// ]
 
 
 
 
-const MyTable = () => {
+const MyTable = ({ orders }) => {
 	const [ open, setOpen ] = useState(false)
 	const [ anchorEl, setAnchorEl ] = useState(null)
 	const [ orderId, setOrderId ] = useState(0)
@@ -107,10 +107,12 @@ const MyTable = () => {
 							<Button
 								variant='outlined'
 								size='small'
-								color= {item.isPaid ? 'warning' : 'error' }
+								color='success'
+								// color={item.isPaid ? 'warning' : 'error' }
 								sx={{ textTransform: 'capitalize' }}
 							>
-								{item.isPaid ? 'Delivered' : 'Pending' }
+								{/*{item.isPaid ? 'Delivered' : 'Pending' }*/}
+								Delivered
 							</Button>
 						</TableCell>
 

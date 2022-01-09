@@ -1,6 +1,10 @@
-import { useState } from 'react'
+import nookies from 'nookies'
+import { useState, useEffect } from 'react'
+import { useDispatch, useSelector } from 'react-redux'
+import { getOrders } from '../../store/paymentReducer'
 
 import OrderTable from './order/table'
+import SearchBar from './order/searchBar'
 
 import Box from '@mui/material/Box'
 import Grid from '@mui/material/Grid'
@@ -20,22 +24,65 @@ import AddCircleOutline from '@mui/icons-material/AddCircleOutline'
 import FilterAltOutlined from '@mui/icons-material/FilterAltOutlined'
 
 const filterButtons = [
+	{ label: 'Date', name: 'createdAt' },
 	{ label: 'Category', name: 'category' },
 	{ label: 'Status', name: 'status' },
 	{ label: 'Price', name: 'price' },
-	{ label: 'Date', name: 'date' },
 ]
 
-const options = ['one', 'two', 'three']
+
+const searchBarCategories = [
+	{ label: 'Username', value: 'shipping.username' },
+	{ label: 'Email', 	value: 'shipping.email' },
+	{ label: 'Address', value: 'shipping.address' },
+	{ label: 'Currency', 	value: 'payment.currency' },
+	// { label: 'Phone', 	value: 'shipping.phone' },
+	// { label: 'Price', 	value: 'payment.amount' }, 							// Regular Expression can't search by number, must be string text
+]
+
+
+const { token } = nookies.get(null)
+const tableLimitOptions = [...Array(10)].map((item, index) => index + 1)
 
 const Orders = () => {
-	const [ selectedButton, setSelectedButton ] = useState(0)
-	const [ page, setPage ] = useState(1)
+	const dispatch = useDispatch()
+
+	const [ searchValue, setSearchValue ] = useState('')
+	const [ category, setCategory ] = useState(searchBarCategories[0])
+
+	const [ selectedButton, setSelectedButton ] = useState(0) 			// select 1st button
+	const [ page, setPage ] = useState(1) 													// page 	= 1
+	const [ limit, setLimit ] = useState(tableLimitOptions[1])  		// limit 	= 2
 
 	const [ filterOpen, setFilterOpen ] = useState(false)
 	const [ filterAnchorEl, setFilterAnchorEl ] = useState(null)
 
-	const searchChangeHandler = () => {}
+	// save orders into store
+	useEffect(() => {
+		token && dispatch(getOrders(token, { page, limit }))
+	}, [page, limit])
+
+	// get oders from store
+	const { error, loading, orders, countPage } = useSelector(state => state.payment)
+
+
+
+	// useEffect(() => {
+	// 	// console.log({ searchValue })
+	// 	// console.log({ category: category.value })
+	// 	// token && dispatch(getOrders(token, { page, limit, search: [category.value, searchValue] }))
+	// }, [token, searchValue, category])
+
+
+
+
+
+	const searchChangeHandler = (evt) => setSearchValue(evt.target.value)
+	const searchBarSubmitHandler = (evt) => {
+		evt.preventDefault()
+
+		token && dispatch(getOrders(token, { page, limit, search: [category.value, searchValue] }))
+	}
 
 	const filterCloseHandler = () => {
 		setFilterOpen(false)
@@ -46,11 +93,17 @@ const Orders = () => {
 		setFilterOpen(true)
 	}
 
-	const filterMenuItemHandler = (evt, key, item) => {
+	const filterMenuItemHandler = (evt, key, fieldName) => {
 		filterCloseHandler()
 		setSelectedButton(key)
 
-		console.log(item)
+		// only handled date, for other value, have to modify little bit
+		token && dispatch(getOrders(token, { page, limit, sort: `-${fieldName}` }))
+		// console.log(fieldName)
+	}
+
+	const limitTableItems = (evt, newLimit) => {
+		setLimit(newLimit)
 	}
 
 	const addOrderHandler = () => {
@@ -64,13 +117,14 @@ const Orders = () => {
 		<>
 			<Grid container>
 				<Grid item xs={12} sm={6} >
-					<Autocomplete
-						options={options}
-						getOptionLabel={option => option}
-						renderInput={params => <TextField {...params}
-							label='Search'
-						/>}
+					<SearchBar
+						placeholder='Search for Orders'
+						dataList={searchBarCategories}
+						value={searchValue}
 						onChange={searchChangeHandler}
+						category={category}
+						setCategory={setCategory}
+						submitHandler={searchBarSubmitHandler}
 					/>
 				</Grid>
 			</Grid>
@@ -125,7 +179,7 @@ const Orders = () => {
 			<Paper sx={{ py: 2, px: 1 }}>
 				<Typography variant='h6' color='primary' paragraph >All Orders</Typography>
 
-				<OrderTable />
+				<OrderTable orders={orders} />
 
 				<Box sx={{
 					display: 'flex',
@@ -134,23 +188,31 @@ const Orders = () => {
 					my: 2
 				}}>
 					<Autocomplete
-						// options={['one', 'two', 'three']}
-						options={[1, 2, 3]}
+						// options={[...Array(10)].map((item, index) => index + 1)}
+						options={tableLimitOptions}
 						getOptionLabel={option => `${option}`}
 						renderInput={params => <TextField {...params}
 							placeholder='Show : '
 						/>}
 
+						value={limit}
+						onChange={limitTableItems}
 						// sx={{ minWidth: 120 }}
 					/>
-					<Pagination
-						count={3}
+
+					{countPage && countPage != 1 && <Pagination
+						count={countPage}
+						boundaryCount={0}
+						siblingCount={1}
+
 						shape='rounded'
 						color='primary'
 
+						hidePrevButton
+						hideNextButton
 						page={page}
 						onChange={(evt, newValue) => setPage(newValue)}
-					/>
+					/>}
 				</Box>
 			</Paper>
 		</>

@@ -1,6 +1,16 @@
 import { Schema, model, models } from 'mongoose'
 import { isEmail } from 'validator'
 
+/* 	Create every models as though we can apply every API features to all model */
+
+/* to add filtering features we need to add
+ 		. a product[s] name [as array]
+ 		. price field seperately only for filtering purpose
+ 		. use createdAt property as filter by date
+ 		. use isDeleveliried property as filter by status
+*/
+
+
 const paymentSchema = new Schema({
 	user: {
 		type: Schema.Types.ObjectId,

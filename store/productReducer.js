@@ -118,31 +118,3 @@ export const getProductBrands = (token) => catchAsyncDispatch( async (dispatch) 
 
 
 
-
-
-
-
-/*
-export const getProducts = (req) => catchAsyncDispatch( async (dispatch) => {
-	dispatch(actions.requested())
-
-	const { origin } = absoluteUrl(req)
-	const { data } = await axios.get(`${origin}/api/products`)
-	// const { data } = await axios.get('https://api.github.com/users/robitops10')
-
-	dispatch(actions.productGot( data ))
-}, actions.failed)
-
-
-export const getProductBySlug = (req, slug) => catchAsyncDispatch( async (dispatch) => {
-	// dispatch(actions.requested())
-
-	const { origin } = absoluteUrl(req)
-	const { data } = await axios.get(`${origin}/api/products/${slug}`)
-
-	console.log(data)
-
-	dispatch(actions.productBySlug( data ))
-}, actions.failed)
-
-*/
