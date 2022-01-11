@@ -38,11 +38,11 @@ const leftPanelItems = [
 
 
 const DashboardComponent = () => {
-	const [ selected, setSelected ] = useState(2)
+	const [ selected, setSelected ] = useState(3)
 
 	const { user } = useSelector(state => state.user)
 
-	// console.log(typeof selected)
+	console.log(selected)
 
 	const navItemClickHandler = (evt) => {
 		setSelected(+evt.currentTarget.dataset.listValue)

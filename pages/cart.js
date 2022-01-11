@@ -77,7 +77,7 @@ const Cart = () => {
 							{cartItems.map(cart => (
 								<TableRow key={cart._id}>
 									<TableCell>
-										<Image src={cart.image} alt={cart.slug} width={50} height={50} />
+										<Image src={cart.coverImage.secure_url} alt={cart.slug} width={50} height={50} />
 									</TableCell>
 									<TableCell>
 										<Link href={`/product/${cart.slug}`} passHref >
@@ -118,6 +118,7 @@ const Cart = () => {
 											currency: 'usd',
 											currencyDisplay: 'symbol'
 										})}
+
 									{/*${cartItems.reduce((total, item, index) => total + item.price * item.quantity, 0)}*/}
 								</Typography>
 							</ListItem>

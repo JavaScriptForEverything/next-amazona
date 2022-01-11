@@ -64,7 +64,7 @@ export const getOrders = (token, queryObj={}) => catchAsyncDispatch( async (disp
 	// if(category) 	query = `${query}&category=${category}`
 	// if(createdAt) query = `${query}&createdAt=${createdAt}`
 
-	console.log(query)
+	// console.log(query)
 
 	dispatch(actions.requested())
 	const { data } = await axios.get(`/api/payments?${query}`, { headers: { Authorization: `Bearer ${token}`}})

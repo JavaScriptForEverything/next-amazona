@@ -3,8 +3,8 @@ import { useState, useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { getOrders } from '../../store/paymentReducer'
 
-import OrderTable from './order/table'
 import SearchBar from './order/searchBar'
+import OrderTable from './order/table'
 
 import Box from '@mui/material/Box'
 import Grid from '@mui/material/Grid'
@@ -45,6 +45,8 @@ const { token } = nookies.get(null)
 const tableLimitOptions = [...Array(10)].map((item, index) => index + 1)
 
 const Orders = () => {
+	const [ view, setView ] = useState(true) 												// for Design
+
 	const dispatch = useDispatch()
 
 	const [ searchValue, setSearchValue ] = useState('')
@@ -64,17 +66,6 @@ const Orders = () => {
 
 	// get oders from store
 	const { error, loading, orders, countPage } = useSelector(state => state.payment)
-
-
-
-	// useEffect(() => {
-	// 	// console.log({ searchValue })
-	// 	// console.log({ category: category.value })
-	// 	// token && dispatch(getOrders(token, { page, limit, search: [category.value, searchValue] }))
-	// }, [token, searchValue, category])
-
-
-
 
 
 	const searchChangeHandler = (evt) => setSearchValue(evt.target.value)
@@ -107,11 +98,16 @@ const Orders = () => {
 	}
 
 	const addOrderHandler = () => {
-		let message = 'Open a Dialog | redirect to order page: order page shows 2 things: \n\n'
-				message += '\t1.show orders,\n'
-				message += '\t2. add order\n'
-		console.log(message)
+		// let message = 'Open a Dialog | redirect to order page: order page shows 2 things: \n\n'
+		// 		message += '\t1.show orders,\n'
+		// 		message += '\t2. add order\n'
+		// console.log(message)
+
+		setView(false)
 	}
+
+
+	if(!view) return <Button variant='outlined' onClick={() => setView(true)}>Done</Button>
 
 	return (
 		<>

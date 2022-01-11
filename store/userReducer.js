@@ -21,6 +21,9 @@ const { reducer, actions } = createSlice({
 		message: '', 							// email sent message
 		search: '', 							// to store input search
 
+		users: [],
+		countPage: 0, 						// totalUsers / limit
+
 		user : { 									// set default user value
 		  _id: '',
 		  username: '',
@@ -81,6 +84,12 @@ const { reducer, actions } = createSlice({
 			loading: false,
 			...action.payload
 		}),
+		allUsersAdded: (state, action) => ({
+			...state,
+			loading: false,
+			users: action.payload.users,
+			countPage: action.payload.countPage
+		}),
 		profileUpdated: (state, action) => {
 			return {
 				...state,
@@ -135,6 +144,13 @@ export const getUser = (token) => catchAsyncDispatch(async (dispatch) => {
 	dispatch(actions.requested())
 	const { data } = await axios.get(`/api/users/me`, { headers: {Authorization: `Bearer ${token}`} })
 	dispatch(actions.getMe(data))
+}, actions.failed)
+
+
+export const getAllUsers = (token) => catchAsyncDispatch(async (dispatch) => {
+	dispatch(actions.requested())
+	const { data } = await axios.get(`/api/users`, { headers: {Authorization: `Bearer ${token}`} })
+	dispatch(actions.allUsersAdded(data))
 }, actions.failed)
 
 /* every place used this function we have to pass token too, but as we use cookie,

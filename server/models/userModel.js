@@ -34,10 +34,16 @@ const userSchema = new Schema({
 		enum: ['user', 'admin', 'guest'],
 		default: 'user'
 	},
+	active: { 											// deside user active or inactive or deleted
+		type: Boolean,
+		default: true
+	},
 
 	passwordResetToken: String, 		// required to reset password
 	passwordResetExpires: Date, 		// required to make token expire after given time
 	passwordChangedAt: Date, 				// required to make token invalid after modify password
+
+	// transactions: 								: populate this from payment createdAt
 
 	// avatar: { 											// we make it required in signup controler, by condition check.
 	// 	type: String,

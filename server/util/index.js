@@ -130,8 +130,6 @@ export const apiFeatures = (Model, queryObj) => {
 		const fieldName 	= queryObj.search?.split(',')[0]
 		const searchValue = queryObj.search?.split(',')[1]
 
-		console.log({ fieldName, searchValue })
-
 		const searchObj = queryObj.search ? { [fieldName]: { $regex: searchValue, $options: 'i' }} : {}
 		this.query = this.query.find(searchObj)
 

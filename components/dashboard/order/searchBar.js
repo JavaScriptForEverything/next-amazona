@@ -56,24 +56,24 @@ const SearchBar = (props) => {
 			</Menu>
 
 			<form onSubmit={submitHandler}>
-			<TextField
-				type='search'
-				placeholder={placeholder}
-				margin='dense'
-				value={value}
-				onChange={onChange}
-				InputProps={{
-					startAdornment: <InputAdornment position='start'><SearchIcon /></InputAdornment>,
-					endAdornment: (
-					<InputAdornment position='end'>
-						{category.label}
-						<IconButton onClick={iconButtonClickHandler}>
-							<ArrowDropDownIcon />
-						</IconButton>
-					</InputAdornment>),
-				}}
+				<TextField
+					type='search'
+					placeholder={placeholder}
+					margin='dense'
+					value={value}
+					onChange={onChange}
+					InputProps={{
+						startAdornment: <InputAdornment position='start'><SearchIcon /></InputAdornment>,
+						endAdornment: (
+						<InputAdornment position='end'>
+							{category.label}
+							<IconButton onClick={iconButtonClickHandler}>
+								<ArrowDropDownIcon />
+							</IconButton>
+						</InputAdornment>),
+					}}
 
-			/>
+				/>
 			</form>
 
 		</>

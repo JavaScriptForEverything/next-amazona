@@ -83,16 +83,24 @@ export const signup = catchAsync(async (req, res, next) => {
 
 
 
-/* userReducer.js  > /api/users/index.js	:	handler.get(userController.getAllUser)
- 		//.	/pages/user/profile.js */
-export const getAllUser = catchAsync(async(req, res, next) => {
-	// const { id } = req.params
+/* userReducer.js  > /api/users/index.js	:	handler.get(userController.getAllUsers)
+ 		/pages/user/dashboard.js  => /components/dashboard/customer/view.js */
+export const getAllUsers = catchAsync(async(req, res, next) => {
+	let limit = req.query.limit || 4
+			limit = limit * 1
+
 	const users = await User.find()
+	const totalDocuments = await User.countDocuments()
+
+	const countPage = Math.ceil( totalDocuments / limit )
+
+	// console.log({ totalDocuments, limit, countPage })
 
 	res.status(200).json({
 		status: 'success',
-		totalUsers: users?.length,
+		total: users?.length,
 		users,
+		countPage
 	})
 })
 

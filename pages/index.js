@@ -13,7 +13,6 @@ import { useRouter } from 'next/router'
 import Layout from '../layout'
 import Header from '../components/home/header.js'
 
-
 import Box from '@mui/material/Box'
 import Grid from '@mui/material/Grid'
 import Paper from '@mui/material/Paper'
@@ -85,7 +84,7 @@ const Home = ({ products }) => {
 	const { error, cartItems, brands } = useSelector(state => state.product)
 	const [ brandsObj, setBrandsObj ] = useState([]) 										// filter-checkbox
 
-	console.log(products.length)
+	// console.log(products.length)
 
 
 	// get brands from backend
