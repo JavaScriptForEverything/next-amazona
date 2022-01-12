@@ -2,8 +2,7 @@
 
 import { useState } from 'react'
 import Image from 'next/image'
-
-import { idFormatter, priceFormatter } from '../../../util'
+import { priceFormatter } from '../../../util'
 
 import Box from '@mui/material/Box'
 import Paper from '@mui/material/Paper'
@@ -86,47 +85,37 @@ const TableComponent = (props) => {
 					<TableHead>
 						<TableRow sx={{ backgroundColor: (theme) => theme.palette.primary.main}}>
 							{[
-								'Customer Name', 		// avatar + name
-								'# ID',
-								'Spent', 						// total proce of customer
-								'Last Order', 			// last transaction time
-								'Email',
-								'Phone',
-								'Status', 						// active | inactive 	=> active=true,
+								'Customer Name',
+								'Category',
+								'Price',
+								'Stock',
+								'Sold',
+								'Revenue',
 								'Actions'
 							].map((item, key) => <TableCell key={key} sx={{ whiteSpace: 'nowrap', color: '#ffffff', fontWeight: 600}} >{item}</TableCell> )}
 						</TableRow>
 					</TableHead>
 
 					<TableBody>
-						{data.map((user, key) => <TableRow key={key} >
+						{data.map((product, key) => <TableRow key={key} >
 							<TableCell sx={{
 								display: 'flex',
 								gap: 1,
 								alignItems: 'center',
 								whiteSpace: 'nowrap',
 							}} >
-								<img src={user?.avatar.secure_url} width={50} height={50} layout='responsive' />
-								<Typography > {user.username} </Typography>
+								<img src={product?.coverImage.secure_url} width={50} height={50} layout='responsive' />
+								<Typography > {product.name} </Typography>
 							</TableCell>
 
-							<TableCell>{idFormatter(user._id)}</TableCell>
-							<TableCell>{priceFormatter(user.price || 0)}</TableCell>
-							<TableCell>{new Date(user.createdAt).toLocaleDateString()}</TableCell>
-							<TableCell>{user.email}</TableCell>
-							<TableCell>{user.phone}</TableCell>
-							<TableCell>
-								<Button
-									variant='outlined'
-									color={user.active ? 'success' : 'error'}
-								>
-									{user.active ? 'Active' : 'Inactive'}
-								</Button>
-							</TableCell>
-
+							<TableCell>{product.category}</TableCell>
+							<TableCell>{priceFormatter(product.price)}</TableCell>
+							<TableCell>{product.stock || 20}</TableCell>
+							<TableCell>{product.sold || 2}</TableCell>
+							<TableCell>{priceFormatter(product.revenue || 0)}</TableCell>
 
 							<TableCell>
-								<IconButton onClick={(evt) => actionHandler(evt, user._id)}>
+								<IconButton onClick={(evt) => actionHandler(evt, product._id)}>
 									<MoreVertIcon />
 								</IconButton>
 							</TableCell>

@@ -1,6 +1,4 @@
 import { useState } from 'react'
-import { useDispatch } from 'react-redux'
-import { enableView } from '../../../store/dialogReducer'
 
 import Box from '@mui/material/Box'
 import Button from '@mui/material/Button'
@@ -12,15 +10,11 @@ import ListItemIcon from '@mui/material/ListItemIcon'
 import FilterIcon from '@mui/icons-material/FilterAltOutlined'
 import AddIcon from '@mui/icons-material/AddCircleOutline'
 
-const FilterComponent = ({ items }) => {
-	const dispatch = useDispatch()
+const FilterComponent = ({ items=[], filterHandler=f=>f, addLabel='Add', addHandler=f=>f }) => {
 	const [ open, setOpen ] = useState(false)
 	const [ anchorEl, setAnchorEl ] = useState(null)
 	const [ selected, setSelected ] = useState(0)
 
-	const addClickHandler = () => {
-		dispatch(enableView(false))
-	}
 
 	const menuCloseHandler = () => {
 		setOpen(false)
@@ -33,11 +27,10 @@ const FilterComponent = ({ items }) => {
 	const menuItemHandler = (evt, key, item) => {
 		menuCloseHandler()
 		setSelected(key)
-		console.log(item)
+
+		filterHandler(evt, key, item)
 	}
-	const buttonHandler = (evt, key, item) => {
-		setSelected(key)
-	}
+	const addButtonHandler = (evt) => addHandler(evt)
 
 		// console.log(selected)
 
@@ -63,8 +56,12 @@ const FilterComponent = ({ items }) => {
 					selected={selected === key}
 					onClick={(evt) => menuItemHandler(evt, key, name)}
 				>
-					<ListItemIcon>{icon}</ListItemIcon>
-					<ListItemText>{label}</ListItemText>
+				{icon ? (
+					<>
+						<ListItemIcon>{icon}</ListItemIcon>
+						<ListItemText>{label}</ListItemText>
+					</>
+					) : label }
 				</MenuItem>)}
 			</Menu>
 
@@ -73,15 +70,17 @@ const FilterComponent = ({ items }) => {
 				{items.map(({label, icon, name}, key) => <Button key={key}
 					variant={selected === key ? 'contained' : 'outlined'}
 					startIcon={<FilterIcon />}
-					onClick={evt => buttonHandler(evt, key, name)}
+					onClick={evt => menuItemHandler(evt, key, name)}
+					sx={{ textTransform: 'capitalize' }}
 				>{label}</Button>)}
 			</Box>
 
 			<Button
 				variant='contained'
-				onClick={addClickHandler}
+				onClick={addButtonHandler}
 				startIcon={<AddIcon />}
-			>Add Order</Button>
+				sx={{ textTransform: 'capitalize' }}
+			>{addLabel}</Button>
 
 		</Box>
 	)

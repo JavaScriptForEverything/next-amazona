@@ -25,6 +25,9 @@ cloudinary.config({
 /* /pages/index.js  > /pages/api/products/index.js	:	handler.get(getAllProducts)
  		.	/pages/index.js  */
 export const getAllProducts = catchAsync( async (req, res, next) => {
+	let limit = req.query.limit
+			limit = limit * 1
+
 	const products = await apiFeatures(Product, req.query)
 		.pagination()
 		.sort()
@@ -35,12 +38,15 @@ export const getAllProducts = catchAsync( async (req, res, next) => {
 
 	if(!products) return next(appError('No product found.', 404))
 
+	const countDocuments = await Product.countDocuments()
+	const countPage = Math.ceil(countDocuments / limit)
 	// console.log({ brand: req.query.brand })
 
 	res.status(200).json({
 		status: 'success',
 		total: products.length,
-		products
+		products,
+		countPage
 	})
 })
 

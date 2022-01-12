@@ -4,11 +4,12 @@ import absoluteUrl from 'next-absolute-url'
 import axios from 'axios'
 import { useDispatch, useSelector } from 'react-redux'
 import { showAlert } from '../store/dialogReducer'
-import { addItemToCart, getProductBrands } from '../store/productReducer'
+import { getAllProducts, addItemToCart, getProductBrands } from '../store/productReducer'
 import { filterPush, shorter } from '../util'
 
 import Link from 'next/link'
 import { useRouter } from 'next/router'
+import { wrapper } from '../store'
 
 import Layout from '../layout'
 import Header from '../components/home/header.js'
@@ -68,7 +69,7 @@ const groupButtons = [
 
 
 
-const Home = ({ products }) => {
+const Home = ({ products=[] }) => {
 	const dispatch = useDispatch()
 	const router = useRouter()
 
@@ -451,30 +452,37 @@ export default Home
 
 
 
-export const getServerSideProps = async (ctx) => {
-	const { token } = nookies.get(ctx)
+// export const getServerSideProps = async (ctx) => {
+// 	const { token } = nookies.get(ctx)
 
-	let { page, limit, sort, fields, search, price, ratings, common, brand, size, category } = ctx.query
+// 	let { page, limit, sort, fields, search, price, ratings, common, brand, size, category } = ctx.query
 
-	let query = `page=${page || 1}`
-	if(limit) 		query = `${query}&limit=${limit || 4}`
-	if(sort) 			query = `${query}&sort=${sort}`
-	if(fields) 		query = `${query}&fields=${fields}`
-	if(search) 		query = `${query}&search=${search}`
-	if(brand) 		query = `${query}&brand=${brand}`
+// 	let query = `page=${page || 1}`
+// 	if(limit) 		query = `${query}&limit=${limit || 4}`
+// 	if(sort) 			query = `${query}&sort=${sort}`
+// 	if(fields) 		query = `${query}&fields=${fields}`
+// 	if(search) 		query = `${query}&search=${search}`
+// 	if(brand) 		query = `${query}&brand=${brand}`
 
-	if(price) 		query = `${query}&price=${price}`
-	if(ratings) 	query = `${query}&ratings=${ratings}`
-	if(category) 	query = `${query}&category=${category}`
-	if(size) 	query = `${query}&size=${size}`
-	// if(common) 		query = `${query}&common=${common}`
+// 	if(price) 		query = `${query}&price=${price}`
+// 	if(ratings) 	query = `${query}&ratings=${ratings}`
+// 	if(category) 	query = `${query}&category=${category}`
+// 	if(size) 	query = `${query}&size=${size}`
+// 	// if(common) 		query = `${query}&common=${common}`
 
-	const { origin } = absoluteUrl(ctx.req)
-	const { data: { products } } = await axios.get(`${origin}/api/products?${query}`, {
-		headers: { Authorization: `Bearer ${token}` }
-	})
+// 	const { origin } = absoluteUrl(ctx.req)
+// 	const { data: { products } } = await axios.get(`${origin}/api/products?${query}`, {
+// 		headers: { Authorization: `Bearer ${token}` }
+// 	})
 
-	return { props: { products } }
-}
+// 	return { props: { products } }
+// }
 
 
+
+
+export const getServerSideProps = wrapper.getServerSideProps(store => async ctx => {
+
+	await	store.dispatch(getAllProducts(ctx))
+	// console.log( await store.getState())
+})

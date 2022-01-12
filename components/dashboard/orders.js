@@ -3,11 +3,13 @@ import { useState, useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { getOrders } from '../../store/paymentReducer'
 
-import SearchBar from './order/searchBar'
+import { idFormatter, priceFormatter } from '../../util'
 import OrderTable from './order/table'
+import FilterComponent from './_filter'
+import SearchComponent from './_search'
+import CreateComponent from './order/create'
 
 import Box from '@mui/material/Box'
-import Grid from '@mui/material/Grid'
 import Paper from '@mui/material/Paper'
 import TextField from '@mui/material/TextField'
 import Autocomplete from '@mui/material/Autocomplete'
@@ -22,23 +24,30 @@ import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
 import ExpandLessIcon from '@mui/icons-material/ExpandLess'
 import AddCircleOutline from '@mui/icons-material/AddCircleOutline'
 import FilterAltOutlined from '@mui/icons-material/FilterAltOutlined'
+import PersonIcon from '@mui/icons-material/Person'
+import EmailIcon from '@mui/icons-material/Email'
+import InfoIcon from '@mui/icons-material/Info'
+import AccessTimeIcon from '@mui/icons-material/AccessTime'
+import CategoryIcon from '@mui/icons-material/Category'
+import DataUsageIcon from '@mui/icons-material/DataUsage'
+import AttachMoneyIcon from '@mui/icons-material/AttachMoney'
 
-const filterButtons = [
-	{ label: 'Date', name: 'createdAt' },
-	{ label: 'Category', name: 'category' },
-	{ label: 'Status', name: 'status' },
-	{ label: 'Price', name: 'price' },
+
+const menuItemsForFilter = [
+	{ label: 'Date', 		 icon: <AccessTimeIcon />,	name: 'createdAt' },
+	{ label: 'Category', icon: <CategoryIcon />, 		name: 'category' },
+	{ label: 'Status', 	 icon: <DataUsageIcon />, 	name: 'status' },
+	{ label: 'Price', 	 icon: <AttachMoneyIcon />,	name: 'price' },
 ]
-
-
 const searchBarCategories = [
-	{ label: 'Username', value: 'shipping.username' },
-	{ label: 'Email', 	value: 'shipping.email' },
-	{ label: 'Address', value: 'shipping.address' },
-	{ label: 'Currency', 	value: 'payment.currency' },
-	// { label: 'Phone', 	value: 'shipping.phone' },
+	{ label: 'Username',icon: <PersonIcon />, 		name: 'username', value: 'shipping.username' },
+	{ label: 'Email', 	icon: <EmailIcon />, 			name: 'email', 		value: 'shipping.email' },
+	{ label: 'Address', icon: <InfoIcon />, 			name: 'address', 	value: 'shipping.address' },
+	{ label: 'Currency',icon: <AttachMoneyIcon />,name: 'currency', value: 'payment.currency' },
 	// { label: 'Price', 	value: 'payment.amount' }, 							// Regular Expression can't search by number, must be string text
 ]
+
+
 
 
 const { token } = nookies.get(null)
@@ -67,6 +76,18 @@ const Orders = () => {
 	// get oders from store
 	const { error, loading, orders, countPage } = useSelector(state => state.payment)
 
+	// const tableHead = ['Order ID', 'Date', 'Name', 'Email', 'Price', 'Status', 'Actions']
+	// const tableData = users.map(order => ({
+	// 	name: order.username,
+	// 	avatar: order.avatar.secure_url,
+	// 	_id: order._id, 													// original id required for CRUD operation
+	// 	id: idFormatter(order._id), 							// shorted id for designing
+	// 	price: priceFormatter(order.price || 32),
+	// 	date: new Date(order.createdAt).toLocaleDateString(),
+	// 	email: order.email,
+	// 	phone: order.phone,
+	// 	status: order.active
+	// }))
 
 	const searchChangeHandler = (evt) => setSearchValue(evt.target.value)
 	const searchBarSubmitHandler = (evt) => {
@@ -107,69 +128,35 @@ const Orders = () => {
 	}
 
 
-	if(!view) return <Button variant='outlined' onClick={() => setView(true)}>Done</Button>
+	if(!view) return <CreateComponent setView={setView} />
 
 	return (
 		<>
-			<Grid container>
-				<Grid item xs={12} sm={6} >
-					<SearchBar
-						placeholder='Search for Orders'
-						dataList={searchBarCategories}
-						value={searchValue}
-						onChange={searchChangeHandler}
-						category={category}
-						setCategory={setCategory}
-						submitHandler={searchBarSubmitHandler}
-					/>
-				</Grid>
-			</Grid>
+			<Box sx={{ mb: 2 }}>
+				<SearchComponent
+					value={searchValue}
+					onChange={searchChangeHandler}
+
+					keywords={searchBarCategories} 	// used to be search on it
+					keyword={category.name}
+					setKeyword={setCategory}
+
+					onSubmit={searchBarSubmitHandler}
+				/>
+			</Box>
+
 
 			{/*--------[ Filter Section ]--------*/}
-			<Paper sx={{ my: 2, p: 1, display: { xs: 'none', sm: 'flex' }, gap: 2 }}>
-				{filterButtons.map(({label, name}, key) => <Button key={key}
-					variant={ selectedButton === key ? 'contained' : 'outlined' }
-					endIcon={ selectedButton === key ? <ExpandMoreIcon /> : <ExpandLessIcon />}
-					// onClick={() => setSelectedButton(key)}
-					onClick={(evt) => filterMenuItemHandler(evt, key, name)}
-					sx={{ textTransform: 'capitalize' }}
-					>{label}</Button>
-				)}
-				<Button
-					variant='contained'
-					startIcon={<AddCircleOutline />}
-					sx={{ ml: 'auto', textTransform: 'capitalize' }}
-					onClick={addOrderHandler}
-				>Add Order</Button>
+			<Paper sx={{ mb: 2 }}>
+				<FilterComponent
+					addLabel='Add Order'
+					items={menuItemsForFilter}
+					filterHandler={filterMenuItemHandler}
+					addHandler={addOrderHandler}
+				/>
 			</Paper>
 
 
-					{/*--------[ Filter mobile View ]--------*/}
-			<Paper sx={{ my: 2, p: 1, display: { xs: 'flex', sm: 'none' } }}>
-				<Button
-					variant='outlined'
-					startIcon={<FilterAltOutlined />}
-					onClick={filterButtonHandler}
-				>Filter</Button>
-
-				<Button
-					variant='contained'
-					startIcon={<AddCircleOutline />}
-					sx={{ ml: 'auto', textTransform: 'capitalize' }}
-					onClick={addOrderHandler}
-				>Add Order</Button>
-
-				<Menu
-					open={filterOpen}
-					anchorEl={filterAnchorEl}
-					onClose={filterCloseHandler}
-				>
-					{filterButtons.map(({ label, name }, key) => <MenuItem key={key}
-						onClick={(evt) => filterMenuItemHandler(evt, key, name)}
-						selected={ selectedButton === key }
-					>{label}</MenuItem> )}
-				</Menu>
-			</Paper>
 
 			{/*--------[ Order Table Section ]--------*/}
 			<Paper sx={{ py: 2, px: 1 }}>
@@ -211,6 +198,21 @@ const Orders = () => {
 					/>}
 				</Box>
 			</Paper>
+
+{/*			<Paper sx={{ mb: 2 }}>
+				<TableComponent
+					title='All Orders'
+					headers={tableHead}
+					data={tableData} 		// to make table re-usable, only send required fields instead of full users
+					countPage={countPage}
+
+					itemHandler={tableItemHandler}
+					limitHandler={tableLimitHandler}
+					pageHandler={tablePageHandler}
+				/>
+			</Paper>
+*/}
+
 		</>
 	)
 }

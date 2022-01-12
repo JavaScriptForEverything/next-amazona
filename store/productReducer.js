@@ -1,7 +1,8 @@
 import { createSlice } from '@reduxjs/toolkit'
-// import { HYDRATE } from 'next-redux-wrapper'
+import { HYDRATE } from 'next-redux-wrapper'
 import axios from 'axios'
-// import absoluteUrl from 'next-absolute-url'
+import nookies from 'nookies'
+import absoluteUrl from 'next-absolute-url'
 
 import { catchAsyncDispatch } from '../util'
 
@@ -9,8 +10,10 @@ import { catchAsyncDispatch } from '../util'
 const { reducer, actions } = createSlice({
 	name: 'product',
 	initialState: {
-		// products: [],
+		products: [],
+		countPage: 0,
 		// product: {},
+
 		brands: [],
 
 		loading: false,
@@ -65,13 +68,21 @@ const { reducer, actions } = createSlice({
 			...state,
 			loading: false,
 			brands:  action.payload
+		}),
+
+
+		allProductsAdded: (state, action ) => ({
+			...state,
+			loading: false,
+			products: action.payload.products,
+			countPage: action.payload.countPage
 		})
 
 	},
 
-	// extraReducers: {
-	// 	[HYDRATE]: (state, action) => ({ ...state, ...action.payload }),
-	// }
+	extraReducers: { 	// only hydrate product reducer => Exactly what we want
+		[HYDRATE]: (state, action) => ({ ...state, ...action.payload.product }),
+	}
 })
 export default reducer
 
@@ -99,8 +110,40 @@ export const getTotalPrice = () => (dispatch) => {
 
 
 
-// getAllProduct will be dispatched here instead of /pages/product.js getServerSideProps
+// getAllProducts will be dispatched here instead of /pages/product.js getServerSideProps
+export const getAllProducts = (ctx={}) => async (dispatch) => {
+	const { token } = nookies.get(ctx)
+	if(!token) return
+
+	const queryObj = ctx.query || {}
+
+	let query = `page=${queryObj.page || 1}`
+	if(queryObj.limit) 		query = `${query}&limit=${queryObj.limit || 4}`
+	if(queryObj.sort) 		query = `${query}&sort=${queryObj.sort}`
+	if(queryObj.fields) 	query = `${query}&fields=${queryObj.fields}`
+	if(queryObj.search) 	query = `${query}&search=${queryObj.search}`
+	if(queryObj.brand) 		query = `${query}&brand=${queryObj.brand}`
+
+	if(queryObj.price) 		query = `${query}&price=${queryObj.price}`
+	if(queryObj.ratings) 	query = `${query}&ratings=${queryObj.ratings}`
+	if(queryObj.category) query = `${query}&category=${queryObj.category}`
+	if(queryObj.size) 		query = `${query}&size=${queryObj.size}`
+	// if(common) 		query = `${query}&common=${common}`
+
+	let url = `/api/products?${query}`
+
+	const { origin } = absoluteUrl(ctx?.req)
+	if(origin) url = origin + url
+
+	dispatch(actions.requested())
+	const { data } = await axios.get(url, {headers: { Authorization: `Bearer ${token}` } })
+	dispatch(actions.allProductsAdded(data))
+	// console.log({ origin, url, query, countPage: data.countPage })
+}
+
+
 // getProduct will be dispatched here instead of /pages/product/[id].js getServerSideProps
+
 
 export const addProduct = (obj, token) => catchAsyncDispatch( async (dispatch) => {
 	dispatch(actions.requested())

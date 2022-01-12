@@ -12,7 +12,7 @@ const { reducer, actions } = createSlice({
 		severity: 'success',
 		message: '',
 
-		view: true,
+		// view: true,
 	},
 	reducers: {
 		requested: (state, action) => ({ ...state, loading: true }),
@@ -34,7 +34,7 @@ export const showAlert = (obj) => (dispatch) => {
 }
 
 
-export const enableView = (bool) => (dispatch) => dispatch(actions.viewEnabled(bool))
+// export const enableView = (bool) => (dispatch) => dispatch(actions.viewEnabled(bool))
 
 
 

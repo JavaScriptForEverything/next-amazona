@@ -1,3 +1,5 @@
+// try use customer/table.js which is more usable instead of this table,
+
 import { useState } from 'react'
 
 import { idFormatter, dateFormatter, priceFormatter } from '../../../util'
@@ -82,7 +84,7 @@ const MyTable = ({ orders }) => {
 							</Button>
 						</TableCell>
 
-						<TableCell align='center'>
+						<TableCell>
 							<IconButton onClick={(evt) => actionHandler(evt, item)}><MoreVertIcon /></IconButton>
 						</TableCell>
 					</TableRow>

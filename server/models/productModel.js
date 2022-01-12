@@ -79,10 +79,22 @@ const productSchema = new Schema({
 		secure_url: String,
 	}],
 
-	inStock: {
+	stock: {
 		type: Number,
 		min: 0,
+		default: 0,
 	},
+	sold: {
+		type: Number,
+		min: 0,
+		default: 0,
+	},
+	revenue: {
+		type: Number,
+		min: 0,
+		default: 0,
+	},
+
 	quantity: {
 		type: Number,
 		min: 1,

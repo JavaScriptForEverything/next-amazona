@@ -2,7 +2,6 @@ import nookies from 'nookies'
 import { useState } from 'react'
 import { useSelector } from 'react-redux'
 
-
 import Layout from '../../layout'
 import Dashboard from '../../components/dashboard/dashboard'
 import Products from '../../components/dashboard/products'
@@ -38,15 +37,11 @@ const leftPanelItems = [
 
 
 const DashboardComponent = () => {
-	const [ selected, setSelected ] = useState(3)
-
+	const [ selected, setSelected ] = useState(4)
 	const { user } = useSelector(state => state.user)
 
-	console.log(selected)
-
-	const navItemClickHandler = (evt) => {
-		setSelected(+evt.currentTarget.dataset.listValue)
-	}
+	// console.log(selected)
+	const navItemClickHandler = (evt) => setSelected(+evt.currentTarget.dataset.listValue)
 
 
 	return (
@@ -83,7 +78,6 @@ const DashboardComponent = () => {
 						))}
 				</Grid>
 			</Grid>
-
 
 		</Layout>
 	)
