@@ -2,6 +2,66 @@ import { isEmail } from 'validator'
 import Box from '@mui/material/Box'
 
 
+/*
+	TextField 	:		onChange={evt => changeHandler(evt, name)}
+	Autocomplete:		onChange={(evt, newValue) => changeHandler(evt, name, newValue)}
+
+	const changeHandler = (evt, name, newValue) => {
+		setFields({ ...fields, [name]: newValue || evt.target.value })
+	}
+
+// => { label: 'fieldLabel', 'name: fieldName', type: 'fieldType', options=['autoComplete', 'options']}
+*/
+// export const fieldObjectCreator = (label, name, type='text', image=true, options) => ({label, name, type, options})
+
+// =>  { confirmation: '', status: '', ...  } 			:
+// =>  { confirmation: true, status: false, ...  } 	: if passed 2nd arg as property name
+// export const getNameFieldOfArrayObject = (arr=[], field ) => {
+// 	const tempObj = {}
+// 	arr.forEach(obj => tempObj[obj.name] = field ? obj[field] : '')
+
+// 	return tempObj
+// }
+
+// Form Validator
+export const formValidator = (obj, errorStateUpdateMethod, requireLength=4) => {
+	const errorObj = {}
+
+	if( obj.username && obj.username.length < 4)  errorObj.username = 'name reqired 4 digit long'
+	if( obj.email && !isEmail(obj.email) ) errorObj.email = 'Invalid Email address'
+
+	if(obj.password && obj.password.length < requireLength ) errorObj.password = `Password must be ${requireLength} character long`
+	if(obj.password && obj.confirmPassword && obj.password !== obj.confirmPassword) errorObj.confirmPassword = 'Confirm Password not matched'
+
+	Object.entries(obj).forEach(([key, value]) => {
+		if(`${value}`.trim() === '')  errorObj[key] = `'${key}' field is empty`
+	})
+
+	errorStateUpdateMethod(errorObj)
+	return Object.keys(errorObj).every(item => item === '')
+	// it should be Object.values() but still works fine
+}
+
+// /file/user.png 	=> 	data:image/jpeg;base64,/9j/4QlQaHR0cDovL25zLmFkb2JlL...
+export const readAsDataURL = (file, setMethod, isImage=true) => {
+	if(!file) return console.error('pass a file as argument')
+	if(!setMethod || setMethod.constructor !== Function) {
+		return console.error('2nd argument (as setState) required')
+	}
+
+	if(isImage) {
+		const image = file.type.match('image/*')
+		if(!image) return console.error('You must have to pass image')
+	}
+
+	const reader = new FileReader()
+	reader.readAsDataURL(file)
+	reader.addEventListener('load', () => {
+		if(reader.readyState === 2) setMethod( reader.result )
+	})
+}
+
+
 
 
 export const catchAsyncDispatch = (fn, showError=f=>f) => (dispatch, getStore) => fn(dispatch, getStore).catch(err => {
@@ -66,44 +126,6 @@ export const TabPanel = ({ children, value, index}) => (
 	</Box>
 )
 
-
-// Form Validator
-export const formValidator = (obj, errorStateUpdateMethod, requireLength=4) => {
-	const errorObj = {}
-
-	if( obj.username && obj.username.length < 4)  errorObj.username = 'name reqired 4 digit long'
-	if( obj.email && !isEmail(obj.email) ) errorObj.email = 'Invalid Email address'
-
-	if(obj.password && obj.password.length < requireLength ) errorObj.password = `Password must be ${requireLength} character long`
-	if(obj.password && obj.confirmPassword && obj.password !== obj.confirmPassword) errorObj.confirmPassword = 'Confirm Password not matched'
-
-	Object.entries(obj).forEach(([key, value]) => {
-		if(`${value}`.trim() === '')  errorObj[key] = `'${key}' field is empty`
-	})
-
-	errorStateUpdateMethod(errorObj)
-	return Object.keys(errorObj).every(item => item === '')
-	// it should be Object.values() but still works fine
-}
-
-
-export const readAsDataURL = (file, setMethod, isImage=true) => {
-	if(!file) return console.error('pass a file as argument')
-	if(!setMethod || setMethod.constructor !== Function) {
-		return console.error('2nd argument (as setState) required')
-	}
-
-	if(isImage) {
-		const image = file.type.match('image/*')
-		if(!image) return console.error('You must have to pass image')
-	}
-
-	const reader = new FileReader()
-	reader.readAsDataURL(file)
-	reader.addEventListener('load', () => {
-		if(reader.readyState === 2) setMethod( reader.result )
-	})
-}
 
 
 // File Size

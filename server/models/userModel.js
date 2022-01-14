@@ -82,15 +82,14 @@ const userSchema = new Schema({
 		default: '01957500605'
 	},
 	age : {
-		type: String,
-		lowercase: true,
-		maxLength: 50,
-		trim: true,
-		default: '28 Yars'
+		type: Number,
+		min: 5,
+		max: 100,
+		default: 20
 	},
 	ctc: {
-		type: String,
-		default: '2.5 Lac'
+		type: Number,
+		default: 2.5
 	},
 	location: {
 		address: {
@@ -116,11 +115,9 @@ const userSchema = new Schema({
 		},
 	},
 	experience : {
-		type: String,
-		lowercase: true,
-		maxLength: 50,
-		trim: true,
-		default: '6 Yars'
+		type: Number,
+		max: 50,
+		default: 6
 	},
 	resume : {
 		type: String,
