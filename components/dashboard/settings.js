@@ -63,13 +63,19 @@ const getNameFieldOfArrayObject = (arr=[], field ) => {
 
 
 const Settings = () => {
+
+	// 1st section
 	const [ fields, setFields ] = useState(getNameFieldOfArrayObject(userInputs))
 	const [ fieldsError, setFieldsError ] = useState({})
 	const [ imageObj, setImageObj ] = useState({}) 					// to store image as dataURL
+	const [ isUpdated, setIsUpdated ] = useState(false)
 
+	// 2nd section
 	const [ passwordFields, setPasswordFields ] = useState(getNameFieldOfArrayObject(passwordInputs))
 	const [ passwordFieldsError, setPasswordFieldsError ] = useState({})
+	const [ isPasswordUpdated, setIsPasswordUpdated ] = useState(false)
 
+	// 3rd section
 	const [ notificationFields, setNotificationFields ] = useState(getNameFieldOfArrayObject(notifications, 'selected'))
 
 	// console.log(notificationFields)
@@ -77,42 +83,19 @@ const Settings = () => {
 
 	// profile update
 	const changeHandler = async (evt, name, type, isImage, newValue) => {
-		/* Error: InvalidStateError: An attempt was made to use an object that is not, or is no longer, usable
-				if we try to set file value in state, it throw error, because the file take some time to read
-				min-while browser set object (and object is placed in DOM, and dom can't take object)
-		 		so it throw error.
-
-			Solve: To solve the problem, we put file value in other state variable and before submit merge the data.
-
-			It solve one problem but create another one, in validation, image field is empty because the of the
-			await take some time.
-
-			Solve: We set input value in state before the file read, then read the file. so
-
-			- Original Code:
-
-					const isFile = type.trim() === 'file'
-					const file = evt.target?.files?.[0]
-					if(file) setImageObj({ ...imageObj, [name]: await readAsDataURL(file, isImage) })
-
-					setFields({ ...fields, [name]: newValue || evt.target.value })
-
-
-			- Update State First, then Read File:
-
-					setFields({ ...fields, [name]: newValue || evt.target.value })
-
-					const isFile = type.trim() === 'file'
-					const file = evt.target?.files?.[0]
-					if(file) setImageObj({ ...imageObj, [name]: await readAsDataURL(file, isImage) })
-		*/
+		// make sure call before promise, if put after await, then Current DOM will be changed because of
+		// setImageObj so on onChange evt.target.value get nothing
 		setFields({ ...fields, [name]: newValue || evt.target.value })
+		setIsUpdated(false)
 
 		const isFile = type.trim() === 'file'
 		const file = evt.target?.files?.[0]
 		if(file) setImageObj({ ...imageObj, [name]: await readAsDataURL(file, isImage) })
 	}
-
+	const resetHandler = () => {
+		setIsUpdated(false)
+		console.clear()
+	}
 	const fieldSubmitHandler = (evt) => {
 		evt.preventDefault()
 
@@ -122,12 +105,18 @@ const Settings = () => {
 
 		const data =  Object.assign({}, fields, imageObj)
 		console.log(data)
+		setIsUpdated(true)
 	}
 
 
 	// password change
 	const passwordChangeHandler = (evt, name) => {
 		setPasswordFields({ ...passwordFields, [name]: evt.target.value })
+		setIsPasswordUpdated(false)
+	}
+	const passwordResetHandler = () => {
+		setIsPasswordUpdated(false)
+		console.clear()
 	}
 	const passwordSubmitHandler = (evt) => {
 		evt.preventDefault()
@@ -135,6 +124,7 @@ const Settings = () => {
 		const isValidated = formValidator(passwordFields, setPasswordFieldsError)
 		if(!isValidated) return
 
+		setIsPasswordUpdated(true)
 		console.log(passwordFields)
 	}
 
@@ -192,8 +182,8 @@ const Settings = () => {
 							gap: 1,
 							py: 2
 						}}>
-							<Button variant='outlined'>Clear</Button>
-							<Button type='submit' variant='contained'>Update</Button>
+							<Button variant='outlined' onClick={resetHandler}>Clear</Button>
+							<Button type='submit' variant='contained' disabled={isUpdated}>Update</Button>
 						</Box>
 					</form>
 				</Paper>
@@ -225,8 +215,8 @@ const Settings = () => {
 							gap: 1,
 							py: 2
 						}}>
-							<Button variant='outlined'>Clear</Button>
-							<Button type='submit' variant='contained'>Update</Button>
+							<Button variant='outlined' onClick={passwordResetHandler}>Clear</Button>
+							<Button type='submit' variant='contained' disabled={isPasswordUpdated }>Update</Button>
 						</Box>
 					</form>
 				</Paper>

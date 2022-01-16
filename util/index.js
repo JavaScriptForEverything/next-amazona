@@ -49,15 +49,19 @@ export const readAsDataURL = (file, setMethod, isImage=true) => {
 		return console.error('2nd argument (as setState) required')
 	}
 
-	if(isImage) {
-		const image = file.type.match('image/*')
-		if(!image) return console.error('You must have to pass image')
-	}
+	const image = file.type.match('image/*')
+	if(isImage && !image) return console.error('please select only image.')
+	if(!isImage && image) return console.error('please don\'t select image.')
 
 	const reader = new FileReader()
 	reader.readAsDataURL(file)
 	reader.addEventListener('load', () => {
 		if(reader.readyState === 2) setMethod( reader.result )
+
+		// if(reader.readyState === 2) {
+		// 	if(!name) return setMethod(reader.result)
+		// 	setMethod( oldValue => ({ ...oldValue, [name]: reader.result }))
+		// }
 	})
 }
 

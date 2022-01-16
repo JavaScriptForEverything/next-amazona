@@ -48,6 +48,7 @@ export const getAllProducts = catchAsync( async (req, res, next) => {
 		products,
 		countPage
 	})
+
 })
 
 
