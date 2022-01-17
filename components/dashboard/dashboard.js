@@ -16,12 +16,23 @@ const graphItems = [
 	{ title: 'Total Products', 	value: 4325,graph: 'products Array' },
 	{ title: 'Today\s Visitor', value: 425, graph: 'visitors Array' },
 ]
+const topProductsListItems = [
+	{ avatar: '/user.jpg', title: 'Best Shirt', subheader: 'Shirt', price: 432 },
+	{ avatar: '/user.jpg', title: 'Fit Shirt', 	subheader: 'Shirt', price: 423 },
+	{ avatar: '/user.jpg', title: 'Polo Shirt', subheader: 'Shirt', price: 342 },
+	{ avatar: '/user.jpg', title: 'Git Shirt', 	subheader: 'Shirt', price: 324 },
+]
 
 const Dashboard = () => {
 	const [ revinueYear, setRevinueYear ] = useState('')
+	const [ topProductSelectedItem, topProductSetSelectedItem ] = useState(0)
 
 	const revinueChartHandler = (evt) => setRevinueYear(evt.target.value)
+	const topProductsItemClickHandler = (evt, key) => topProductSetSelectedItem(key)
+
 	console.log({ revinueYear })
+
+
 
 	return (
 		<>
@@ -55,6 +66,9 @@ const Dashboard = () => {
 					<Paper sx={{ py: 2, px: 1 }}>
 						<TopProducts
 							title='Top Products'
+							items={topProductsListItems}
+							select={topProductSelectedItem}
+							onClick={topProductsItemClickHandler}
 						/>
 					</Paper>
 				</Grid>
