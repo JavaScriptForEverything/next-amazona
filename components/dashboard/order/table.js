@@ -27,7 +27,7 @@ import DeleteIcon from '@mui/icons-material/Delete'
 const header = ['Order ID', 'Date', 'Name', 'Email', 'Price', 'Status', 'Actions']
 
 
-const MyTable = ({ orders }) => {
+const MyTable = ({ orders=[] }) => {
 	const [ open, setOpen ] = useState(false)
 	const [ anchorEl, setAnchorEl ] = useState(null)
 	const [ orderId, setOrderId ] = useState(0)

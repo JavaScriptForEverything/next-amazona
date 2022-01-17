@@ -4,9 +4,9 @@ import { useDispatch, useSelector } from 'react-redux'
 import { getOrders } from '../../store/paymentReducer'
 
 import { idFormatter, priceFormatter } from '../../util'
-import OrderTable from './order/table'
-import FilterComponent from './_filter'
 import SearchComponent from './_search'
+import FilterComponent from './_filter'
+import OrderTable from './order/table'
 import CreateComponent from './order/create'
 
 import Box from '@mui/material/Box'
