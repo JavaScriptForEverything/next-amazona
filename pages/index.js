@@ -1,7 +1,5 @@
 import { useState, useEffect } from 'react'
 import nookies from 'nookies'
-import absoluteUrl from 'next-absolute-url'
-import axios from 'axios'
 import { useDispatch, useSelector } from 'react-redux'
 import { showAlert } from '../store/dialogReducer'
 import { getAllProducts, addItemToCart, getProductBrands } from '../store/productReducer'
@@ -50,6 +48,18 @@ import MoreVertIcon from '@mui/icons-material/MoreVert'
 import ListIcon from '@mui/icons-material/List'
 import GridViewIcon from '@mui/icons-material/GridView'
 import SearchIcon from '@mui/icons-material/Search'
+import AccessTimeIcon from '@mui/icons-material/AccessTime'
+import CategoryIcon from '@mui/icons-material/Category'
+import DataUsageIcon from '@mui/icons-material/DataUsage'
+import AttachMoneyIcon from '@mui/icons-material/AttachMoney'
+
+const menuItemsForFilter = [
+	{ label: 'Name', 		 icon: <SearchIcon /> ,name: 'name' },
+	{ label: 'Date', 		 icon: <AccessTimeIcon /> ,name: 'createdAt' },
+	{ label: 'Category', icon: <CategoryIcon /> ,name: 'category' },
+	{ label: 'Status', 	 icon: <DataUsageIcon /> ,name: 'status' },
+	{ label: 'Price', 	 icon: <AttachMoneyIcon /> ,name: 'price' },
+]
 
 
 const { token } = nookies.get(null)
@@ -69,12 +79,14 @@ const groupButtons = [
 
 
 
-const Home = ({ products=[] }) => {
+const Home = () => {
 	const dispatch = useDispatch()
 	const router = useRouter()
-
 	const [ view, setView ] = useState(1) 																// filter-ButtonGroup
+
 	const [ inputSearchValue, setInputSearchValue ] = useState('') 				// filter-search
+	const [ keyword, setKeyword ] = useState(menuItemsForFilter[0])
+
 	const [ sliderValue, setSliderValue ] = useState([0, 100]) 						// filter-slider
 	const [ sliderFields, setSliderFields ] = useState(sliderInputsObj)
 	const [ filterBy, setFilterBy ] = useState(filterByOptions[0]) 				// filter-Autocomplete
@@ -82,7 +94,7 @@ const Home = ({ products=[] }) => {
 
 	const [ page, setPage ] = useState(1) 																// bottom page nagivation
 
-	const { error, cartItems, brands } = useSelector(state => state.product)
+	const { error, cartItems, brands, products } = useSelector(state => state.product)
 	const [ brandsObj, setBrandsObj ] = useState([]) 										// filter-checkbox
 
 	// console.log(products.length)
@@ -180,7 +192,16 @@ const Home = ({ products=[] }) => {
 
 	return (
 		<Layout>
-			<Header />
+			<Header
+				// placeholder={}
+				value={inputSearchValue}
+				keywords={menuItemsForFilter}
+				keyword={keyword.name}
+				setKeyword={setKeyword}
+				onChange={inputSearchHandler}
+				onSubmit={inputSearchSubmitHandler}
+				sx={{display: { xs: 'none', md: 'block' } }}
+			/>
 			<Grid container spacing={2} sx={{ my: 2 }} >
 				{/*-------[ Left Side ]--------*/}
 				<Grid item xs={12} md={3}>
@@ -198,6 +219,7 @@ const Home = ({ products=[] }) => {
 								}}
 								onChange={inputSearchHandler}
 								value={inputSearchValue}
+								sx={{display: { xs: 'block', md: 'none' } }}
 							/>
 						</form>
 

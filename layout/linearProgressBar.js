@@ -7,8 +7,8 @@ const LinearProgressBar = function() {
 	const scrollHandler = () => {
 		const { scrollTop, scrollHeight, clientHeight } = document.documentElement
 
-		const originalHeight = scrollHeight - clientHeight 			// => total inner hight 	- 	viewable areas height
-		let scrolledRatio = scrollTop / originalHeight 					// =>
+		const restHeight = scrollHeight - clientHeight 			// => total page hight 	- 	viewable areas height
+		let scrolledRatio = scrollTop / restHeight 					// =>
 				scrolledRatio = scrolledRatio * 100 								// => 0.3243 => 32.43
 				scrolledRatio = parseInt(scrolledRatio) 						// => 32
 
