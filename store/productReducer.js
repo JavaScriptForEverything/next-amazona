@@ -76,6 +76,11 @@ const { reducer, actions } = createSlice({
 			loading: false,
 			products: action.payload.products,
 			countPage: action.payload.countPage
+		}),
+		productsAddedOnScroll: (state, action) => ({
+			...state,
+			loading: false,
+			products: state.products.concat(action.payload)
 		})
 
 	},
@@ -141,6 +146,12 @@ export const getAllProducts = (ctx={}) => async (dispatch) => {
 	// console.log({ origin, url, query, countPage: data.countPage })
 }
 
+export const getProductsOnScroll = ({ token, page=1, limit=2 }) => catchAsyncDispatch( async (dispatch) => {
+	dispatch(actions.requested())
+	const { data: { products } } = await axios.get(`/api/products?page=${page}&limit=${limit}`, {headers: { Authorization: `Bearer ${token}` } })
+	dispatch(actions.productsAddedOnScroll(products))
+
+}, actions.failed)
 
 // getProduct will be dispatched here instead of /pages/product/[id].js getServerSideProps
 

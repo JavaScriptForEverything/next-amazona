@@ -49,15 +49,17 @@ const Revinue = ({ year, onChange=f=>f, chartData=[] }) => {
 				</FormControl>
 			</Box>
 
-			<LineChart width={500} height={300} data={data} margin={{ top: 10 }} >
-				<Line dataKey='value' type='natural' stroke='green' />
-				<Line dataKey='price' type='natural' />
-				<CartesianGrid strokeDasharray='5 5' />
-				<Tooltip />
-				<XAxis dataKey='name' />
-				<YAxis />
-				<Legend verticalAlign='top' />
-			</LineChart>
+			<Box sx={{ overflow: 'auto'}}>
+				<LineChart width={500} height={300} data={data} margin={{ top: 10 }} >
+					<Line dataKey='value' type='natural' stroke='green' />
+					<Line dataKey='price' type='natural' />
+					<CartesianGrid strokeDasharray='5 5' />
+					<Tooltip />
+					<XAxis dataKey='name' />
+					<YAxis />
+					<Legend verticalAlign='top' />
+				</LineChart>
+			</Box>
 		</>
 	)
 }

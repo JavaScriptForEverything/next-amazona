@@ -12,7 +12,7 @@ import Box from '@mui/material/Box'
 
 // => { label: 'fieldLabel', 'name: fieldName', type: 'fieldType', options=['autoComplete', 'options']}
 */
-// export const fieldObjectCreator = (label, name, type='text', image=true, options) => ({label, name, type, options})
+export const arrayObjectCreator = (label, name, type='text', options) => ({label, name, type, options})
 
 // =>  { confirmation: '', status: '', ...  } 			:
 // =>  { confirmation: true, status: false, ...  } 	: if passed 2nd arg as property name
@@ -33,8 +33,9 @@ export const formValidator = (obj, errorStateUpdateMethod, requireLength=4) => {
 	if(obj.password && obj.password.length < requireLength ) errorObj.password = `Password must be ${requireLength} character long`
 	if(obj.password && obj.confirmPassword && obj.password !== obj.confirmPassword) errorObj.confirmPassword = 'Confirm Password not matched'
 
-	Object.entries(obj).forEach(([key, value]) => {
-		if(`${value}`.trim() === '')  errorObj[key] = `'${key}' field is empty`
+
+	Object.keys(obj).forEach((key) => {
+		if(`${obj[key]}`.trim() === '')  errorObj[key] = `'${key}' field is empty`
 	})
 
 	errorStateUpdateMethod(errorObj)
@@ -162,4 +163,15 @@ export const filterPush = (router, key, value ) => {
 	const query = Object.assign(router.query, search )
 	const searchParams = new URLSearchParams( query ).toString()
 	router.push(`?${searchParams}`)
+}
+
+
+export const debounce = (callback, delay) => {
+	let timer
+
+	return (...args) => {
+		if(timer)	clearTimeout(timer)
+		timer = setTimeout(() => callback(...args), delay)
+		// timer = setTimeout(() => callback.apply(null, args), delay)
+	}
 }

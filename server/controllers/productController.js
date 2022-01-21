@@ -42,12 +42,16 @@ export const getAllProducts = catchAsync( async (req, res, next) => {
 	const countPage = Math.ceil(countDocuments / limit)
 	// console.log({ brand: req.query.brand })
 
+	setTimeout(() => {
+
 	res.status(200).json({
 		status: 'success',
 		total: products.length,
 		products,
 		countPage
 	})
+
+	}, 2000) // mimic real world data loading
 
 })
 
@@ -57,15 +61,25 @@ export const getAllProducts = catchAsync( async (req, res, next) => {
 export const addProduct = catchAsync( async (req, res, next) => {
 
 	// 1. filter body
-	const body = filterObjectWithAllowedArray(req.body, ['name', 'brand', 'category', 'description', 'images', 'price'])
+	const body = filterObjectWithAllowedArray(req.body, [
+		'name',
+		'price',
+		'quantity',
+		'brand',
+		'category',
+		'size',
+		'summary',
+		'description',
+		'images',
+		'coverImage'
+	])
 
 	let images = []
 	if(body.images?.length) {
 		// 2. upload image to cloudinary
 		const multipleImagesPromise = body.images.map(image => cloudinary.v2.uploader.upload(image, {
-				folder: 'next-amazona/products'
-			})
-		)
+			folder: 'next-amazona/products'
+		}))
 
 		// 3. after upload, return only public_id & secure_url property
 		images = await Promise.all(multipleImagesPromise)
@@ -74,9 +88,17 @@ export const addProduct = catchAsync( async (req, res, next) => {
 		if(!images.length) return next(appError('Please add images [atleast one]', 404))
 	}
 
+	const { public_id, secure_url } = await cloudinary.v2.uploader.upload(body.coverImage, {folder: 'next-amazona/products'})
+
 
 	// 4. pass filtered body & override images with cloudinary { public_id, secure_url }
-	const product = await Product.create({ ...body, images, user: req.user._id})
+	const product = await Product.create({
+		...body,
+		images,
+		coverImage: { public_id, secure_url },
+		user: req.user._id
+	})
+
 	if(!product) return next(appError('No product found.', 404))
 
 	// 5. Finally response back to client & client store data in redux store then use from store.

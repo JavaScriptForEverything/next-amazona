@@ -22,6 +22,7 @@
 	. send Mail (development: mailtrap, in Production: sendGrid)
 	. upload image in Cloudinary (PDF in cloudinary download blocked)
 	. Pagination + Filter + Search + Rating...
+	. Infinite Scrolling instead of Pagination
 
 	. Do next:
 		. CRUD Product (By Form or By 3-dot menu)

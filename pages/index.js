@@ -2,8 +2,13 @@ import { useState, useEffect } from 'react'
 import nookies from 'nookies'
 import { useDispatch, useSelector } from 'react-redux'
 import { showAlert } from '../store/dialogReducer'
-import { getAllProducts, addItemToCart, getProductBrands } from '../store/productReducer'
-import { filterPush, shorter } from '../util'
+import {
+	getAllProducts,
+	getProductsOnScroll,
+	addItemToCart,
+	getProductBrands
+} from '../store/productReducer'
+import { filterPush, shorter, debounce } from '../util'
 
 import Link from 'next/link'
 import { useRouter } from 'next/router'
@@ -41,7 +46,6 @@ import Checkbox from '@mui/material/Checkbox'
 import Slider from '@mui/material/Slider'
 import Badge from '@mui/material/Badge'
 import Rating from '@mui/material/Rating'
-import Pagination from '@mui/material/Pagination'
 
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
 import MoreVertIcon from '@mui/icons-material/MoreVert'
@@ -92,9 +96,7 @@ const Home = () => {
 	const [ filterBy, setFilterBy ] = useState(filterByOptions[0]) 				// filter-Autocomplete
 	// const [ checkboxes, setCheckboxes ] = useState([]) 										// filter-checkbox
 
-	const [ page, setPage ] = useState(1) 																// bottom page nagivation
-
-	const { error, cartItems, brands, products } = useSelector(state => state.product)
+	const { error, loading, cartItems, brands, products, countPage } = useSelector(state => state.product)
 	const [ brandsObj, setBrandsObj ] = useState([]) 										// filter-checkbox
 
 	// console.log(products.length)
@@ -113,6 +115,37 @@ const Home = () => {
 		const currentView = +localStorage.getItem('view')	?? 1
 		setView(currentView)
 	}, [view])
+
+
+	// create infinite scroll heatures
+	useEffect(() => {
+		let page = router.query.page || 1
+		let limit = router.query.limit || 1
+
+		const infiniteScrollHandler = () => {
+			const { scrollTop, clientHeight, scrollHeight } = document.documentElement
+
+			const pageBottom = scrollTop + clientHeight
+			const contentHeight = scrollHeight
+			const extraHeight = clientHeight / 3
+
+			const isRetchedToBottom = pageBottom + extraHeight >= contentHeight
+
+			if(products.length >= countPage) return
+
+			if(isRetchedToBottom) {
+				++page 												// start from page 2, Because we already get page 1
+				// console.log('fired', page)
+
+				// add skeleton or loading indicator to indicate page loading
+				dispatch(getProductsOnScroll({ token, page, limit }))
+			}
+		}
+
+		// adding debouncing so that only call once within given delay
+		window.addEventListener('scroll', debounce(infiniteScrollHandler, 200)) 	// fire on scroll
+		return () => window.removeEventListener('scroll', infiniteScrollHandler) 	// after fire, immediately remove, else it use memory a lot
+	}, [])
 
 
 	// view handler
@@ -182,13 +215,6 @@ const Home = () => {
 		// false ? filterPush(router, 'common', newValue) : router.push(`?common=${newValue}`)
 	}
 
-	const pageHandler = (evt, newValue) => {
-		setPage(newValue)
-
-		false ? filterPush(router, 'page', newValue) : router.push(`?page=${newValue}`)
-	}
-
-
 
 	return (
 		<Layout>
@@ -204,7 +230,7 @@ const Home = () => {
 			/>
 			<Grid container spacing={2} sx={{ my: 2 }} >
 				{/*-------[ Left Side ]--------*/}
-				<Grid item xs={12} md={3}>
+{/*				<Grid item xs={12} md={3}>
 					<Paper>
 						<form noValidate onSubmit={inputSearchSubmitHandler}>
 							<TextField
@@ -318,9 +344,8 @@ const Home = () => {
 							</AccordionDetails>
 						</Accordion>
 					</Paper>
-
 				</Grid>
-
+*/}
 				{/*-------[ Right Side ]--------*/}
 				<Grid item md={9} >
 					<Box sx={{
@@ -458,14 +483,6 @@ const Home = () => {
 				</Grid>
 			</Grid>
 
-			<Pagination
-				count={11}
-				variant='outlined'
-				color='primary'
-				sx={{ my: 5, display: 'flex', maxWidth: '80vw', justifyContent: 'center' }}
-				page={page}
-				onChange={pageHandler}
-			/>
 
 		</Layout>
 	)

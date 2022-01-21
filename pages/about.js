@@ -4,13 +4,12 @@ import Layout from '../layout'
 import InfiniteScroll from '../layout/_infiniteScroll'
 import Typography from '@mui/material/Typography'
 
-import TextField from '@mui/material/TextField'
-import Select from '@mui/material/Select'
-import MenuItem from '@mui/material/MenuItem'
-import InputAdornment from '@mui/material/InputAdornment'
-import Chip from '@mui/material/Chip'
 
-import { Tooltip, IconButton } from '@mui/material'
+import {
+	TextField ,
+	Button
+} from '@mui/material'
+
 
 import SearchIcon from '@mui/icons-material/Search'
 
@@ -25,7 +24,13 @@ const About = () => {
 	return (
 		<Layout title='about page'>
 			<Typography>About Page</Typography>
-		<InfiniteScroll />
+		{/*<InfiniteScroll />*/}
+
+	 <TextField
+    label="Name"
+    value="hello"
+    InputProps={{endAdornment: <Button><SearchIcon /></Button>}}
+  />
 
 
 

@@ -37,7 +37,7 @@ const leftPanelItems = [
 
 
 const DashboardComponent = () => {
-	const [ selected, setSelected ] = useState(0)
+	const [ selected, setSelected ] = useState(1)
 	const { user } = useSelector(state => state.user)
 
 	// console.log(selected)

@@ -65,6 +65,7 @@ const Layout = ({ title, description, children }) => {
 	let [ badge, setBadge ] = useState(0)
 
 	const { authenticated, token, user } = useSelector(state => state.user)
+	const { loading } = useSelector(state => state.product )
 
 	// console.log({ authenticated, token, user })
 
@@ -202,6 +203,9 @@ const Layout = ({ title, description, children }) => {
 
 			{/*------[ Middle Section ]--------*/}
 			<Container sx={{ minHeight: '80vh', my: 3 }} > { children } </Container>
+
+
+			{ loading && <Typography align='center' >Loading</Typography> }
 
 			{/*------[ Footer Section ]--------*/}
 			<Typography component='footer' align='center' > All Right Reserved amazona </Typography>

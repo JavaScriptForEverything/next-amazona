@@ -3,15 +3,13 @@ import { useState } from 'react'
 import Box from '@mui/material/Box'
 import Typography from '@mui/material/Typography'
 import TextField from '@mui/material/TextField'
-import InputAdornment from '@mui/material/InputAdornment'
-import IconButton from '@mui/material/IconButton'
+import Button from '@mui/material/Button'
 import Menu from '@mui/material/Menu'
 import MenuItem from '@mui/material/MenuItem'
 import ListItemIcon from '@mui/material/ListItemIcon'
 import ListItemText from '@mui/material/ListItemText'
 
 import SearchIcon from '@mui/icons-material/Search'
-import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown'
 
 const SearchComponent = (props) => {
 	const {
@@ -59,11 +57,10 @@ const SearchComponent = (props) => {
 					autoFocus
 
 					InputProps={{
-						startAdornment: <InputAdornment position='start'><SearchIcon /></InputAdornment>,
-						endAdornment: <InputAdornment position='end'>
-							<Typography onClick={iconButtonClickHandler}> {keyword} </Typography>
-							<IconButton onClick={iconButtonClickHandler}> <ArrowDropDownIcon /> </IconButton>
-						</InputAdornment>,
+						endAdornment: <>
+							<Typography onClick={iconButtonClickHandler} sx={{cursor: 'pointer'}}> {keyword} </Typography>
+							<Button onClick={onSubmit}><SearchIcon /></Button>
+						</>
 					}}
 				/>
 
