@@ -87,6 +87,9 @@ const Home = () => {
 	const dispatch = useDispatch()
 	const router = useRouter()
 	const [ view, setView ] = useState(1) 																// filter-ButtonGroup
+	// const [ page, setPage ] = useState(+router.query.page || 1)
+	// const [ limit, setLimit ] = useState(+router.query.limit || 4)
+
 
 	const [ inputSearchValue, setInputSearchValue ] = useState('') 				// filter-search
 	const [ keyword, setKeyword ] = useState(menuItemsForFilter[0])
@@ -96,7 +99,7 @@ const Home = () => {
 	const [ filterBy, setFilterBy ] = useState(filterByOptions[0]) 				// filter-Autocomplete
 	// const [ checkboxes, setCheckboxes ] = useState([]) 										// filter-checkbox
 
-	const { error, loading, cartItems, brands, products, countPage } = useSelector(state => state.product)
+	const { error, loading, cartItems, brands, products, total: totalProducts } = useSelector(state => state.product)
 	const [ brandsObj, setBrandsObj ] = useState([]) 										// filter-checkbox
 
 	// console.log(products.length)
@@ -119,26 +122,19 @@ const Home = () => {
 
 	// create infinite scroll heatures
 	useEffect(() => {
-		let page = router.query.page || 1
-		let limit = router.query.limit || 1
+		let page = +router.query.page || 2
+		let limit = +router.query.limit || 4
 
 		const infiniteScrollHandler = () => {
 			const { scrollTop, clientHeight, scrollHeight } = document.documentElement
 
-			const pageBottom = scrollTop + clientHeight
-			const contentHeight = scrollHeight
-			const extraHeight = clientHeight / 3
+			if(scrollTop + clientHeight >= scrollHeight ) {
 
-			const isRetchedToBottom = pageBottom + extraHeight >= contentHeight
+				if(page * limit <= totalProducts) {
+					dispatch(getProductsOnScroll({ token, page: page, limit }))
+					page++
+				}
 
-			if(products.length >= countPage) return
-
-			if(isRetchedToBottom) {
-				++page 												// start from page 2, Because we already get page 1
-				// console.log('fired', page)
-
-				// add skeleton or loading indicator to indicate page loading
-				dispatch(getProductsOnScroll({ token, page, limit }))
 			}
 		}
 

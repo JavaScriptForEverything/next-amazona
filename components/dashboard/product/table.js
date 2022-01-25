@@ -35,12 +35,13 @@ const TableComponent = (props) => {
 		data=[],
 		countPage=3,
 		itemHandler=f=>f,
+		limit=4,
 		limitHandler=f=>f,
+		page=1,
 		pageHandler=f=>f,
 	} = props
 
-	const [ page, setPage ] = useState(1)
-	const [ limit, setLimit ] = useState(tableLimitOptions[1]) 		// => limit = 2
+	// const [ limit, setLimit ] = useState(tableLimitOptions[1]) 		// => limit = 2
 	const [ open, setOpen ] = useState(false)
 	const [ anchorEl, setAnchorEl ] = useState(null)
 	const [ customerId, setCustomerId ] = useState('')
@@ -62,18 +63,6 @@ const TableComponent = (props) => {
 		// console.log({ customerId })
 	}
 
-	const limitChangeHandler = (evt, newLimit) => {
-		setLimit(newLimit)
-
-		limitHandler(evt, newLimit)
-		// console.log({ newLimit })
-	}
-	const pageClickHandler = (evt, newPage) => {
-		setPage(newPage)
-
-		pageHandler(evt, newPage)
-		// console.log({ newPage })
-	}
 
 	return (
 		<>
@@ -151,7 +140,7 @@ const TableComponent = (props) => {
 					renderInput={params => <TextField {...params} />}
 
 					value={limit}
-					onChange={limitChangeHandler}
+					onChange={limitHandler}
 				/>
 
 				{countPage && countPage != 1 && <Pagination
@@ -164,7 +153,7 @@ const TableComponent = (props) => {
 
 					count={countPage}
 					page={page}
-					onChange={pageClickHandler}
+					onChange={pageHandler}
 				/>}
 			</Box>
 		</>

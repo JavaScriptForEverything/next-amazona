@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "start": " next build && next start",
+    "start": "next build && next start",
     "seeder": "node server/models/seeder.js --import",
     "seeder:prod": "NODE_ENV=production node server/models/seeder.js --import"
   },

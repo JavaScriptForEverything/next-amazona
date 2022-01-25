@@ -16,12 +16,12 @@ export const arrayObjectCreator = (label, name, type='text', options) => ({label
 
 // =>  { confirmation: '', status: '', ...  } 			:
 // =>  { confirmation: true, status: false, ...  } 	: if passed 2nd arg as property name
-// export const getNameFieldOfArrayObject = (arr=[], field ) => {
-// 	const tempObj = {}
-// 	arr.forEach(obj => tempObj[obj.name] = field ? obj[field] : '')
+export const getKeysOfArrayObject = (arr=[], field ) => {
+	const tempObj = {}
+	arr.forEach(obj => tempObj[obj.name] = field ? obj[field] : '')
 
-// 	return tempObj
-// }
+	return tempObj
+}
 
 // Form Validator
 export const formValidator = (obj, errorStateUpdateMethod, requireLength=4) => {

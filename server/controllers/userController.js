@@ -7,7 +7,8 @@ import {
 	setToken,
 	getIdFromToken,
 	filterObjectWithAllowedArray,
-	sendMail
+	sendMail,
+	apiFeatures
 } from '../util'
 
 
@@ -34,6 +35,10 @@ export const login = catchAsync(async (req, res, next) => {
 	// 2. check password
 	const authenticated = await compare(password, user.password )
 	if(!authenticated) return next(appError('Email or password is incorrect'))
+
+	if(!user.active) return next(appError('Plase active your account first.'))
+
+	console.log({ active: user.active })
 
 	// 3. check user update password or not, if do then force to re-login
 	const token = setToken(user._id)
@@ -86,11 +91,16 @@ export const signup = catchAsync(async (req, res, next) => {
 /* userReducer.js  > /api/users/index.js	:	handler.get(userController.getAllUsers)
  		/pages/user/dashboard.js  => /components/dashboard/customer/view.js */
 export const getAllUsers = catchAsync(async(req, res, next) => {
-	let limit = req.query.limit || 4
-			limit = limit * 1
+	const limit = +req.query.limit || 4
 
-	const users = await User.find()
 	const totalDocuments = await User.countDocuments()
+	// const users = await User.find()
+	const users = await apiFeatures(User, req.query)
+		.pagination()
+		.sort()
+		.search()
+		.filter()
+		.query
 
 	const countPage = Math.ceil( totalDocuments / limit )
 
@@ -150,16 +160,27 @@ export const userMailTo = catchAsync(async(req, res, next) => {
 
 
 
-// only for testing purpose, not connected with project
-export const uploadImage = catchAsync( async (req, res, next) => {
-	const { file } = req.body
+export const deleteMe = catchAsync(async(req, res, next) => {
+	const { email, password } = req.body
 
-	const data = await cloudinary.v2.uploader.upload(file, {
-		folder: 'next-amazona/users'
-	})
+	const user = await User.findOne({ email }).select('+password')
+	if(!user) return next(appError('You are not validated user', 403))
+
+	const authenticated = await compare(password, user.password)
+	if(!authenticated) return next(appError('Password not matched', 403))
+
+	const newUser = await User.findByIdAndUpdate(user._id, { active: false }, { new: true, runValidators: true })
+	// console.log(newUser)
+
+	setTimeout(() => {
 
 	res.status(200).json({
 		status: 'success',
-		doc: data
+		// user,
+		// user: newUser
 	})
+	}, 2000)
 })
+
+
+

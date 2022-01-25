@@ -1,6 +1,7 @@
 import { useState } from 'react'
 
 import { formValidator } from '../../util'
+import DeleteMe from './settings/deleteMe'
 
 import Box from '@mui/material/Box'
 import Grid from '@mui/material/Grid'
@@ -128,9 +129,12 @@ const Settings = () => {
 		console.log(passwordFields)
 	}
 
-
 	const switchChangeHandler = (evt, name, selected) => {
 		setNotificationFields({ ...notificationFields, [name]: selected })
+	}
+
+	const handleDeleteUser = () => {
+		console.log('Delete Me')
 	}
 
 	return (
@@ -251,6 +255,13 @@ const Settings = () => {
 					</Paper>
 					)}
 				</Paper>
+
+				<Paper sx={{ p: 1, mt: 3 }}>
+					<DeleteMe
+						// onClick={handleDeleteUser}
+					/>
+				</Paper>
+
 			</Grid>
 		</Grid>
 		</>

@@ -11,6 +11,8 @@ const { reducer, actions } = createSlice({
 	name: 'product',
 	initialState: {
 		products: [],
+		total:0,
+		length: 0,
 		countPage: 0,
 		// product: {},
 
@@ -74,8 +76,9 @@ const { reducer, actions } = createSlice({
 		allProductsAdded: (state, action ) => ({
 			...state,
 			loading: false,
-			products: action.payload.products,
-			countPage: action.payload.countPage
+			// products: action.payload.products,
+			// countPage: action.payload.countPage
+			...action.payload
 		}),
 		productsAddedOnScroll: (state, action) => ({
 			...state,
@@ -146,7 +149,25 @@ export const getAllProducts = (ctx={}) => async (dispatch) => {
 	// console.log({ origin, url, query, countPage: data.countPage })
 }
 
-export const getProductsOnScroll = ({ token, page=1, limit=2 }) => catchAsyncDispatch( async (dispatch) => {
+
+// used in 	/components/dashboard/products.js
+export const getProductsXHR = ({ token, page=1, limit=4 }) => catchAsyncDispatch( async (dispatch) => {
+	if(!token) return
+
+	// return console.log({ page, limit })
+
+	dispatch(actions.requested())
+	const { data } = await axios.get(`/api/products?page=${page}&limit=${limit}`, {headers: { Authorization: `Bearer ${token}` } })
+	dispatch(actions.allProductsAdded(data))
+
+}, actions.failed)
+
+// used in 	/pages/index.js
+export const getProductsOnScroll = ({ token, page=1, limit=4 }) => catchAsyncDispatch( async (dispatch) => {
+	if(!token) return
+
+	// return console.log({ page, limit })
+
 	dispatch(actions.requested())
 	const { data: { products } } = await axios.get(`/api/products?page=${page}&limit=${limit}`, {headers: { Authorization: `Bearer ${token}` } })
 	dispatch(actions.productsAddedOnScroll(products))

@@ -11,11 +11,19 @@ import CreateComponent from './customer/create'
 import Box from '@mui/material/Box'
 import Paper from '@mui/material/Paper'
 
+import PersonIcon from '@mui/icons-material/Person'
+import EmailIcon from '@mui/icons-material/Email'
+import CallIcon from '@mui/icons-material/Call'
 import AccessTimeIcon from '@mui/icons-material/AccessTime'
 import CategoryIcon from '@mui/icons-material/Category'
 import DataUsageIcon from '@mui/icons-material/DataUsage'
 import AttachMoneyIcon from '@mui/icons-material/AttachMoney'
 
+const menuItemsForSearch = [
+	{ label: 'User Name',icon: <PersonIcon /> ,name: 'username' },
+	{ label: 'Email Address', icon: <EmailIcon /> ,name: 'email' },
+	{ label: 'Phone', 	 icon: <CallIcon /> ,name: 'phone' },
+]
 const menuItemsForFilter = [
 	{ label: 'Date', 		 icon: <AccessTimeIcon /> ,name: 'createdAt' },
 	{ label: 'Category', icon: <CategoryIcon /> ,name: 'category' },
@@ -26,11 +34,12 @@ const menuItemsForFilter = [
 
 
 const ViewComponent = () => {
-	const [ view, setView ] = useState(true) 			// To goggle between view & insert mode
 	const dispatch = useDispatch()
-
+	const [ view, setView ] = useState(true) 			// To goggle between view & insert mode
 	const [ searchValue, setSearchValue ] = useState('')
-	const [ keyword, setKeyword ] = useState(menuItemsForFilter[0])
+	const [ keyword, setKeyword ] = useState(menuItemsForSearch[0])
+	const [ page, setPage ] = useState(1)
+	const [ limit, setLimit ] = useState(4)
 
 	const { token } = nookies.get(null)
 	const { error, loading, users, countPage } = useSelector(state => state.user)
@@ -40,8 +49,8 @@ const ViewComponent = () => {
 	// console.log(tableData)
 
 	useEffect(() => {
-		dispatch(getAllUsers(token))
-	}, [token])
+		dispatch(getAllUsers(token, {page, limit}))
+	}, [token, page, limit])
 
 	const filterAddOrderHandler = () => setView(false)
 
@@ -51,7 +60,7 @@ const ViewComponent = () => {
 		evt.preventDefault()
 		if(!searchValue.trim()) return
 
-		console.log({ searchValue, keyword  })
+		dispatch(getAllUsers(token, {search: [keyword.name, searchValue]}))
 	}
 
 	// filterComponent handling
@@ -66,12 +75,10 @@ const ViewComponent = () => {
 		console.log({ customerId })
 	}
 	const tableLimitHandler = (evt, limit) => {
-
-		console.log({ limit })
+		setLimit(limit)
 	}
 	const tablePageHandler = (evt, page) => {
-
-		console.log({ page })
+		setPage(page)
 	}
 
 
@@ -84,7 +91,7 @@ const ViewComponent = () => {
 					value={searchValue}
 					onChange={searchChangeHandler}
 
-					keywords={menuItemsForFilter} 	// used to be search on it
+					keywords={menuItemsForSearch} 	// used to be search on it
 					keyword={keyword.name}
 					setKeyword={setKeyword}
 
@@ -106,9 +113,11 @@ const ViewComponent = () => {
 					title='All Customers'
 					data={users} 		// to make table re-usable, only send required fields instead of full users
 					countPage={countPage}
-
 					itemHandler={tableItemHandler}
+
+					limit={limit}
 					limitHandler={tableLimitHandler}
+					page={page}
 					pageHandler={tablePageHandler}
 				/>
 			</Paper>

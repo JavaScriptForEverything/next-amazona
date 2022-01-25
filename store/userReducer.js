@@ -68,7 +68,8 @@ const { reducer, actions } = createSlice({
 				maxAge: 30 * 24 * 60 * 60,
 				secure: true, 			// https only except localhost
 				// httpOnly: true, 	// [Only Server can do it] remove from document.cookie to read by javascript
-				sameSite: 'strict' 	// Stop CORS
+				// sameSite: 'strict',	// Stop CORS
+				path: '/'
 			})
 			return { ...state, loading: false, authenticated: true, token }
 		},
@@ -105,6 +106,17 @@ const { reducer, actions } = createSlice({
 			user: {},
 			message: action.payload
 		}),
+		userDeleted: (state, action) => {
+			nookies.destroy(null, 'token')
+
+			return {
+				...state,
+				loading: false,
+				user: {},
+				token: undefined,
+				authenticated: false
+			}
+		},
 
 		mailSended: (state, action) => ({
 			...state,
@@ -116,7 +128,8 @@ const { reducer, actions } = createSlice({
 			...state,
 			loading: false,
 			search: action.payload
-		})
+		}),
+
 
 
 	}, // End of Reducer
@@ -147,9 +160,24 @@ export const getUser = (token) => catchAsyncDispatch(async (dispatch) => {
 }, actions.failed)
 
 
-export const getAllUsers = (token) => catchAsyncDispatch(async (dispatch) => {
+export const getAllUsers = (token, obj ) => catchAsyncDispatch(async (dispatch) => {
+	if(!token) return
+
+	const {
+		page=1,
+		limit=2,
+		search=[]
+	} = obj
+
+		console.log({ page, limit })
+
+	let query = ''
+	if(page) query += `page=${page}`
+	if(limit) query += `&limit=${limit}`
+	if(search) query += `&search=${search}`
+
 	dispatch(actions.requested())
-	const { data } = await axios.get(`/api/users`, { headers: {Authorization: `Bearer ${token}`} })
+	const { data } = await axios.get(`/api/users?${query}`, { headers: {Authorization: `Bearer ${token}`} })
 	dispatch(actions.allUsersAdded(data))
 }, actions.failed)
 
@@ -241,5 +269,13 @@ export const dispatchSearch = (obj) => catchAsyncDispatch(async (dispatch) => {
 
 
 
+export const deleteUser = (token, fields) => catchAsyncDispatch(async dispatch => {
+	if(!token) return
+
+	dispatch(actions.requested())
+	const { data } = await axios.patch(`/api/users/delete-me`, fields, { headers: {Authorization: `Bearer ${token}`} })
+	// console.log(fields)
+	dispatch(actions.userDeleted())
+}, actions.failed)
 
 
