@@ -9,41 +9,42 @@ const getPosts = async ({ page=1, limit=2 }) => {
 }
 
 const InfiniteScroll = () => {
-	const [ page, setPage ] = useState(1)
-	const [ loading, setLoading ] = useState(false)
 	const [ posts, setPosts ] = useState([])
+	const [ page, setPage ] = useState(1)
 
 	const limit = 10
 	const totalPosts = 100
 
-
-	useEffect(async() => {
-		setLoading(true)
-		const { data } = await getPosts({ page })
-		setPosts(prevPosts => [...prevPosts, ...data])
-		setLoading(false)
-	}, [page])
-
-	const handleScroll = (evt) => {
+	const scrollHandler = async() => {
 		const { scrollTop, clientHeight, scrollHeight } = document.documentElement
-		if(scrollTop + clientHeight === scrollHeight && page < 10 ) setPage(page++)
+
+		if(page * limit <= totalPosts) { 												// don't request if no content available
+			if(scrollTop + clientHeight >= scrollHeight) { 				// got to end of the page to check page end or not
+				const { data } = await getPosts({ page, limit })
+				setPosts( oldPost => oldPost.concat(data) )
+				setPage(page++)
+			}
+		}
 	}
 
+	// // for first time
+	// useEffect(() => getPosts({ limit }), [])
+
 	useEffect(() => {
-		window.addEventListener('scroll', handleScroll)
-		return () => window.removeEventListener('scroll', handleScroll)
+		window.addEventListener('scroll', scrollHandler)
+
+		// useEffect Cleanup function to solve, so that don't try to update unmounted object.
+		return () => window.removeEventListener('scroll', scrollHandler)
 	}, [])
 
 
 	return (
 		<>
-
 			{posts.map((item, key) => <Box key={key}>
 				<Typography>{item.id}</Typography>
 				<Typography>{item.title}</Typography>
 				<Typography>{item.body}</Typography>
 			</Box>)}
-
 		</>
 	)
 }
