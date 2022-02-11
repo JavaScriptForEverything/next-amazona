@@ -17,7 +17,7 @@ import MuiLink from '@mui/material/Link'
 
 const listItems = [
 	{ label: 'Profile', path: '/user/profile' },
-	{ label: 'Dashboard', path: '/user/account' },
+	{ label: 'Dashboard', path: '/user/dashboard' },
 	{ label: 'Reset Password', path: '/user/reset-password' },
 	{ label: 'Update Password', path: '/user/update-my-password' },
 	{ label: 'Cart', path: '/cart' },

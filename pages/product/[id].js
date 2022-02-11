@@ -26,8 +26,6 @@ const Product = ({ product }) => {
 	const dispatch = useDispatch()
 	const { cartItems } = useSelector(state => state.product)
 
-	if(!product) return 'No product found'
-
 	const addToCartHandler = (evt, product) => {
 		const	itemFound = cartItems.some(item => item._id === product._id )
 
@@ -37,7 +35,8 @@ const Product = ({ product }) => {
 	}
 
 
-	// console.log(product)
+	console.log(product)
+
 	if(!product) return (
 		<Layout title='404 | No page Found'>
 			<Typography>No product found</Typography>
@@ -50,15 +49,15 @@ const Product = ({ product }) => {
 
 			<Grid container spacing={1}>
 				<Grid item xs={12} md={6} >
-{/*					<Image
-						src={product.images[0]}
+					<Image
+						src={product.coverImage.secure_url}
 						alt={product.name}
 						title={product.name}
 						width={400}
 						height={400}
 						layout='responsive'
 					/>
-*/}				</Grid>
+				</Grid>
 				<Grid item xs={12} md={3}>
 					<List>
 						<ListItem>

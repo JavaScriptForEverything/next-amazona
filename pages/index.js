@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react'
 import nookies from 'nookies'
 import { useDispatch, useSelector } from 'react-redux'
-import { showAlert } from '../store/dialogReducer'
 import {
 	getAllProducts,
 	getProductsOnScroll,
@@ -16,6 +15,8 @@ import { wrapper } from '../store'
 
 import Layout from '../layout'
 import Header from '../components/home/header.js'
+import GridCard from '../components/home/girdView/card'
+import ListCard from '../components/home/listView/card'
 
 import Box from '@mui/material/Box'
 import Grid from '@mui/material/Grid'
@@ -150,14 +151,6 @@ const Home = () => {
 		localStorage.setItem('view', id)
 	}
 
-
-	const addToCartHandler = (evt, product) => {
-		const isFound = cartItems.find(cart => cart._id === product._id)
-		if(isFound) return dispatch(showAlert({ open: true, severity: 'info', message: 'This product all ready added into cart'}))
-
-		dispatch(addItemToCart(product))
-		dispatch(showAlert({ open: true, severity: 'success', message: 'added to cart'}))
-	}
 
 
 	const brandOnChangeHandler = (evt, brandId ) => {
@@ -377,57 +370,7 @@ const Home = () => {
 					{view === 0 ? (// List View component
 						<Paper sx={{ p: 1 }}>
 							<Grid container spacing={2}>
-								{products.map((product, key) => [
-									<Grid key={key} item xs={12} sm={3} >
-										<Link href={`/product/${product.slug}`} passHref>
-											<CardActionArea sx={{position: 'relative'}} sx={{ minHeight: 150 }} >
-												<CardMedia
-													component='img'
-													src={product.coverImage?.secure_url || '/images/coverImage.jpg'}
-													height={150}
-												/>
-												<Badge color='error' badgeContent='New' sx={{position: 'absolute', top: 20, left: 30, }} />
-											</CardActionArea>
-										</Link>
-									</Grid>,
-
-									<Grid key={`${key}-${key}`} item xs={12} sm={6} >
-										<Typography color='primary'>{product.name}</Typography>
-										<Box sx={{
-											display: 'flex',
-											gap: 2,
-											alignItems: 'center',
-										}}>
-											<Typography>
-												<Rating
-													size='small'
-													name='product rating'
-													defaultValue={product.ratings}
-													precision={.5}
-													readOnly
-												/>
-											</Typography>
-
-											<Typography color='primary'> {product.ratings || 4}/5 </Typography>
-										</Box>
-										<Typography color='textSecondary' align='justify'>{product.description}</Typography>
-									</Grid>,
-
-									<Grid key={`${key}-${key}-${key}`} item xs={12} sm={3} >
-										<Box sx={{
-											display: 'flex',
-											flexDirection: 'column',
-											height: '100%',
-											justifyContent: 'center',
-											gap: 3,
-											p: 2
-										}}>
-											<Typography  variant='h6' >${product.price.toFixed(2)}</Typography>
-											<Button variant='contained'fullWidth onClick={(evt) => addToCartHandler(evt, product)} >Add To Cart</Button>
-										</Box>
-									</Grid>,
-
-								])}
+								{products.map((product, key) => <ListCard key={key} id={key} product={product} /> )}
 							</Grid>
 						</Paper>
 
@@ -436,41 +379,7 @@ const Home = () => {
 						<Grid container spacing={2}>
 							{products.map((product, key) => (
 							<Grid key={key} item xs={12} sm={6} md={4} >
-								<Card>
-									<CardHeader
-										title={product.name}
-										action={<IconButton><MoreVertIcon /></IconButton>}
-									/>
-									<Link href={`/product/${product.slug}`} passHref>
-										<CardActionArea sx={{position: 'relative'}}>
-											<CardMedia
-												component='img'
-												src={product.coverImage?.secure_url || '/images/coverImage.jpg'}
-												height={150}
-											/>
-											<Badge color='error'badgeContent='New'sx={{position: 'absolute', top: 20, left: 30, }} />
-										</CardActionArea>
-									</Link>
-
-									<CardContent>
-										<Typography color='textSecondary' align='justify' paragraph>{shorter(product.description, 100)}</Typography>
-										<Box sx={{display: 'flex', gap: 2, alignItems: 'center', }}>
-											<Typography>
-												<Rating size='small' name='product rating' defaultValue={product.ratings} precision={.5} readOnly />
-											</Typography>
-											<Typography color='primary'> {product.ratings || 4}/5 </Typography>
-										</Box>
-										<Typography variant='h6' sx={{ my: 3 }} >${product.price.toFixed(2)}</Typography>
-									</CardContent>
-
-{/*									<CardActions>
-										<Button variant='contained'fullWidth onClick={(evt) => addToCartHandler(evt, product)} >Add To Cart</Button>
-									</CardActions>
-*/}
-									<CardActions sx={{display: 'flex', justifyContent: 'flex-end', my: 1 }} >
-										<Button onClick={() => router.push(`/product/${product.slug}`)} variant='contained'>Details</Button>
-									</CardActions>
-								</Card>
+								<GridCard product={product} />
 							</Grid>
 							))}
 						</Grid>
