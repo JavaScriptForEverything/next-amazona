@@ -67,6 +67,8 @@ export const signup = catchAsync(async (req, res, next) => {
 		if(!body[item]) throw next(appError(`${item} field is empty`))
 	})
 
+	try {
+
 	// 5. upload image in cloudinary
 	const { public_id, secure_url } = await cloudinary.v2.uploader.upload(body.avatar, {
 		folder: 'next-amazona/users'
@@ -84,6 +86,11 @@ export const signup = catchAsync(async (req, res, next) => {
 		status: 'success',
 		user
 	})
+
+	} catch (err) {
+		next(appError(err.message), 404)
+	}
+
 })
 
 

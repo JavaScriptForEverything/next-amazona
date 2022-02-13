@@ -11,6 +11,8 @@ import Snackbar from './snackbar'
 import StyledAvatar from '../components/styledAvatar'
 import theme from './theme'
 import LinearProgressBar from './linearProgressBar'
+import Header from '../components/header' 						// headerLeft
+import Footer from '../components/footer' 						// Page Bottom Footer
 
 import { ThemeProvider } from '@mui/material/styles'
 import Container from '@mui/material/Container'
@@ -37,12 +39,6 @@ import VpnKeyIcon from '@mui/icons-material/VpnKey'
 import DashboardIcon from '@mui/icons-material/Dashboard'
 import LogoutIcon from '@mui/icons-material/Logout'
 import PersonIcon from '@mui/icons-material/Person'
-
-const navItems = [
-	{label: 'Amazona', path: '/'},
-	{label: 'About', path: '/about'},
-	{label: 'Contact', path: '/contact'},
-]
 
 const menuItems = [
 	{ label: 'Dashboard', path: '/user/dashboard', icon: <DashboardIcon /> },
@@ -122,11 +118,7 @@ const Layout = ({ title, description, children }) => {
 			<AppBar position='relative'>
 				<Toolbar>
 					{/*------[ Toolbar: Left side ]--------*/}
-					{ navItems.map((nav, key) => (
-						<Link key={key} href={nav.path} passHref>
-							<Button color='inherit' sx={{ textTransform: 'capitalize' }} >{nav.label}</Button>
-						</Link>
-					))}
+					<Header />
 
 					{/*------[ Toolbar: Right side ]--------*/}
 					<Box sx={{ marginLeft: 'auto' }}>
@@ -182,12 +174,8 @@ const Layout = ({ title, description, children }) => {
 									divider={item.label !== items[items.length - 1].label}
 									dense
 									>
-									<ListItemIcon>
-										{item.icon}
-									</ListItemIcon>
-									<ListItemText>
-									{item.label}
-									</ListItemText>
+									<ListItemIcon> {item.icon} </ListItemIcon>
+									<ListItemText> {item.label} </ListItemText>
 								</MenuItem>
 							])}
 						</Menu>
@@ -203,12 +191,10 @@ const Layout = ({ title, description, children }) => {
 
 			{/*------[ Middle Section ]--------*/}
 			<Container sx={{ minHeight: '80vh', my: 3 }} > { children } </Container>
-
-
 			{ loading && <Typography align='center' >Loading</Typography> }
 
 			{/*------[ Footer Section ]--------*/}
-			<Typography component='footer' align='center' > All Right Reserved amazona </Typography>
+			<Footer />
 
 		</ThemeProvider>
 	)

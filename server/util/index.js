@@ -51,7 +51,7 @@ export const filterObjectWithAllowedArray = (obj, allowedItems) => {
 export const randomHexColor = "#000000".replace(/0/g,() => (~~(Math.random()*16)).toString(16) )
 
 // ---------------[ SendMail ]-----------
-const stripeCrediential = {
+const mailtrapCredential = {
 	  host: process.env.MAILTRAP_HOST,
 	  port: process.env.MAILTRAP_PORT,
 	  auth: {
@@ -66,8 +66,8 @@ const sendGridCrediential = {
 	    pass: process.env.SENDGRID_PASS,
 	  }
 	}
-// const transportOptions = process.env.NODE_ENV === 'production' ? sendGridCrediential : stripeCrediential
-const transportOptions = stripeCrediential 	// SendGrid account disabled after some time
+// const transportOptions = process.env.NODE_ENV === 'production' ? sendGridCrediential : mailtrapCredential
+const transportOptions = mailtrapCredential 	// SendGrid account disabled after some time
 export const sendMail = async ({ from='<next.amazona.gmail.com>', to, subject, text }) => {
 	const transport = nodemailer.createTransport(transportOptions)
 

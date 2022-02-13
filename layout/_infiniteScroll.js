@@ -19,14 +19,14 @@ const InfiniteScroll = () => {
 
 	useEffect(async() => {
 		setLoading(true)
-		const { data } = await getPosts({ page })
+		const { data } = await getPosts({ page, limit })
 		setPosts(prevPosts => [...prevPosts, ...data])
 		setLoading(false)
 	}, [page])
 
 	const handleScroll = (evt) => {
 		const { scrollTop, clientHeight, scrollHeight } = document.documentElement
-		if(scrollTop + clientHeight === scrollHeight && page < 10 ) setPage(page++)
+		if(scrollTop + clientHeight === scrollHeight && page < 10 ) setPage(++page)
 	}
 
 	useEffect(() => {

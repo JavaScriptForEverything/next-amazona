@@ -12,16 +12,17 @@ const { reducer, actions } = createSlice({
 		severity: 'success',
 		message: '',
 
-		// view: true,
+		selected: 0, 						// Drawer select first item by default
 	},
 	reducers: {
-		requested: (state, action) => ({ ...state, loading: true }),
+		requested: (state, action) => ({ ...state, error: '', loading: true }),
 		failed: (state, action) => ({...state, loading: false, error: action.payload, }),
 		showAlert: (state, action) => ({
 			...state, loading: false, ...action.payload
 		}),
 
-		viewEnabled: (state, action) => ({ ...state, view: action.payload})
+		// drawer item select, else useState reseted on page navigation
+		selectedItem: (state, action) => ({ ...state, selected: action.payload})
 
 	} // end of reducer method
 })
@@ -33,8 +34,7 @@ export const showAlert = (obj) => (dispatch) => {
 	dispatch(actions.showAlert(obj))
 }
 
-
-// export const enableView = (bool) => (dispatch) => dispatch(actions.viewEnabled(bool))
+export const selectItem = (index) => (dispatch) => dispatch(actions.selectedItem(index))
 
 
 
