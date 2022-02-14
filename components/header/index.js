@@ -5,8 +5,8 @@ import { useDispatch, useSelector } from 'react-redux'
 import { selectItem } from '../../store/dialogReducer'
 
 import Box from '@mui/material/Box'
-import Button from '@mui/material/Button'
 import IconButton from '@mui/material/IconButton'
+import MuiLink from '@mui/material/Link'
 import Drawer from '@mui/material/Drawer'
 import List from '@mui/material/List'
 import ListItem from '@mui/material/ListItem'
@@ -21,9 +21,9 @@ import CallIcon from '@mui/icons-material/Call'
 
 
 const navItems = [
-	{label: 'Amazona', 	icon: <HomeIcon />, path: '/'},
+	{label: 'Amazona', 	icon: <HomeIcon />, 	path: '/'},
 	{label: 'About', 		icon: <PersonIcon />, path: '/about'},
-	{label: 'Contact', 	icon: <CallIcon />, path: '/contact'},
+	{label: 'Contact', 	icon: <CallIcon />, 	path: '/contact'},
 ]
 
 const Header = () => {
@@ -68,10 +68,10 @@ const Header = () => {
 				</IconButton>
 			</Box>
 
-			<Box sx={{display: { xs: 'none', sm: 'block' } }}>
+			<Box sx={{display: { xs: 'none', sm: 'flex', gap: 20 } }}>
 				{ navItems.map((nav, key) => (
 					<Link key={key} href={nav.path} passHref>
-						<Button color='inherit' sx={{ textTransform: 'capitalize' }} >{nav.label}</Button>
+						<MuiLink color='inherit' underline='none' >{nav.label}</MuiLink>
 					</Link>
 				))}
 			</Box>

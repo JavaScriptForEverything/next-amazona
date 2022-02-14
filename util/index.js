@@ -162,7 +162,8 @@ export const filterPush = (router, key, value ) => {
 	const search = value ? { [key]: value } : delete router.query[key]
 	const query = Object.assign(router.query, search )
 	const searchParams = new URLSearchParams( query ).toString()
-	router.push(`?${searchParams}`)
+	// router.push(`?${searchParams}`)
+	router.push(`?${searchParams}`, undefined, { shallow: true })
 }
 
 

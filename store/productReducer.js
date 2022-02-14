@@ -88,8 +88,8 @@ const { reducer, actions } = createSlice({
 
 	},
 
-	extraReducers: { 	// only hydrate product reducer => Exactly what we want
-		[HYDRATE]: (state, action) => ({ ...state, ...action.payload.product }),
+	extraReducers: { 	// Dy drade all else, some state will be removed
+		[HYDRATE]: (state, action) => ({ ...state, ...action.payload }),
 	}
 })
 export default reducer
@@ -146,7 +146,6 @@ export const getAllProducts = (ctx={}) => async (dispatch) => {
 	dispatch(actions.requested())
 	const { data } = await axios.get(url, {headers: { Authorization: `Bearer ${token}` } })
 	dispatch(actions.allProductsAdded(data))
-	// console.log({ origin, url, query, countPage: data.countPage })
 }
 
 

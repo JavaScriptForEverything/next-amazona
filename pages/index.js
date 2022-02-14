@@ -100,7 +100,7 @@ const Home = () => {
 	const [ filterBy, setFilterBy ] = useState(filterByOptions[0]) 				// filter-Autocomplete
 	// const [ checkboxes, setCheckboxes ] = useState([]) 										// filter-checkbox
 
-	const { error, loading, cartItems, brands, products, total: totalProducts } = useSelector(state => state.product)
+	const { error, loading, cartItems, brands, product: {products}, total: totalProducts } = useSelector(state => state.product)
 	const [ brandsObj, setBrandsObj ] = useState([]) 										// filter-checkbox
 
 	// console.log(products.length)
@@ -219,7 +219,7 @@ const Home = () => {
 			/>
 			<Grid container spacing={2} sx={{ my: 2 }} >
 				{/*-------[ Left Side ]--------*/}
-{/*				<Grid item xs={12} md={3}>
+				<Grid item xs={12} md={3}>
 					<Paper>
 						<form noValidate onSubmit={inputSearchSubmitHandler}>
 							<TextField
@@ -334,7 +334,7 @@ const Home = () => {
 						</Accordion>
 					</Paper>
 				</Grid>
-*/}
+
 				{/*-------[ Right Side ]--------*/}
 				<Grid item md={9} >
 					<Box sx={{
