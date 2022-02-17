@@ -8,7 +8,7 @@ import Link from 'next/link'
 import { useRouter } from 'next/router'
 
 import Snackbar from './snackbar'
-import StyledAvatar from '../components/styledAvatar'
+import StyledAvatar from '../components/header/styledAvatar'
 import theme from './theme'
 import LinearProgressBar from './linearProgressBar'
 import Header from '../components/header' 						// headerLeft
@@ -194,7 +194,11 @@ const Layout = ({ title, description, children }) => {
 			{ loading && <Typography align='center' >Loading</Typography> }
 
 			{/*------[ Footer Section ]--------*/}
-			<Footer />
+			<Footer sx={{
+				backgroundColor: '#282828',
+				color: '#f9f9f9d0',
+				mt: 8
+			}} />
 
 		</ThemeProvider>
 	)

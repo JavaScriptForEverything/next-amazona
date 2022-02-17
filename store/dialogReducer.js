@@ -13,6 +13,7 @@ const { reducer, actions } = createSlice({
 		message: '',
 
 		selected: 0, 						// Drawer select first item by default
+
 	},
 	reducers: {
 		requested: (state, action) => ({ ...state, error: '', loading: true }),
@@ -22,7 +23,10 @@ const { reducer, actions } = createSlice({
 		}),
 
 		// drawer item select, else useState reseted on page navigation
-		selectedItem: (state, action) => ({ ...state, selected: action.payload})
+		selectedItem: (state, action) => ({ ...state, selected: action.payload}),
+
+		// To show product in listView or GridView
+		viewMode: (state, action) => ({ ...state, viewMode: action.payload})
 
 	} // end of reducer method
 })

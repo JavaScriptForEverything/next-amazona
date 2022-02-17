@@ -9,11 +9,13 @@ import Typography from '@mui/material/Typography'
 import IconButton from '@mui/material/IconButton'
 import MuiLink from '@mui/material/Link'
 import Button from '@mui/material/Button'
+import Divider from '@mui/material/Divider'
 
 import GitHubIcon from '@mui/icons-material/GitHub'
 import FacebookIcon from '@mui/icons-material/FacebookRounded'
 import TwitterIcon from '@mui/icons-material/Twitter'
 import LinkedInIcon from '@mui/icons-material/LinkedIn'
+import InstagramIcon from '@mui/icons-material/Instagram'
 import DownloadIcon from '@mui/icons-material/Download'
 
 const siteLinks = [
@@ -27,42 +29,78 @@ const siteLinks = [
 	{ label: 'cart', path: '/cart' },
 	{ label: 'shipping', path: '/shipping' },
 	{ label: 'login', path: '/login' },
+	{ label: 'smartr', path: 'https://www.smartr.me/public/profiles/riajul.islam' },
 ]
+
+const apiLinks = [
+	{ label: 'products', path: '/api/products' },
+	{ label: 'users', path: '/api/users' },
+	{ label: 'comments', path: '/api/comments' },
+	{ label: 'documents', path: '/api/documents' },
+]
+
+const docLinks = [
+	{ label: 'site doc', path: '/doc/site' },
+	{ label: 'api doc', path: '/doc/api' },
+	{ label: 'others', 	path: '/doc/other' },
+]
+
+
+
 
 const socialMedia = [
 	{ icon: <GitHubIcon fontSize='large' />, path: 'https://github.com/JavaScriptForEverything' },
 	{ icon: <LinkedInIcon fontSize='large' />, path: 'https://www.linkedin.com/in/javascriptforeverything/' },
 	{ icon: <TwitterIcon fontSize='large' />, path: 'https://twitter.com/JSforEverything' },
 	{ icon: <FacebookIcon fontSize='large' />, path: 'https://www.facebook.com/JavaScriptForEverything' },
+	{ icon: <InstagramIcon fontSize='large' />, path: 'https://www.instagram.com/javascriptforeverything/' },
 ]
 
+const DocComponent = () => (
+	<>
+		<Typography paragraph sx={{ fontWeight: 'bold' }}>Docs</Typography>
+		<Box sx={{display: 'grid', gridGap: 8}} >
+		{docLinks.map(({label, path}, key) => (
+			<Link key={key} href={path} passHref>
+				<MuiLink underline='none'sx={{color: '#ffffffaa', fontSize: '.9rem', whiteSpace: 'nowrap'}} >{label}</MuiLink>
+			</Link>
+		))}
+		</Box>
+	</>
+)
 
-const Footer = () => {
+const Footer = ({ ...params }) => {
 
 	return (
-		<Box disableGutters
-			sx={{
-				backgroundColor: '#282828',
-				color: '#f9f9f9d0'
-			}}
-		>
-		<Container>
-
+		<Box {...params} >
+		<Container >
 			<Grid container spacing={3} >
+
+				{/*----------[ footer: HashTag Section ]----------*/}
 				<Grid item xs={12} sm={6} md={3}>
-					<FooterSection dividerColor='white' title='Site Links'>
-						<Grid container spacing={2}>
-							{siteLinks.map(({label, path}, key) => (
-							<Grid key={key} item xs={6}>
-								<Link href={path} passHref>
-									<MuiLink fontSize='small' underline='none' sx={{whiteSpace: 'nowrap'}} >{label}</MuiLink>
-								</Link>
-							</Grid>
-							))}
-						</Grid>
+					<FooterSection dividerColor='white' title='HashTag'>
+						<Box sx={{
+							display: 'grid',
+							gridTemplateColumns: '1fr 2fr',
+							alignItems: 'center',
+							gridGap: 8
+						}}>
+							<Link href='/about' passHref>
+								<MuiLink><img src='/logo.svg' /></MuiLink>
+							</Link>
+
+							<Box>
+								<Typography align='justify' fontSize='small'>
+									HashTag is a fasion ware house, here we sell shirt pant and men ladis and babies
+									and all type of ware collection.
+								</Typography>
+							</Box>
+						</Box>
+
 					</FooterSection>
 				</Grid>
 
+				{/*----------[ footer: Contact Section ]----------*/}
 				<Grid item xs={12} sm={6} md={3}>
 					<FooterSection dividerColor='white' title='Contact'>
 						<Typography fontSize='small' paragraph>
@@ -77,6 +115,7 @@ const Footer = () => {
 					</FooterSection>
 				</Grid>
 
+				{/*----------[ footer: About-Us Section ]----------*/}
 				<Grid item xs={12} sm={6} md={3}>
 					<FooterSection dividerColor='white' title='About Us'>
 						<Typography fontSize='small' paragraph>
@@ -89,10 +128,11 @@ const Footer = () => {
 					</FooterSection>
 				</Grid>
 
+				{/*----------[ footer: Social-Media Section ]----------*/}
 				<Grid item xs={12} sm={6} md={3}>
 					<FooterSection dividerColor='white' title='Social Media'>
 
-						<Box sx={{display: 'flex', gap: 2 }}>
+						<Box sx={{display: 'flex', gap: 2, my: 2 }}>
 							{socialMedia.map(({ icon, path}, key) => <Link key={key} href={path} passHref>
 								<MuiLink target='_blank' color='inherit' >{icon}</MuiLink>
 							</Link>
@@ -105,8 +145,66 @@ const Footer = () => {
 					</FooterSection>
 				</Grid>
 			</Grid>
+
+			<Divider sx={{mt: 3, mb: 1, borderBottom: '1px solid gray'}} />
+
+
+			{/*----------[ footer: Link Section ]----------*/}
+{/*			<Box component='p' sx={{
+				// display: 'flex',
+				// flexWrap: 'wrap',
+				// gap: 2
+
+				display: 'grid',
+				gridTemplateColumns: { xs: 'repeat(2, 1fr)', sm: 'repeat(3, 1fr)', md: 'repeat(4, 1fr)' },
+				gridGap: 2,
+			}}>
+			{siteLinks.map(({label, path}, key) => (
+				<Link key={key} href={path} passHref>
+					<MuiLink fontSize='small' underline='none'sx={{whiteSpace: 'nowrap'}} >{label}</MuiLink>
+				</Link>
+			))}
+			</Box>
+			<Divider sx={{mt: 3, mb: 1, borderBottom: '1px solid gray'}} />
+*/}
+			{/*----------[ footer: Link Section ]----------*/}
+			<Box sx={{
+				mt: 2,
+				display: 'grid',
+				gridTemplateColumns: { xs: 'repeat(2, 1fr)', sm: 'repeat(3, 1fr)' },
+				gridGap: 16,
+			}}>
+				<Box>
+					<Typography paragraph sx={{ fontWeight: 'bold' }}>HashTag</Typography>
+					<Box sx={{display: 'grid', gridGap: 8}} >
+					{siteLinks.map(({label, path}, key) => (
+						<Link key={key} href={path} passHref>
+							<MuiLink underline='none'sx={{color: '#ffffffaa', fontSize: '.9rem', whiteSpace: 'nowrap'}} >{label}</MuiLink>
+						</Link>
+					))}
+					</Box>
+				</Box>
+
+				<Box>
+					<Typography paragraph sx={{ fontWeight: 'bold' }}>API</Typography>
+					<Box sx={{display: 'grid', gridGap: 8}} >
+					{apiLinks.map(({label, path}, key) => (
+						<Link key={key} href={path} passHref>
+							<MuiLink underline='none'sx={{color: '#ffffffaa', fontSize: '.9rem', whiteSpace: 'nowrap'}} >{label}</MuiLink>
+						</Link>
+					))}
+					</Box>
+
+					{/*----------[ Docs: show here in xs ]----------*/}
+					<Box sx={{ display: { xs: 'block', sm: 'none'}, mt: 5 }}> <DocComponent /> </Box>
+				</Box>
+
+					{/*----------[ Docs: hide in xs and show here in sm ]----------*/}
+				<Box sx={{ display: { xs: 'none', sm: 'block'} }}> <DocComponent /> </Box>
+			</Box>
 		</Container>
 
+			{/*----------[ footer: CopyRight Section ]----------*/}
 			<Typography component='footer' align='center' sx={{
 				backgroundColor: '#18181888',
 				mt: 3,
