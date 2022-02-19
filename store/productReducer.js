@@ -76,10 +76,24 @@ const { reducer, actions } = createSlice({
 		allProductsAdded: (state, action ) => ({
 			...state,
 			loading: false,
-			// products: action.payload.products,
-			// countPage: action.payload.countPage
-			...action.payload
+			products: action.payload.products,
+			countPage: action.payload.countPage
+			// ...action.payload
 		}),
+		productAddedByFilter: (state, action) => {
+			// console.log(action.payload)
+
+			// console.log(state.product.products)
+			// console.log(state)
+
+			return {
+				...state,
+				loading: false,
+				products: action.payload
+			}
+		},
+
+
 		productsAddedOnScroll: (state, action) => ({
 			...state,
 			loading: false,
@@ -89,7 +103,8 @@ const { reducer, actions } = createSlice({
 	},
 
 	extraReducers: { 	// Dy drade all else, some state will be removed
-		[HYDRATE]: (state, action) => ({ ...state, ...action.payload }),
+		// [HYDRATE]: (state, action) => ({ ...state, ...action.payload }),
+		[HYDRATE]: (state, action) => ({ ...state, ...action.payload.product }),
 	}
 })
 export default reducer
@@ -148,6 +163,12 @@ export const getAllProducts = (ctx={}) => async (dispatch) => {
 	dispatch(actions.allProductsAdded(data))
 }
 
+export const addFilterSearch = (search, token) => catchAsyncDispatch(async (dispatch) => {
+	dispatch(actions.requested())
+	const { data: { products } } = await axios.get(`/api/products?search=${search}`, {headers: { Authorization: `Bearer ${token}` } })
+	dispatch(actions.productAddedByFilter(products))
+}, actions.failed)
+
 
 // used in 	/components/dashboard/products.js
 export const getProductsXHR = ({ token, page=1, limit=4 }) => catchAsyncDispatch( async (dispatch) => {
@@ -188,6 +209,7 @@ export const getProductBrands = (token) => catchAsyncDispatch( async (dispatch) 
 	const { data: { brands } } = await axios.get('/api/products/brand', { headers: {Authorization: `Bearer ${token}`} })
 	dispatch(actions.getBrands(brands))
 }, actions.failed)
+
 
 
 

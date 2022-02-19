@@ -9,7 +9,7 @@ import Box from '@mui/material/Box'
 const LeftPanel = ({ ...params}) => {
 	return (
 		<Box {...params}>
-			<Search />
+			<Search sx={{display: { xs: 'block', md: 'none' } }} />
 			<Rating />
 			<Brand />
 			<PriceRating />

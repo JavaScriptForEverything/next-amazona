@@ -4,6 +4,8 @@ import { wrapper } from '../store'
 import { getAllProducts } from '../store/productReducer'
 
 import Layout from '../layout'
+import Search from '../components/home/leftPanel/search'
+import NoResultFound from '../components/home/noResultFound'
 import ViewHandler from '../components/home/viewHandler'
 import CommonFilter from '../components/home/filter/commonFilter'
 import LeftPanel from '../components/home/leftPanel'
@@ -18,11 +20,17 @@ import Typography from '@mui/material/Typography'
 
 const Home = () => {
 	const [ viewMode, setViewMode ] = useState(0)
-	const { products } = useSelector(state => state.product.product)
+	const { products } = useSelector(state => state.product)
+
 	// console.log({ products })
 
 	return (
 		<Layout>
+
+			{/*-----[ Top Searchbar will show only in desktop view ]-----*/}
+			<Box sx={{display: 'flex', justifyContent: 'flex-end', mb: 2 }} >
+				<Search sx={{display: {xs: 'none', md: 'block'}, minWidth: 350 }} />
+			</Box>
 
 			<Grid container spacing={1}>
 				{/*-----[ Left Panel ]-----*/}
@@ -35,13 +43,18 @@ const Home = () => {
 
 					{/*-----[ Right Panel: Head Section ]-----*/}
 					<Box sx={{display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 2}} >
-						<Typography>{4} items found</Typography>
+						<Typography>{products.length} items found</Typography>
 						<CommonFilter sx={{flexGrow: 2, maxWidth: 300 }}  />
 						<ViewHandler viewMode={viewMode} setViewMode={setViewMode} />
 					</Box>
 
+
+
 					{/*-----[ Right Panel: Products Card ]-----*/}
 					<Box sx={{ mt: 2 }}>
+
+					{!products.length && <NoResultFound /> }
+
 						{viewMode ? ( 														// Grid View
 							<Grid container spacing={2}>
 							{products.map((product, key) => (
