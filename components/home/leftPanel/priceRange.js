@@ -1,4 +1,9 @@
+import nookies from 'nookies'
 import { useState } from 'react'
+import { useRouter } from 'next/router'
+import { useDispatch } from 'react-redux'
+import { addFilter } from '../../../store/productReducer'
+
 // import { useDispatch, useSelector } from 'react-redux'
 // import { getProductBrands } from '../../../store/productReducer'
 // import nookies from 'nookies'
@@ -24,7 +29,11 @@ sliderInputs.forEach((item, index) => sliderInputsObj[item.name] = index * 100 )
 
 
 const PriceRating = () => {
-	const [ sliderValue, setSliderValue ] = useState([0, 100]) 						// filter-slider
+	const router = useRouter()
+	const dispatch = useDispatch()
+	const { token } = nookies.get(null)
+
+	const [ sliderValue, setSliderValue ] = useState([0, 50]) 						// filter-slider
 	const [ sliderFields, setSliderFields ] = useState(sliderInputsObj)
 
 	const sliderOnChangeHandler = (evt, newValue) => setSliderValue(newValue)
@@ -33,9 +42,13 @@ const PriceRating = () => {
 		evt.preventDefault()
 
 		const currentValue = sliderValue.map(item => item * (sliderFields.max - sliderFields.min))
+		// console.log({ currentValue })
 
-		console.log({ currentValue })
-		// false ? filterPush(router, 'price', currentValue) : router.push(`?price=${currentValue}`)
+		// 1. Work on SSR on page refresh
+		router.push(`?price=${currentValue}`, undefined, { shallow: true })
+
+		// 2. Work on click on XHR Request
+		dispatch(addFilter('price', currentValue, token)) 	// key, value, token
 	}
 
 	return (

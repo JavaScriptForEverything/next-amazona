@@ -11,9 +11,10 @@ const { reducer, actions } = createSlice({
 	name: 'product',
 	initialState: {
 		products: [],
-		total:0,
-		length: 0,
-		countPage: 0,
+		total:0, 								// Total products available in the database
+		// length: 0, 							// already get products from total products
+		// // to determine page (not it no need, because we use infinite scrolling, instead of pagination on front-end)
+		// countPage: 0,
 		// product: {},
 
 		brands: [],
@@ -77,7 +78,8 @@ const { reducer, actions } = createSlice({
 			...state,
 			loading: false,
 			products: action.payload.products,
-			countPage: action.payload.countPage
+			total: action.payload.total,
+			// length: action.payload.length,
 			// ...action.payload
 		}),
 		productAddedByFilter: (state, action) => {
@@ -97,7 +99,9 @@ const { reducer, actions } = createSlice({
 		productsAddedOnScroll: (state, action) => ({
 			...state,
 			loading: false,
-			products: state.products.concat(action.payload)
+			products: [ ...state.products, ...action.payload.products],
+			total: action.payload.total,
+			// length: action.payload.length,
 		})
 
 	},
@@ -163,11 +167,15 @@ export const getAllProducts = (ctx={}) => async (dispatch) => {
 	dispatch(actions.allProductsAdded(data))
 }
 
-export const addFilterSearch = (search, token) => catchAsyncDispatch(async (dispatch) => {
+
+// used in /pages/index.js 	=> components/home/leftPanel/*
+export const addFilter = (key, value, token) => catchAsyncDispatch(async (dispatch) => {
 	dispatch(actions.requested())
-	const { data: { products } } = await axios.get(`/api/products?search=${search}`, {headers: { Authorization: `Bearer ${token}` } })
+	const { data: { products } } = await axios.get(`/api/products?${key}=${value}`, {headers: { Authorization: `Bearer ${token}` } })
 	dispatch(actions.productAddedByFilter(products))
 }, actions.failed)
+
+
 
 
 // used in 	/components/dashboard/products.js
@@ -189,8 +197,8 @@ export const getProductsOnScroll = ({ token, page=1, limit=4 }) => catchAsyncDis
 	// return console.log({ page, limit })
 
 	dispatch(actions.requested())
-	const { data: { products } } = await axios.get(`/api/products?page=${page}&limit=${limit}`, {headers: { Authorization: `Bearer ${token}` } })
-	dispatch(actions.productsAddedOnScroll(products))
+	const { data } = await axios.get(`/api/products?page=${page}&limit=${limit}`, {headers: { Authorization: `Bearer ${token}` } })
+	dispatch(actions.productsAddedOnScroll(data))
 
 }, actions.failed)
 

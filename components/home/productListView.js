@@ -23,10 +23,10 @@ const ProductListView = ({ product }) => {
 			</Box>
 
 			<Box sx={{p: 2 }}>
-				<Typography color='primary'>{product.name}</Typography>
+				<Typography color='primary'>{product.name} [ {product.brand} ]</Typography>
 				<Rating
 					readOnly
-					defaultValue={product.ratings}
+					value={product.ratings}
 					size='small'
 					precision={.5}
 				/>

@@ -8,11 +8,11 @@ import Link from 'next/link'
 import { useRouter } from 'next/router'
 
 import Snackbar from './snackbar'
-import StyledAvatar from '../components/header/styledAvatar'
 import theme from './theme'
 import LinearProgressBar from './linearProgressBar'
-import Header from '../components/header' 						// headerLeft
-import Footer from '../components/footer' 						// Page Bottom Footer
+import Header from './header' 												// headerLeft
+import StyledAvatar from './header/styledAvatar'
+import Footer from './footer' 												// Page Bottom Footer
 
 import { ThemeProvider } from '@mui/material/styles'
 import Container from '@mui/material/Container'
@@ -47,7 +47,7 @@ const menuItems = [
 	{ label: 'Logout', path: '/user/logout', icon: <LogoutIcon /> },
 ]
 
-const Layout = ({ title, description, children }) => {
+const Layout = ({ title, description, children, ...params }) => {
 	const dispatch = useDispatch()
 	const router = useRouter()
 	const { redirect } = router.query
@@ -109,14 +109,12 @@ const Layout = ({ title, description, children }) => {
 				{ description && <meta name='description' content={description} />}
 			</Head>
 
-
-
 			<Snackbar /> 				{/*------[ Show Alert ]--------*/}
 			<CssBaseline />
 
 			{/*------[ Head Section ]--------*/}
-			<AppBar position='relative'>
-				<Toolbar>
+			<AppBar position='relative' component='header'>
+				<Toolbar component='nav'>
 					{/*------[ Toolbar: Left side ]--------*/}
 					<Header />
 
@@ -150,11 +148,7 @@ const Layout = ({ title, description, children }) => {
 							open={menuOpen}
 							anchorEl={anchorEl}
 							onClose={menuCloseHandler}
-							PaperProps={{
-								style: {
-									width: 200,
-								}
-							}}
+							PaperProps={{ style: {width: 200} }}
 						>
 							<Box sx={{display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 0.5, my: 2 }} >
 							<IconButton onClick={f =>router.push('/user/profile')} >
@@ -190,16 +184,12 @@ const Layout = ({ title, description, children }) => {
 
 
 			{/*------[ Middle Section ]--------*/}
-			<Container sx={{ minHeight: '80vh', my: 3 }} > { children } </Container>
+			<Container component='main' sx={{ minHeight: '80vh', my: 3 }} > { children } </Container>
 			{ loading && <Typography align='center' >Loading</Typography> }
 
 			{/*------[ Footer Section ]--------*/}
-			<Footer sx={{
-				backgroundColor: '#282828',
-				color: '#f9f9f9d0',
-				mt: 8
-			}} />
-
+			<Footer id='footer' component='footer' sx={{
+				backgroundColor: '#282828', color: '#f9f9f9d0', mt: 6 }} />
 		</ThemeProvider>
 	)
 }

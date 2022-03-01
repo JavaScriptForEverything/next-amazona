@@ -14,10 +14,10 @@ const ProductGridView = ({ product }) => {
 				src={product?.coverImage?.secure_url}
 			/>
 			<CardContent sx={{height: '100%', display: 'flex', flexDirection: 'column'}}>
-				<Typography color='primary'>{product.name}</Typography>
+				<Typography color='primary'>{product.name} [ {product.brand} ]</Typography>
 				<Rating
 					readOnly
-					defaultValue={product.ratings}
+					value={product.ratings}
 					size='small'
 					precision={.5}
 					sx={{mb: 2}}

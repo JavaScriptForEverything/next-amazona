@@ -1,7 +1,7 @@
-// import { useState } from 'react'
-// import { useDispatch, useSelector } from 'react-redux'
-// import { getProductBrands } from '../../../store/productReducer'
-// import nookies from 'nookies'
+import nookies from 'nookies'
+import { useRouter } from 'next/router'
+import { useDispatch } from 'react-redux'
+import { addFilter } from '../../../store/productReducer'
 
 import Typography from '@mui/material/Typography'
 import Button from '@mui/material/Button'
@@ -15,8 +15,18 @@ import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
 
 
 const Size = () => {
-	const clickHandler = (evt, item) => {
-		console.log({ item })
+	const router = useRouter()
+	const dispatch = useDispatch()
+	const { token } = nookies.get(null)
+
+	const clickHandler = (evt, size) => {
+		// console.log({ item })
+
+		// 1. Work on SSR on page refresh
+		router.push(`?size=${size}`, undefined, { shallow: true })
+
+		// 2. Work on click on XHR Request
+		dispatch(addFilter('size', size, token)) 	// key, value, token
 	}
 
 	return (

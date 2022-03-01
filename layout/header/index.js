@@ -21,7 +21,7 @@ import CallIcon from '@mui/icons-material/Call'
 
 
 const navItems = [
-	{label: 'HashTag', 	icon: <HomeIcon />, 	path: '/'},
+	{label: 'Home', 		icon: <HomeIcon />, 	path: '/'},
 	{label: 'About', 		icon: <PersonIcon />, path: '/about'},
 	{label: 'Contact', 	icon: <CallIcon />, 	path: '/contact'},
 ]
