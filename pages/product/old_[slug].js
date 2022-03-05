@@ -35,7 +35,7 @@ const Product = ({ product }) => {
 	}
 
 
-	console.log(product)
+	// console.log(product)
 
 	if(!product) return (
 		<Layout title='404 | No page Found'>
@@ -106,11 +106,14 @@ export const getServerSideProps = async (ctx) => {
 	const { token } = nookies.get(ctx)
 
 	const { origin } = absoluteUrl(ctx.req)
-	const { data: { product } } = await axios.get(`${origin}/api/products/${ctx.params.id}`, {
+	const { data: { product } } = await axios.get(`${origin}/api/products/${ctx.params.slug}`, {
 		headers: { Authorization: `Bearer ${token}`}
 	})
 
-	console.log(product)
+	// console.log(product)
 
+	// return { props: { }}
 	return { props: { product }}
 }
+
+

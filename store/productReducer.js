@@ -15,7 +15,7 @@ const { reducer, actions } = createSlice({
 		// length: 0, 							// already get products from total products
 		// // to determine page (not it no need, because we use infinite scrolling, instead of pagination on front-end)
 		// countPage: 0,
-		// product: {},
+		product: {},
 
 		brands: [],
 
@@ -102,7 +102,10 @@ const { reducer, actions } = createSlice({
 			products: [ ...state.products, ...action.payload.products],
 			total: action.payload.total,
 			// length: action.payload.length,
-		})
+		}),
+
+		// getServerSideProps() 	/pages/product/[slug].js
+		getProduct: (state, action) => ({...state, loading: false, product: action.payload })
 
 	},
 
@@ -167,6 +170,21 @@ export const getAllProducts = (ctx={}) => async (dispatch) => {
 	dispatch(actions.allProductsAdded(data))
 }
 
+// getServerSideProps() 	/pages/product/[slug].js
+export const getProductBySlug = (ctx) => catchAsyncDispatch( async (dispatch) => {
+	const { token } = nookies.get(ctx)
+	if(!token) return
+
+	const { origin } = absoluteUrl(ctx.req)
+	dispatch(actions.requested())
+	const { data: { product } } = await axios.get(`${origin}/api/products/${ctx.params.slug}`, {
+		headers: {Authorization: `Bearer ${token}`}
+	})
+	dispatch(actions.getProduct(product))
+}, actions.failed)
+
+
+
 
 // used in /pages/index.js 	=> components/home/leftPanel/*
 export const addFilter = (key, value, token) => catchAsyncDispatch(async (dispatch) => {
@@ -202,8 +220,6 @@ export const getProductsOnScroll = ({ token, page=1, limit=4 }) => catchAsyncDis
 
 }, actions.failed)
 
-// getProduct will be dispatched here instead of /pages/product/[id].js getServerSideProps
-
 
 export const addProduct = (obj, token) => catchAsyncDispatch( async (dispatch) => {
 	dispatch(actions.requested())
@@ -212,11 +228,15 @@ export const addProduct = (obj, token) => catchAsyncDispatch( async (dispatch) =
 }, actions.failed)
 
 
+// used in home page left filter section for get all products
 export const getProductBrands = (token) => catchAsyncDispatch( async (dispatch) => {
 	dispatch(actions.requested())
 	const { data: { brands } } = await axios.get('/api/products/brand', { headers: {Authorization: `Bearer ${token}`} })
 	dispatch(actions.getBrands(brands))
 }, actions.failed)
+
+
+
 
 
 

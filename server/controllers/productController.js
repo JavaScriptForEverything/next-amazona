@@ -113,10 +113,11 @@ export const addProduct = catchAsync( async (req, res, next) => {
 
 /* (directly in /pages/product/[id].js)  > /pages/api/products/[id].js	:	handler.get(getProductBy)
  		.	we will move it  to productReducer latter  */
-export const getProductBy = catchAsync(async (req, res, next) => {
+export const getProductBySlug = catchAsync(async (req, res, next) => {
 
-	const isObjectId = Types.ObjectId.isValid(req.query.id)
-	const product = isObjectId ? await Product.findById(req.query.id) : await Product.findOne({ slug: req.query.id })
+	// const isObjectId = Types.ObjectId.isValid(req.query.id)
+	// const product = isObjectId ? await Product.findById(req.query.id) : await Product.findOne({ slug: req.query.id })
+	const product = await Product.findOne({ slug: req.query.slug })
 
 	if(!product) return next(appError('No product found.', 404))
 
@@ -126,15 +127,15 @@ export const getProductBy = catchAsync(async (req, res, next) => {
 	})
 })
 
-export const deleteProductById = catchAsync(async (req, res, next) => {
+// export const deleteProductById = catchAsync(async (req, res, next) => {
 
-	const product = await Product.findByIdAndDelete(req.query.id)
-	if(!product) return next(appError('No product found.', 404))
+// 	const product = await Product.findByIdAndDelete(req.query.id)
+// 	if(!product) return next(appError('No product found.', 404))
 
-	res.status(204).json({
-		status: 'success',
-	})
-})
+// 	res.status(204).json({
+// 		status: 'success',
+// 	})
+// })
 
 
 

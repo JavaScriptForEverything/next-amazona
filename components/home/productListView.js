@@ -1,3 +1,5 @@
+import Link from 'next/link'
+
 import Box from '@mui/material/Box'
 import Paper from '@mui/material/Card'
 import CardMedia from '@mui/material/CardMedia'
@@ -5,6 +7,7 @@ import CardContent from '@mui/material/CardContent'
 import Button from '@mui/material/Button'
 import Typography from '@mui/material/Typography'
 import Rating from '@mui/material/Rating'
+import MuiLink from '@mui/material/Link'
 
 const ProductListView = ({ product }) => {
 	return (
@@ -23,7 +26,11 @@ const ProductListView = ({ product }) => {
 			</Box>
 
 			<Box sx={{p: 2 }}>
-				<Typography color='primary'>{product.name} [ {product.brand} ]</Typography>
+				<Link href={`/product/${product.slug}`} passHref>
+					<MuiLink>
+						<Typography color='primary'>{product.name} [ {product.brand} ]</Typography>
+					</MuiLink>
+				</Link>
 				<Rating
 					readOnly
 					value={product.ratings}

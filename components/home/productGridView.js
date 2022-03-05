@@ -1,3 +1,5 @@
+import Link from 'next/link'
+
 import Box from '@mui/material/Box'
 import Card from '@mui/material/Card'
 import CardMedia from '@mui/material/CardMedia'
@@ -5,6 +7,7 @@ import CardContent from '@mui/material/CardContent'
 import Button from '@mui/material/Button'
 import Typography from '@mui/material/Typography'
 import Rating from '@mui/material/Rating'
+import MuiLink from '@mui/material/Link'
 
 const ProductGridView = ({ product }) => {
 	return (
@@ -14,7 +17,11 @@ const ProductGridView = ({ product }) => {
 				src={product?.coverImage?.secure_url}
 			/>
 			<CardContent sx={{height: '100%', display: 'flex', flexDirection: 'column'}}>
-				<Typography color='primary'>{product.name} [ {product.brand} ]</Typography>
+				<Link href={`/product/${product.slug}`} passHref>
+					<MuiLink>
+						<Typography color='primary'>{product.name} [ {product.brand} ]</Typography>
+					</MuiLink>
+				</Link>
 				<Rating
 					readOnly
 					value={product.ratings}
