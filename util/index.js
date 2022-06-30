@@ -18,53 +18,59 @@ export const arrayObjectCreator = (label, name, type='text', options) => ({label
 // =>  { confirmation: true, status: false, ...  } 	: if passed 2nd arg as property name
 export const getKeysOfArrayObject = (arr=[], field ) => {
 	const tempObj = {}
-	arr.forEach(obj => tempObj[obj.name] = field ? obj[field] : '')
+	arr.forEach( (obj, index) => {
+		tempObj[obj.name] = field ? obj[field] : ''
+		// tempObj[`${obj.name}_on`] = field ? obj[field] : false
+	})
 
 	return tempObj
 }
 
-// Form Validator
-export const formValidator = (obj, errorStateUpdateMethod, requireLength=4) => {
-	const errorObj = {}
 
-	if( obj.username && obj.username.length < 4)  errorObj.username = 'name reqired 4 digit long'
-	if( obj.email && !isEmail(obj.email) ) errorObj.email = 'Invalid Email address'
+/* 	if( !formValidator(fields, setFieldsError)) return 
+		dispatch(loginUser(fields)) */ 	
+export const formValidator = (fields, setFieldsError) => {
+  const { email, password, confirmPassword } = fields || {}
+  const tempObj = {}
 
-	if(obj.password && obj.password.length < requireLength ) errorObj.password = `Password must be ${requireLength} character long`
-	if(obj.password && obj.confirmPassword && obj.password !== obj.confirmPassword) errorObj.confirmPassword = 'Confirm Password not matched'
+  if( email && !isEmail(email) ) tempObj.email = `(${email}) is invalid email address`
+  if(confirmPassword !== password) tempObj.confirmPassword = 'password and confirmPassword not matched'
+  if(password?.length < 4) tempObj.password = 'password field must be atleast 4 charecter long'
+  
 
+  Object.keys(fields).forEach(field => {
+		if( field.endsWith('on') ) return 	// to ignore 'is_password_on' .... like fields
 
-	Object.keys(obj).forEach((key) => {
-		if(`${obj[key]}`.trim() === '')  errorObj[key] = `'${key}' field is empty`
-	})
-
-	errorStateUpdateMethod(errorObj)
-	return Object.keys(errorObj).every(item => item === '')
-	// it should be Object.values() but still works fine
+    if( !fields[field] ) tempObj[field] = `${field} field is empty`
+  })
+  
+  setFieldsError(tempObj)
+  return Object.keys(tempObj).every(field => field === '')
 }
 
-// /file/user.png 	=> 	data:image/jpeg;base64,/9j/4QlQaHR0cDovL25zLmFkb2JlL...
-export const readAsDataURL = (file, setMethod, isImage=true) => {
-	if(!file) return console.error('pass a file as argument')
-	if(!setMethod || setMethod.constructor !== Function) {
-		return console.error('2nd argument (as setState) required')
-	}
 
-	const image = file.type.match('image/*')
-	if(isImage && !image) return console.error('please select only image.')
-	if(!isImage && image) return console.error('please don\'t select image.')
 
-	const reader = new FileReader()
-	reader.readAsDataURL(file)
-	reader.addEventListener('load', () => {
-		if(reader.readyState === 2) setMethod( reader.result )
+/* 	const { error } = readAsDataURL(file, setAvatar, { pdf: true })
+		const { error } = readAsDataURL(file, setAvatar, { pdf: false })
+		const { error } = readAsDataURL(file, setAvatar) */ 
+export const readAsDataURL = (file, setValue=f=>f, {pdf = false}={} ) => {
+  let error = ''
 
-		// if(reader.readyState === 2) {
-		// 	if(!name) return setMethod(reader.result)
-		// 	setMethod( oldValue => ({ ...oldValue, [name]: reader.result }))
-		// }
-	})
+  const isImage = file.type.match('image/(jpeg|png)')?.[1]
+  if(!pdf) error = !isImage ? 'Only "jpg/jpeg" or "png" image allowed' : ''
+  
+  const reader = new FileReader()
+  reader.readAsDataURL(file)
+  reader.onload = () => {
+    if(reader.readyState === 2) {
+			setValue({ secure_url: reader.result, size: file.size })
+		}
+  }
+
+  return { error }
 }
+
+
 
 
 

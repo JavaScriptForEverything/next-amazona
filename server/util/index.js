@@ -1,5 +1,7 @@
 import { sign, verify } from 'jsonwebtoken' 	// required for setToken()
 import nodemailer from 'nodemailer'
+import { nanoid } from 'nanoid'
+import sharp from 'sharp'
 
 export const catchAsync = (fn) => (req, res, next) => fn(req, res, next).catch(next)
 
@@ -152,3 +154,49 @@ export const apiFeatures = (Model, queryObj) => {
 	return { query, pagination, sort, search, filter, handleBrandFilter }
 }
 
+
+
+
+/* const PUBLIC_ROOT = path.join(__dirname, '../../../../public')  
+    const { error, image } = await uploadImage(req.body.avatar, PUBLIC_ROOT)
+		const { error, image } = await uploadImage(dataURL, saveToDir, [100, 100] )  // => size=[50, 50]
+    if(error) return next(appError(error))
+
+    res.status(200).json({ 
+      status: 'success', 
+      user: { avatar: image } 
+    }) */
+export const uploadImage = async (image={}, saveToDir, size=[50, 50]) => {
+  let error = ''
+
+  // 1. Get image as dataURL
+  const dataURL = image?.secure_url                 
+  if(!dataURL) return error = 'No image found'
+
+  const isValidDataURL = dataURL.startsWith('data:')
+  if( !isValidDataURL ) return error = `upload image instead of '${dataURL}'`
+
+  // 2. remove metadata so that only base64 encoded data remains
+  const base64 = dataURL.split(';base64,').pop()    
+
+  // 3. convert base64 data to Binary buffer
+  const buf = Buffer.from(base64, 'base64')         
+
+  // 4. Save image from buffer  
+  const uniqueName = nanoid()
+  const public_id = uniqueName
+	const filename = public_id + '.jpg'
+	const destination = `${saveToDir}/${filename}`
+	const secure_url = destination.split('/public').pop()
+
+  await sharp(buf)
+    .resize(size)
+    .toFormat('jpg')
+    .toFile(destination)
+  
+  // 5. Return image or error just node style:  (err, (success) => )
+  return {
+    error,
+    image: { secure_url, public_id, size: image.size }
+  }
+}

@@ -1,3 +1,6 @@
+import path from 'path'
+import fs from 'fs'
+import { promisify } from 'util'
 import { compare } from 'bcryptjs'
 import User from '../models/userModel'
 import { isEmail } from 'validator'
@@ -8,7 +11,8 @@ import {
 	getIdFromToken,
 	filterObjectWithAllowedArray,
 	sendMail,
-	apiFeatures
+	apiFeatures,
+	uploadImage
 } from '../util'
 
 
@@ -21,6 +25,7 @@ cloudinary.config({
 })
 
 
+const PUBLIC_ROOT = path.join(__dirname, '../../../../../public')
 
 
 /* userReducer.js  > /pages/api/users/login.js	:	handler.post(login)
@@ -53,45 +58,48 @@ export const login = catchAsync(async (req, res, next) => {
 
 
 /* userReducer.js  > /api/users/signup.js	:	handler.post(login)
- 		.	/pages/login.js */
-export const signup = catchAsync(async (req, res, next) => {
+ 		.	/pages/signup.js */
+export const signup = async (req, res, next) => {
+	try {
+
 	// 1. filter out un wanted fields
-	const allowedFields = ['username', 'email', 'password', 'confirmPassword', 'avatar']
+	const allowedFields = ['name', 'email', 'password', 'confirmPassword', 'avatar']
 	const body = filterObjectWithAllowedArray(req.body, allowedFields)
 
 	// 2. check extra staff
-	// allowedFields.forEach(item => {
-	// 	if(!body[item]) throw next(appError(`${item} field is empty`))
-	// })
 	allowedFields.forEach(item => {
 		if(!body[item]) throw next(appError(`${item} field is empty`))
 	})
 
-	try {
+	// 3. Save image to /public/images/users/
+	const saveToDir = path.join(PUBLIC_ROOT, '/images/users')
+	const { error, image } = await uploadImage(body.avatar, saveToDir, [100, 100] )
 
-	// 5. upload image in cloudinary
-	const { public_id, secure_url } = await cloudinary.v2.uploader.upload(body.avatar, {
-		folder: 'next-amazona/users'
-	})
-	body.avatar = { public_id, secure_url } 		// body => { ..., avatar: {public_id, secure_url } }
+	// N-1: last extep, to remove image, if throw error after image upload
+	req.body.avatar = image.secure_url 		
 
-	// 3. password will be hashed before save by pre('save') hook
 	// 4. save to database
-	const user = await User.create(body)
-	if(!user) return next(appError('data can\' be save into database'))
+	const user = await User.create({ ...body, avatar: image })
+	if(!user) return next(appError('signup failed, data not saved into mongoDB'))
 
-	user.password = undefined 	// Don't send hashed password to user
-
-	res.status(200).json({
+	res.status(201).json({
 		status: 'success',
-		user
+		message: 'Sign up is successfull'
 	})
 
 	} catch (err) {
-		next(appError(err.message), 404)
+
+		// 1. Get image path which we set when image uploaded
+		const destination = path.join(PUBLIC_ROOT, req.body.avatar)
+
+		// 2. check if file exists then try to remove image
+		fs.exists(destination, (isExist) => isExist && promisify(fs.unlink)(destination))
+
+		// 3. Close Request-Response-circle with sending error message
+		next(appError(err.message))
 	}
 
-})
+}
 
 
 

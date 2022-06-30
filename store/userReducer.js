@@ -217,9 +217,11 @@ export const userMailTo = (obj, token) => catchAsyncDispatch(async (dispatch) =>
 
 
 export const logoutMe = () => (dispatch) => dispatch(actions.logedOut())
-export const signUpMe = (obj) => catchAsyncDispatch(async (dispatch) => {
+
+// /pages/signup.js
+export const signUpMe = (fields) => catchAsyncDispatch(async (dispatch) => {
 	dispatch(actions.requested())
-	const { data } = await axios.post('/api/users/signup', obj)
+	const { data } = await axios.post('/api/users/signup', fields)
 	dispatch(actions.signedUp(data))
 }, actions.failed)
 

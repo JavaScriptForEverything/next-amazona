@@ -5,7 +5,7 @@ const { randomHexColor } = require('../util')
 
 
 const userSchema = new Schema({
-	username: {
+	name: {
 		type: String,
 		lowercase: true,
 		trim: true,
@@ -50,8 +50,17 @@ const userSchema = new Schema({
 	// 	default: '/user.jpg'
 	// },
 	avatar: {
-		public_id: String,
-		secure_url: String
+		public_id: {
+			type: String,
+			required: true,
+			unique: true
+		}, 
+		secure_url: {
+			type: String,
+			required: true,
+		}, 
+		size: Number
+		
 	},
 	title: {
 		type: String,

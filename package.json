@@ -25,6 +25,7 @@
     "countries-list": "^2.6.1",
     "jsonwebtoken": "^8.5.1",
     "mongoose": "^6.0.12",
+    "nanoid": "^4.0.0",
     "next": "^12.0.2",
     "next-absolute-url": "^1.2.2",
     "next-connect": "^0.11.0",
@@ -36,6 +37,7 @@
     "react-dropzone": "^11.4.2",
     "react-redux": "^7.2.6",
     "recharts": "^2.1.8",
+    "sharp": "^0.30.7",
     "slugify": "^1.6.1",
     "stripe": "^8.191.0",
     "validator": "^13.7.0"
