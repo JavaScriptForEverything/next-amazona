@@ -51,6 +51,7 @@ const Login = () => {
 
 	const { error, loading, authenticated, isSignedUp, user } = useSelector(state => state.user)
 	// console.log('login Page: ', user)
+	// console.log({ authenticated })
 
 	const tabHandler = (evt, newValue) => setValue(newValue)
 	useEffect(() => {
@@ -282,6 +283,8 @@ export default Login
 // login & signup page make server-seide redirect based on cookie
 export const getServerSideProps = (ctx) => {
 	const { token } = nookies.get(ctx)
+
+	// console.log({ token })
 
 	if(token) return { redirect: {
 		destination: '/user/profile',

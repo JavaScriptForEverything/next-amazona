@@ -69,11 +69,12 @@ export const readAsDataURL = (file, setMethod, isImage=true) => {
 
 
 
-export const catchAsyncDispatch = (fn, showError=f=>f) => (dispatch, getStore) => fn(dispatch, getStore).catch(err => {
-	const message = err.response?.data.message || err.message
-	dispatch( showError(message) )
-	// console.error({message})
-})
+export const catchAsyncDispatch = (fn, showError) => (dispatch, getStore) => {
+	return fn(dispatch, getStore).catch(err => {
+		const message = err.response?.data.message || err.message
+		dispatch( showError(message) )
+	})
+}
 
 
 // make word's first character Capitalize

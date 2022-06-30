@@ -177,9 +177,12 @@ const Layout = ({ title, description, children, ...params }) => {
 					</Box>
 				</Toolbar>
 			</AppBar>
-			<Box style={{ position: 'sticky', top: 0, left: 0, zIndex: 1, width: '100%'}} >
+
+
+			{/*------[ progress bar ]--------*/}
+			{/* <Box style={{ position: 'sticky', top: 0, left: 0, zIndex: 1, width: '100%'}} >
 				<LinearProgressBar />
-			</Box>
+			</Box> */}
 
 
 

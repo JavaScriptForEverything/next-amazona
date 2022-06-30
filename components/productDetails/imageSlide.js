@@ -12,8 +12,12 @@ const ImageSlide = () => {
 		<>
 			<Image
 				src={product.coverImage?.secure_url}
-				width='100%' height='100%'
+				width={300} 
+				height={250}
 				layout='responsive'
+
+				// blurDataURL='/BannerForGithub.png'
+				// placeholder='blur'
 			/>
 		</>
 	)

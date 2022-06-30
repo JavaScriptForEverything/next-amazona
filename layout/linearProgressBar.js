@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import LinearProgress from '@mui/material/LinearProgress'
 
+// /layout/index.js
 const LinearProgressBar = function() {
 	const [ scrollValue, setScrollValue ] = useState(0)
 
