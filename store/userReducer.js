@@ -69,24 +69,13 @@ const { reducer, actions } = createSlice({
 		experienceFeature: (state, action) => ({ ...state, isExperienceAdd: action.payload}),
 		profileEdited: (state, action) => ({ ...state, edit: action.payload}),
 
-		logedIn: (state, action) => {
-			const { token } = action.payload
-			if(!token) return { ...state, loading: false }
+		signedUp: (state, action) => ({ ...state, loading: false, status: action.payload }),
+		logedIn: (state, action) => ({ ...state, loading: false, status: action.payload }),
 
-			nookies.set(null, 'token', token, {
-				maxAge: 30 * 24 * 60 * 60,
-				secure: true, 			// https only except localhost
-				// httpOnly: true, 	// [Only Server can do it] remove from document.cookie to read by javascript
-				// sameSite: 'strict',	// Stop CORS
-				path: '/'
-			})
-			return { ...state, loading: false, authenticated: true, token }
-		},
 		logedOut: (state, action) => {
 			nookies.destroy(null, 'token', { path: '/'})
 			return {...state, loading: false, authenticated: false, isSignedUp: false, user: {}, token: undefined }
 		},
-		signedUp: (state, action) => ({ ...state, loading: false, status: action.payload }),
 
 		tokenSent: (state, action) => ({ ...state, loading: false }),
 		getMe: (state, action) => ({ // this method used to dispatch on SSR, which pass data to extraReducers [HYDRATE]
@@ -157,9 +146,9 @@ export const resetUserSlice = () => (dispatch) => dispatch(actions.resetToDefaul
 
 export const loginMe = (fields) => catchAsyncDispatch(async (dispatch, getStore) => {
 	dispatch(actions.requested())
-	const { data } = await axios.post(`/api/users/login`, fields)
+	const { data: { status } } = await axios.post(`/api/users/login`, fields)
 
-	dispatch(actions.logedIn(data))
+	dispatch(actions.logedIn(status))
 }, actions.failed)
 
 /*Geting User but how ? By sending token as cookie or Brearer token

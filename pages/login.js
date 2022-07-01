@@ -68,8 +68,11 @@ const Login = () => {
 	useEffect(() => {
 		if(error) return dispatch( showAlert({ open: true, severity: 'error', message: error, duration: 8000 }) )
 
-		const message = 'Login is success'  
-		if( status == 'success') return dispatch( showAlert({ open: true, message }) )
+		if( status == 'success') {
+			dispatch( showAlert({ open: true, message: 'Login is success' }) )
+			router.push('/user/profile') 										// client-Side redirect: after login success
+			return 
+		}
 
 	}, [error, status])
 
@@ -184,7 +187,7 @@ export const getServerSideProps = async (ctx) => {
 	if( !token ) return { props: {} }
 
 	// 4. if verified success 
-	if(token) return { redirect: {
+	if(token) return { redirect: { 			// server-side redirect: when page refresh
 		destination: '/user/profile',
 		parmanent: false
 	}}
