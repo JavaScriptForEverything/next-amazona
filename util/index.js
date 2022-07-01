@@ -34,7 +34,7 @@ export const formValidator = (fields, setFieldsError) => {
   const tempObj = {}
 
   if( email && !isEmail(email) ) tempObj.email = `(${email}) is invalid email address`
-  if(confirmPassword !== password) tempObj.confirmPassword = 'password and confirmPassword not matched'
+  if(confirmPassword && confirmPassword !== password) tempObj.confirmPassword = 'password and confirmPassword not matched'
   if(password?.length < 4) tempObj.password = 'password field must be atleast 4 charecter long'
   
 

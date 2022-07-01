@@ -41,17 +41,19 @@ export const login = catchAsync(async (req, res, next) => {
 	const authenticated = await compare(password, user.password )
 	if(!authenticated) return next(appError('Email or password is incorrect'))
 
+	// 3. if user disabled/delete his account then force user to active it first
 	if(!user.active) return next(appError('Plase active your account first.'))
 
-	console.log({ active: user.active })
 
-	// 3. check user update password or not, if do then force to re-login
+	// 4. check user update password or not, if do then force to re-login
+
+	// 4. Set Token as Cookie
 	const token = setToken(user._id)
+	const expires = new Date(Date.now() + 1000*60*60*24*30)
+	res.setHeader('set-Cookie', `token=${token}; path=/; httpOnly; secure; expires=${expires}`)
 
-	res.status(200).json({
-		status: 'success',
-		token 		// user only need token that's it
-	})
+	// 5. Send Response back
+	res.status(200).json({ status: 'success' })
 })
 
 

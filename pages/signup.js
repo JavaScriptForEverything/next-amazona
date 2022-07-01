@@ -1,10 +1,9 @@
-import nookies from 'nookies'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useState, useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { showAlert } from '../store/dialogReducer'
-import { loginMe, signUpMe } from '../store/userReducer'
+import { signUpMe } from '../store/userReducer'
 import { formValidator, getKeysOfArrayObject, readAsDataURL, TabPanel } from '../util'
 
 import Layout from '../layout'
@@ -84,8 +83,7 @@ const Signup = () => {
 	const [ fields, setFields ] = useState({ ...arrayObject })
 	const [ fieldsError, setFieldsError ] = useState({})
 
-	const { error, loading, authenticated, status, user } = useSelector(state => state.user)
-	console.log({ status })
+	const { error, loading, status } = useSelector(state => state.user)
 
 	useEffect(() => {
 		if( error) return dispatch( showAlert({ open: true, severity: 'error', message: error, duration: 8000 }) )
@@ -211,21 +209,18 @@ export default Signup
 
 
 // login & signup page make server-seide redirect based on cookie
-export const getServerSideProps = (ctx) => {
+export const getServerSideProps = async (ctx) => {
 	// 1. Get token
 	const token = ctx.req.headers.cookie
-
-	// 2. Veryfy token here: Because it is serverSide Rendering Part
-	// jwt.verify(token)
 	// console.log({ token })
-
-	// 3. if( !verified ) return { props: {} }
+	if( !token ) return { props: {} }
 
 	// 4. if verified success 
-	// if(token) return { redirect: {
-	// 	destination: '/user/profile',
-	// 	parmanent: false
-	// }}
+	if(token) return { redirect: {
+		destination: '/user/profile',
+		parmanent: false
+	}}
 
 	return { props: {}}
 }
+

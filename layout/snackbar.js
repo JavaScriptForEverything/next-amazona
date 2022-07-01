@@ -1,5 +1,6 @@
 import { useSelector, useDispatch } from 'react-redux'
 import { showAlert } from '../store/dialogReducer'
+import { resetUserSlice } from '../store/userReducer'
 
 import Snackbar from '@mui/material/Snackbar'
 import Alert from '@mui/material/Alert'
@@ -15,7 +16,10 @@ const ShowAlert = () => {
 	const dispatch = useDispatch()
 	const { open, severity, message, duration  } = useSelector(state => state.dialog)
 
-	const closeHandler = () => dispatch(showAlert({ open: false, message: '' }))
+	const closeHandler = () => {
+		dispatch(showAlert({ open: false, message: '' }))
+		dispatch(resetUserSlice())
+	}
 
 	return (
 		<Snackbar

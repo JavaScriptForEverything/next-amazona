@@ -31,8 +31,10 @@ export const onError = (err, req, res, next) => { 		// like express global Error
 }
 
 
+// 		const token = setToken(user._id)
 export const setToken = (_id) => sign( {_id}, process.env.TOKEN_SALT, { expiresIn: process.env.TOKEN_EXPIRES })
 
+// 
 export const getIdFromToken = (token) => verify(token, process.env.TOKEN_SALT)
 
 export const filterObjectWithExcludedArray = (obj, filteredField) => {

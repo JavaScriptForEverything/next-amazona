@@ -59,6 +59,12 @@ const { reducer, actions } = createSlice({
 			loading: false,
 			error: action.payload || ''
 		}),
+		resetToDefault: (state, action) => ({
+			...state,
+			loading: false,
+			error: '',  										// reset error
+			status: '',  										// reset status of success 
+		}),
 
 		experienceFeature: (state, action) => ({ ...state, isExperienceAdd: action.payload}),
 		profileEdited: (state, action) => ({ ...state, edit: action.payload}),
@@ -146,9 +152,12 @@ const { reducer, actions } = createSlice({
 export default reducer
 
 
-export const loginMe = (obj) => catchAsyncDispatch(async (dispatch, getStore) => {
+export const resetUserSlice = () => (dispatch) => dispatch(actions.resetToDefault())
+
+
+export const loginMe = (fields) => catchAsyncDispatch(async (dispatch, getStore) => {
 	dispatch(actions.requested())
-	const { data } = await axios.post(`/api/users/login`, obj)
+	const { data } = await axios.post(`/api/users/login`, fields)
 
 	dispatch(actions.logedIn(data))
 }, actions.failed)

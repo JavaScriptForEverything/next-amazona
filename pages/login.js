@@ -1,11 +1,10 @@
-import nookies from 'nookies'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useState, useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { showAlert } from '../store/dialogReducer'
-import { loginMe, signUpMe } from '../store/userReducer'
-import { formValidator, TabPanel } from '../util'
+import { loginMe } from '../store/userReducer'
+import { formValidator, getKeysOfArrayObject, TabPanel } from '../util'
 
 import Layout from '../layout'
 
@@ -23,242 +22,127 @@ import Tabs from '@mui/material/Tabs'
 import Tab from '@mui/material/Tab'
 import MuiLink from '@mui/material/Link'
 
+
+import PersonIcon from '@mui/icons-material/Person'
+import EmailIcon from '@mui/icons-material/Email'
 import LockIcon from '@mui/icons-material/Lock'
 import Visibility from '@mui/icons-material/Visibility'
 import VisibilityOff from '@mui/icons-material/VisibilityOff'
-import PersonIcon from '@mui/icons-material/Person'
-import EmailIcon from '@mui/icons-material/Email'
 
 
-const tabItems = ['login', 'sign up']
-
-
+const inputItems = [
+	{ 
+		label: 'Email Address', 
+		placeholder: 'abc@gmail.com',
+		type: 'email',
+		name: 'email',
+		adornment: {
+			start: <EmailIcon />,
+			end: []
+		}
+	},
+	{ 
+		label: 'Password', 
+		placeholder: '********',
+		type: 'password',
+		name: 'password',
+		adornment: {
+			start: <LockIcon />,
+			end: [<Visibility />, <VisibilityOff />],
+		}
+	}
+]
+const arrayObject = getKeysOfArrayObject(inputItems)
 
 const Login = () => {
 	const dispatch = useDispatch()
 	const router = useRouter()
 	const { redirect } = router.query 		// /login?redirect=something => something
 
-	const [value, setValue] = useState(0)
-	const [visibility, setVisibility] = useState(1)
-	const [passwordVisibility, setPasswordVisibility] = useState(1)
-	const [confirmPasswordVisibility, setConfirmPasswordVisibility] = useState(1)
-	// ---[ Form Validation & Submit ]---
-	const [loginFields, setLoginFields] = useState({email: '', password: ''})
-	const [loginFieldErrors, setLoginFieldErrors] = useState({})
-	const [signupFields, setSignupFields] = useState({username: '', email: '', password: '', confirmPassword: '', avatar: ''})
-	const [signupFieldErrors, setSignupFieldErrors] = useState({})
+	const [ fields, setFields ] = useState({ ...arrayObject })
+	const [ fieldsError, setFieldsError ] = useState({})
 
-	const { error, loading, authenticated, isSignedUp, user } = useSelector(state => state.user)
-	// console.log('login Page: ', user)
-	// console.log({ authenticated })
+	const { error, loading, status } = useSelector(state => state.user)
+	// console.log({ status })
 
-	const tabHandler = (evt, newValue) => setValue(newValue)
 	useEffect(() => {
-		if(error) return dispatch(showAlert({ open: true, severity: 'error', message: error}))
-		if(authenticated) return router.push(redirect || '/user/profile')
-		if(isSignedUp) {
-			dispatch(showAlert({ open: true, severity: 'success', message: 'Congratulation To join our community !!!'}))
-			tabHandler(null, 0) 		// if signup success then redirect to login page
-		}
-	}, [error, authenticated, isSignedUp])
+		if(error) return dispatch( showAlert({ open: true, severity: 'error', message: error, duration: 8000 }) )
 
+		const message = 'Login is success'  
+		if( status == 'success') return dispatch( showAlert({ open: true, message }) )
 
+	}, [error, status])
 
-	// -----------[ Login Form ]-----------
-	const handleLoginForm = async (evt) => {
-		evt.preventDefault()
-
-		const isValidated = formValidator(loginFields, setLoginFieldErrors)
-		if(!isValidated) return
-
-		await dispatch(loginMe(loginFields))
-		await router.push(redirect || '/user/profile')
+	const isOn = (name) => `is_${name}_on`   		// => just use name, instead of magic value
+	const adornmentClickHandler = (name) => () => {
+		setFields({ ...fields, [isOn(name)]: !fields[isOn(name)] })
 	}
+	const changeHandler = (name) => (evt) => setFields({...fields, [name]: evt.target.value})
 
-	// -----------[ Sign Up Form ]-----------
+
 	const handleSignupForm = async (evt) => {
 		evt.preventDefault()
 
-		const isValidated = formValidator(signupFields, setSignupFieldErrors)
+		const isValidated = formValidator(fields, setFieldsError)
 		if(!isValidated) return 		// client-side validation
 
-		dispatch(signUpMe(signupFields))
+		// 2. Send data to database
+		dispatch(loginMe(fields))
 
-		// 3. Redirect to login (But we already in Login Page, We have to switch to login TAB ?)
-		// tabHandler(null, 0) 		// Switch to Login Tab (Do the Redirect Effect)
+		// 3. Redirect to login: We will do that by server-side rendering: by getServerSideProps
 	}
 
 	return (
-		<Layout title={ value ? 'Sign Up Page' : 'Login Page'} >
+		<Layout title='Login Page' >
+
 			<Box sx={{ mt: 3, p: 3 }} >
 				{/*-----[ start coding bellow here ]------*/}
 
 				<Container component='section' maxWidth='xs' >
 					<Paper sx={{ p: 2 }}>
-							<Tabs value={value} onChange={tabHandler} sx={{ borderBottom: 1, borderColor: 'divider', mb: 3 }} >
-								{tabItems.map(item => <Tab key={item} label={item} />)}
+							<Tabs value={0} onChange={f =>f} sx={{ borderBottom: 1, borderColor: 'divider', mb: 3 }} >
+								<Tab label='Login' />
 							</Tabs>
 
-						{/*----[ value for tabItems[0] === 'login' ]----*/}
-							<TabPanel value={value} index={0} >
-								<form noValidate onSubmit={handleLoginForm}>
-									<TextField
-										// sx={{ mt: 2 }}
-										label='Email Address'
-										placeholder='Email Address'
-										type='email'
-										fullWidth
-										required
-										autoFocus
-										InputProps={{
-											startAdornment: <InputAdornment position='start'><EmailIcon /></InputAdornment>
-										}}
-										value={loginFields.email}
-										onChange={(evt) => setLoginFields({...loginFields, email: evt.target.value})}
-										error={!loginFields.email || !!loginFieldErrors.email}
-										helperText={loginFieldErrors.email}
-									/>
-									<TextField
-										sx={{ mt: 2 }}
-										label='Password'
-										placeholder='Password'
-										type={!visibility ? 'text' : 'password'}
-										fullWidth
-										required
-										InputProps={{
-											startAdornment: <InputAdornment position='start'> <LockIcon /> </InputAdornment>,
-											endAdornment: <InputAdornment position='end'>
-												<IconButton onClick={() => setVisibility(!visibility)} >
-													{ visibility ? <Visibility /> : <VisibilityOff />  }
-												</IconButton>
-											</InputAdornment>
-										}}
-										value={loginFields.password}
-										onChange={(evt) => setLoginFields({...loginFields, password: evt.target.value})}
-										error={!loginFields.password || !!loginFieldErrors.password}
-										helperText={loginFieldErrors.password}
-									/>
+							<TabPanel value={1} index={1} >
 
-									<Link href='/user/reset-password' passHref>
-										<MuiLink>
-											<Typography
-												sx={{ mt: 2, display: 'flex', justifyContent: 'flex-end' }}
-												color='secondary'
-												fontSize='small'
-											>Forgot Password ?</Typography>
-										</MuiLink>
-									</Link>
-
-									<Button
-										sx={{ mt: 3, mb: 2 }}
-										variant='contained'
-										color='primary'
-										type='submit'
-										fullWidth
-										required
-									>{false ? <CircularProgress size={24} style={{color: 'white'}} /> : 'Login'}</Button>
-								</form>
-							</TabPanel>
-
-						{/*----[ value for tabItems[1] === 'sign up' ]----*/}
-							<TabPanel value={value} index={1} >
 								<form noValidate onSubmit={handleSignupForm} >
-									<TextField
-										// sx={{ mt: 2 }}
-										label='Full Name'
-										placeholder='Full Name'
-										type='text'
-										fullWidth
-										required
-										autoFocus
-										InputProps={{
-											startAdornment: <InputAdornment position='start'><PersonIcon /></InputAdornment>
-										}}
-										value={signupFields.username}
-										onChange={(evt) => setSignupFields({...signupFields, username: evt.target.value})}
-										error={!signupFields.username || !!signupFieldErrors.username}
-										helperText={signupFieldErrors.username}
-									/>
-									<TextField
-										sx={{ mt: 2 }}
-										label='Email Address'
-										placeholder='Email Address'
-										type='email'
-										fullWidth
-										required
-										InputProps={{
-											startAdornment: <InputAdornment position='start'><EmailIcon /></InputAdornment>
-										}}
-										value={signupFields.email}
-										onChange={(evt) => setSignupFields({...signupFields, email: evt.target.value})}
-										error={!signupFields.email || !!signupFieldErrors.email}
-										helperText={signupFieldErrors.email}
-									/>
-									<TextField
-										sx={{ mt: 2 }}
-										label='Password'
-										placeholder='Password'
-										type={!passwordVisibility ? 'text' : 'password'}
-										fullWidth
-										required
-										InputProps={{
-											startAdornment: <InputAdornment position='start'> <LockIcon /> </InputAdornment>,
-											endAdornment: <InputAdornment position='end'>
-												<IconButton onClick={() => setPasswordVisibility(!passwordVisibility)} >
-													{ passwordVisibility ? <Visibility /> : <VisibilityOff />  }
-												</IconButton>
-											</InputAdornment>
-										}}
-										value={signupFields.password}
-										onChange={(evt) => setSignupFields({...signupFields, password: evt.target.value})}
-										error={!signupFields.password || !!signupFieldErrors.password}
-										helperText={signupFieldErrors.password}
-									/>
-									<TextField
-										sx={{ mt: 2 }}
-										label='Confirm Password'
-										placeholder='Confirm Password'
-										type={!confirmPasswordVisibility ? 'text' : 'password'}
-										fullWidth
-										required
-										InputProps={{
-											startAdornment: <InputAdornment position='start'> <LockIcon /> </InputAdornment>,
-											endAdornment: <InputAdornment position='end'>
-												<IconButton onClick={() => setConfirmPasswordVisibility(!confirmPasswordVisibility)} >
-													{ confirmPasswordVisibility ? <Visibility /> : <VisibilityOff />  }
-												</IconButton>
-											</InputAdornment>
-										}}
-										value={signupFields.confirmPassword}
-										onChange={(evt) => setSignupFields({...signupFields, confirmPassword: evt.target.value})}
-										error={!signupFields.confirmPassword || !!signupFieldErrors.confirmPassword}
-										helperText={signupFieldErrors.confirmPassword}
-									/>
-
-									<Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 3, mt: 2  }} >
-										<Avatar src={signupFields.avatar} />
-										<TextField
-											type = 'file'
-											InputProps={{
-												inputProps: { accept: 'image/*' }
-											}}
+									{inputItems.map( (item, index ) => (
+										<TextField key={item.name}
+											sx={ index === 0 ? {} : { mt: 2 }}
+											label={item.label}
+											placeholder={item.placeholder}
+											type={fields[isOn(item.name)] ? 'text' : item.type}
+											fullWidth
 											required
-											onChange={(evt) => {
-												const file = evt.target.files[0]
-												const isImage = file.type.match('image/*')
-
-												const reader = new FileReader()
-												isImage && reader.readAsDataURL(file)
-												reader.onload = () => {
-													if(reader.readyState === 2) {
-													 setSignupFields({...signupFields, avatar: reader.result})
-													}
-												}
+											autoFocus={ index === 0 }
+											InputProps={{
+												startAdornment: <InputAdornment position='start'> {item.adornment.start} </InputAdornment>,
+												endAdornment: item.adornment.end.length ?  (
+												<InputAdornment position='end'>
+													<IconButton onClick={adornmentClickHandler(item.name)} >
+														{ fields[isOn(item.name)] 
+															? item.adornment.end[1] 
+															: item.adornment.end[0] } 
+													</IconButton>
+												</InputAdornment>
+												) : ''
 											}}
-											error={!signupFields.avatar || !!signupFieldErrors.avatar}
-											helperText={signupFieldErrors.avatar}
+											value={fields[item.name]}
+											onChange={changeHandler(item.name)}
+											error={!fields[item.name] || !!fieldsError[item.name]}
+											helperText={fieldsError[item.name]}
 										/>
+									))}
+
+									<Box sx={{
+										display: 'flex',
+										justifyContent: 'flex-end',
+										mt: 2
+									}}>
+										<Link href='/user/reset-password' passHref >
+											<MuiLink variant='caption' color='secondary'>forgot password ?</MuiLink>
+										</Link>
 									</Box>
 
 									<Button
@@ -267,8 +151,20 @@ const Login = () => {
 										color='primary'
 										type='submit'
 										fullWidth
-									>{loading ? <CircularProgress size={24} style={{color: 'white'}} /> : 'Sign Up'}</Button>
+									>{loading ? <CircularProgress size={24} style={{color: 'white'}} /> : 'Login'}</Button>
 								</form>
+
+								<Box sx={{
+									display: 'flex',
+									justifyContent: 'center',
+									margin: 1
+								}}>
+									<Typography variant='body2'>not registered ? </Typography>
+									<Link href='/signup' passHref>
+										<MuiLink variant='body2' sx={{ marginLeft: 1 }}> signup </MuiLink>
+									</Link>
+								</Box>
+
 							</TabPanel>
 
 					</Paper>
@@ -281,11 +177,13 @@ export default Login
 
 
 // login & signup page make server-seide redirect based on cookie
-export const getServerSideProps = (ctx) => {
-	const { token } = nookies.get(ctx)
-
+export const getServerSideProps = async (ctx) => {
+	// 1. Get token
+	const token = ctx.req.headers.cookie
 	// console.log({ token })
+	if( !token ) return { props: {} }
 
+	// 4. if verified success 
 	if(token) return { redirect: {
 		destination: '/user/profile',
 		parmanent: false
@@ -293,3 +191,4 @@ export const getServerSideProps = (ctx) => {
 
 	return { props: {}}
 }
+
