@@ -18,10 +18,7 @@ export const arrayObjectCreator = (label, name, type='text', options) => ({label
 // =>  { confirmation: true, status: false, ...  } 	: if passed 2nd arg as property name
 export const getKeysOfArrayObject = (arr=[], field ) => {
 	const tempObj = {}
-	arr.forEach( (obj, index) => {
-		tempObj[obj.name] = field ? obj[field] : ''
-		// tempObj[`${obj.name}_on`] = field ? obj[field] : false
-	})
+	arr.forEach( (obj, index) => tempObj[obj.name] = field ? obj[field] : '')
 
 	return tempObj
 }

@@ -1,4 +1,4 @@
-# Stripe Next MaterialUI Redux Mongoose JWT(Token) SendMail Cloudinary
+# Complete Project By Next.js (serverless API)
 
 <img
 	width = "100%"
@@ -9,20 +9,43 @@
 
 
 ###### Features Added
+	. Form:
+		. Generate form Dynamically
+		. FormValidate Dynamical Form Dynamically 	(Advanced Form)
+		. Show message of Error or success of form submit
+		. Reset Password by Sending Email
+		. JsonWebToken to authenticate via cookie (secure)
+
+	. Image:
+		. Generate dataRUL so show preview of image upload
+		. Save image in public directory
+		. Resize image before save
+		. Remove image if request failed after image upload
+
+	. Redux:
+		. Server-Side dispatch and Client-Side dispatch
+		. Global Alert message handled
+
+	. Error Handling:
+		. Global Error handling
+		. Route Error handling
+
+	. Route:
+		. Protected Route both in Server-Side and Client-Side 
+		. Restricted Route: 
+
+	. Payment Gateway
+		. Stripe: (paymentIntents) 	:
+
 	. Serverless API
-	. Material UI (User Friendly UI) + Dark Mode
-	. Redux (dispatch on ServerSide + on Client-Side)
+	. Server-Side Redirect and Client-Side Redirect
 	. Mongoose (MongoDB)
-	. Reset Password by Send Token by Mail (SendMail)
-	. Route
-		. Protected Route on ServerSide + Client-Side (I prefer ServerSide)
-		. Restricted Route: if login then don't go to login(signup)|reset-password page
-	. JsonWebToken
-	. Stripe Payment Method
-	. send Mail (development: mailtrap, in Production: sendGrid)
-	. upload image in Cloudinary (PDF in cloudinary download blocked)
+	. Material UI (User Friendly UI) + Dark Mode
 	. Pagination + Filter + Search + Rating...
 	. Infinite Scrolling instead of Pagination
+	. send Mail (development: mailtrap, in Production: sendGrid)
+	. upload image in Cloudinary (PDF in cloudinary download blocked)
+	. Utility functions:
 
 	. Do next:
 		. CRUD Product (By Form or By 3-dot menu)
@@ -31,7 +54,8 @@
 ###### Routes (Pages)
 	. Home 		: /
 	. About 	: /about
-	. Login 	: /login ( /login + /signup)
+	. signup 	: /signup
+	. Login 	: /login 
 	. Logout 	:  Client-Side Logout
 	. Cart  	: /cart
 	. Payment : /shipping
