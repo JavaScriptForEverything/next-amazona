@@ -8,15 +8,17 @@ const { reducer, actions } = createSlice({
 	initialState: {
 		loading: false,
 		error: '',
-		open: false,
+
+		open: false, 						// To show alert error message
 		severity: 'success',
 		message: '',
+		duration: 5000, 				// 5 sec
 
 		selected: 0, 						// Drawer select first item by default
 
 	},
 	reducers: {
-		requested: (state, action) => ({ ...state, error: '', loading: true }),
+		requested: (state, action) => ({ ...state, error: '', open: false, loading: true }),
 		failed: (state, action) => ({...state, loading: false, error: action.payload, }),
 		showAlert: (state, action) => ({
 			...state, loading: false, ...action.payload
@@ -33,6 +35,7 @@ const { reducer, actions } = createSlice({
 export default reducer
 
 
+// /layout/snackbar.js
 export const showAlert = (obj) => (dispatch) => {
 	dispatch(actions.requested())
 	dispatch(actions.showAlert(obj))

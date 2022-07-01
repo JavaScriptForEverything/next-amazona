@@ -78,6 +78,8 @@ export const signup = async (req, res, next) => {
 	// N-1: last extep, to remove image, if throw error after image upload
 	req.body.avatar = image.secure_url 		
 
+	// throw new Error('server failed')
+
 	// 4. save to database
 	const user = await User.create({ ...body, avatar: image })
 	if(!user) return next(appError('signup failed, data not saved into mongoDB'))

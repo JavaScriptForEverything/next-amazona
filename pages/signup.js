@@ -84,7 +84,16 @@ const Signup = () => {
 	const [ fields, setFields ] = useState({ ...arrayObject })
 	const [ fieldsError, setFieldsError ] = useState({})
 
-	const { error, loading, authenticated, isSignedUp, user } = useSelector(state => state.user)
+	const { error, loading, authenticated, status, user } = useSelector(state => state.user)
+	console.log({ status })
+
+	useEffect(() => {
+		if( error) return dispatch( showAlert({ open: true, severity: 'error', message: error, duration: 8000 }) )
+
+		const message = 'Congratulate to becoming a member of our community'  
+		if( status == 'success') return dispatch( showAlert({ open: true, message }) )
+
+	}, [error, status])
 
 	const isOn = (name) => `is_${name}_on`   		// => just use name, instead of magic value
 	const adornmentClickHandler = (name) => () => {
@@ -100,21 +109,19 @@ const Signup = () => {
 	const handleSignupForm = async (evt) => {
 		evt.preventDefault()
 
-
 		const isValidated = formValidator(fields, setFieldsError)
-		// console.log( fieldsError )
 		if(!isValidated) return 		// client-side validation
-		if(!avatar) setFieldsError({ avatar: 'avatar field is empty' })
+		if(!Object.keys(avatar).length) return setFieldsError({ avatar: 'avatar field is empty' })
 
-		// return console.log({ ...fields, avatar })
+		// 2. Send data to database
 		dispatch(signUpMe({ ...fields, avatar }))
 
-		// 3. Redirect to login (But we already in Login Page, We have to switch to login TAB ?)
-		// tabHandler(null, 0) 		// Switch to Login Tab (Do the Redirect Effect)
+		// 3. Redirect to login: We will do that by server-side rendering: by getServerSideProps
 	}
 
 	return (
 		<Layout title='Sign Up Page' >
+
 			<Box sx={{ mt: 3, p: 3 }} >
 				{/*-----[ start coding bellow here ]------*/}
 
@@ -205,9 +212,16 @@ export default Signup
 
 // login & signup page make server-seide redirect based on cookie
 export const getServerSideProps = (ctx) => {
+	// 1. Get token
 	const token = ctx.req.headers.cookie
+
+	// 2. Veryfy token here: Because it is serverSide Rendering Part
+	// jwt.verify(token)
 	// console.log({ token })
 
+	// 3. if( !verified ) return { props: {} }
+
+	// 4. if verified success 
 	// if(token) return { redirect: {
 	// 	destination: '/user/profile',
 	// 	parmanent: false

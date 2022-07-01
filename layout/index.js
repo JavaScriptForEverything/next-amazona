@@ -7,7 +7,7 @@ import Head from 'next/head'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 
-import Snackbar from './snackbar'
+import ShowAlert from './snackbar'
 import theme from './theme'
 import LinearProgressBar from './linearProgressBar'
 import Header from './header' 												// headerLeft
@@ -109,7 +109,7 @@ const Layout = ({ title, description, children, ...params }) => {
 				{ description && <meta name='description' content={description} />}
 			</Head>
 
-			<Snackbar /> 				{/*------[ Show Alert ]--------*/}
+			<ShowAlert /> 				{/*------[ Show Alert ]--------*/}
 			<CssBaseline />
 
 			{/*------[ Head Section ]--------*/}

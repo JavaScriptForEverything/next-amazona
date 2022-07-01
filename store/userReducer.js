@@ -15,7 +15,9 @@ const { reducer, actions } = createSlice({
 		loading: false, 					// Required to add loading features
 		authenticated: token && !!token || false,
 		token: token || '',
-		isSignedUp: false,
+
+		status: '', 							// 'success' || 'error' || 'failed'
+
 		isExperienceAdd: true, 		// to enable add/update experience form
 		edit: '', 								// to make edit dialog based on it value
 		message: '', 							// email sent message
@@ -49,7 +51,8 @@ const { reducer, actions } = createSlice({
 		requested: (state, action) => ({
 			...state,
 			loading: true,
-			error: '',  										// empty error before new request
+			error: '',  										// reset error
+			status: '',  										// reset status of success 
 		}),
 		failed: (state, action) => ({
 			...state,
@@ -77,7 +80,7 @@ const { reducer, actions } = createSlice({
 			nookies.destroy(null, 'token', { path: '/'})
 			return {...state, loading: false, authenticated: false, isSignedUp: false, user: {}, token: undefined }
 		},
-		signedUp: (state, action) => ({ ...state, loading: false, isSignedUp: !!action.payload }),
+		signedUp: (state, action) => ({ ...state, loading: false, status: action.payload }),
 
 		tokenSent: (state, action) => ({ ...state, loading: false }),
 		getMe: (state, action) => ({ // this method used to dispatch on SSR, which pass data to extraReducers [HYDRATE]
@@ -221,8 +224,8 @@ export const logoutMe = () => (dispatch) => dispatch(actions.logedOut())
 // /pages/signup.js
 export const signUpMe = (fields) => catchAsyncDispatch(async (dispatch) => {
 	dispatch(actions.requested())
-	const { data } = await axios.post('/api/users/signup', fields)
-	dispatch(actions.signedUp(data))
+	const { data: { status } } = await axios.post('/api/users/signup', fields)
+	dispatch(actions.signedUp(status))
 }, actions.failed)
 
 
