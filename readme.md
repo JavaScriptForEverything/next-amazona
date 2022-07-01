@@ -2,7 +2,7 @@
 
 <img
 	width = "100%"
-	src="https://github.com/JavaScriptForEverything/next-amazona/blob/master/public/BannerForGit_Stripe-MaterialUI.png?raw=true"
+	src="https://github.com/JavaScriptForEverything/next-amazona/blob/refactor/public/images/BannerForGithub.png?raw=true"
 	alt="BannerForGit_Stripe-MaterialUI.png"
 />
 <br />
