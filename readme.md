@@ -22,9 +22,11 @@
 		. Resize image before save
 		. Remove image if request failed after image upload
 
-	. Redux:
+	. Redux: (@reduxjs/toolkit)
+		. Best way to setup redux store
+		. quickly create slice, without redendent or duplicate code
 		. Server-Side dispatch and Client-Side dispatch
-		. Global Alert message handled
+		. Global Alert message handled by redux store
 
 	. Error Handling:
 		. Global Error handling
