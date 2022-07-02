@@ -1,4 +1,3 @@
-import nookies from 'nookies'
 import { useState, useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { getUser, logoutMe } from '../store/userReducer'
@@ -60,7 +59,7 @@ const Layout = ({ title, description, children, ...params }) => {
 	let [ darkMode, setDarkMode ] = useState(false)
 	let [ badge, setBadge ] = useState(0)
 
-	const { authenticated, token, user } = useSelector(state => state.user)
+	const { authenticated, token, user, status } = useSelector(state => state.user)
 	const { loading } = useSelector(state => state.product )
 
 	// console.log({ authenticated, token, user })
@@ -96,7 +95,7 @@ const Layout = ({ title, description, children, ...params }) => {
 		if(label !== 'Logout') return router.push(path)
 
 		dispatch(logoutMe())
-		router.push( redirect || '/login')
+		router.push('/login')
 	}
 
 

@@ -17,6 +17,7 @@ import {
 
 
 import cloudinary from 'cloudinary'
+import { serialize } from 'cookie'
 
 cloudinary.config({
 	cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
@@ -26,36 +27,6 @@ cloudinary.config({
 
 
 const PUBLIC_ROOT = path.join(__dirname, '../../../../../public')
-
-
-/* userReducer.js  > /pages/api/users/login.js	:	handler.post(login)
- 		.	/pages/login.js */
-export const login = catchAsync(async (req, res, next) => {
-	const { email, password } = req.body
-
-	// 1. match email with user email
-	const user = await User.findOne({ email }).select('+password')
-	if(!user) return next(appError('Please sign up first'))
-
-	// 2. check password
-	const authenticated = await compare(password, user.password )
-	if(!authenticated) return next(appError('Email or password is incorrect'))
-
-	// 3. if user disabled/delete his account then force user to active it first
-	if(!user.active) return next(appError('Plase active your account first.'))
-
-
-	// 4. check user update password or not, if do then force to re-login
-
-	// 4. Set Token as Cookie
-	const token = setToken(user._id)
-	const expires = new Date(Date.now() + 1000*60*60*24*30)
-	res.setHeader('set-Cookie', `token=${token}; path=/; httpOnly; secure; expires=${expires}`)
-
-	// 5. Send Response back
-	res.status(200).json({ status: 'success' })
-})
-
 
 
 
@@ -102,9 +73,53 @@ export const signup = async (req, res, next) => {
 		// 3. Close Request-Response-circle with sending error message
 		next(appError(err.message))
 	}
-
 }
 
+/* userReducer.js  > /pages/api/users/login.js	:	handler.post(login)
+ 		.	/pages/login.js */
+export const login = catchAsync(async (req, res, next) => {
+	const { email, password } = req.body
+
+	// 1. match email with user email
+	const user = await User.findOne({ email }).select('+password')
+	if(!user) return next(appError('Please sign up first'))
+
+	// 2. check password
+	const authenticated = await compare(password, user.password )
+	if(!authenticated) return next(appError('Email or password is incorrect'))
+
+	// 3. if user disabled/delete his account then force user to active it first
+	if(!user.active) return next(appError('Plase active your account first.'))
+
+	// 4. check user update password or not, if do then force to re-login
+	// 4. Set Token as Cookie
+	const token = setToken(user._id)
+	res.setHeader('set-cookie', serialize('token', token, {
+		httpOnly: true, 																	// server-side only
+		secure: process.env.NODE_ENV === 'production', 		// only https 
+		expires: new Date( Date.now() + 60*60*24*30),
+		path: '/', 																				// cookie will be accessable on root label
+		sameSite: 'strict', 															// Only current domain can access
+	}))
+
+	// 5. Send Response back
+	res.status(200).json({ status: 'success' })
+})
+
+
+
+/* userReducer.js  > /pages/api/users/logout.js	:	handler.post(logout)
+		. /layout/index.js: 	menuItemHandler = () => {} */
+export const logout = (req, res, next) => {
+	res.setHeader('Set-Cookie', serialize('token', '', {
+		httpOnly: true, 																	// server-side only
+		secure: process.env.NODE_ENV === 'production', 		// only https 
+		expires: new Date(0),
+		path: '/', 																				// cookie will be accessable on root label
+		sameSite: 'strict', 															// Only current domain can access
+	}))
+	res.status(200).json({ status: 'success' })
+}
 
 
 /* userReducer.js  > /api/users/index.js	:	handler.get(userController.getAllUsers)

@@ -1,6 +1,8 @@
 import { createSlice } from '@reduxjs/toolkit'
 import { HYDRATE } from 'next-redux-wrapper'
 import axios from 'axios'
+import absoluteUrl from 'next-absolute-url'
+
 import nookies from 'nookies'
 
 import { showAlert } from './dialogReducer'
@@ -70,7 +72,7 @@ const { reducer, actions } = createSlice({
 			loading: false,
 			error: '',  										// reset error
 			status: '',  										// reset status of success 
-			authenticated: true 						// to checked globally is authenticated or not
+			authenticated: action.payload 	// to checked globally is authenticated or not
 		}),
 
 		experienceFeature: (state, action) => ({ ...state, isExperienceAdd: action.payload}),
@@ -81,13 +83,15 @@ const { reducer, actions } = createSlice({
 			...state, 
 			loading: false, 
 			status: action.payload,
-			authenticated: true
+			authenticated: true 					// if(user.status === 'success') authenticated = true
 		}),
-
-		logedOut: (state, action) => {
-			nookies.destroy(null, 'token', { path: '/'})
-			return {...state, loading: false, authenticated: false, isSignedUp: false, user: {}, token: undefined }
-		},
+		logedOut: (state, action) => ({ 
+			...state, 
+			loading: false, 
+			status: action.payload,
+			authenticated: false,  				// Remove cookie from server-side and 
+			user: {}  
+		}),
 
 		tokenSent: (state, action) => ({ ...state, loading: false }),
 		getMe: (state, action) => ({ // this method used to dispatch on SSR, which pass data to extraReducers [HYDRATE]
@@ -160,16 +164,15 @@ const { reducer, actions } = createSlice({
 export default reducer
 
 
+// /layout/snackbar.js: 	closeHandler=() => {...}
 export const resetUserSlice = () => (dispatch) => dispatch(actions.resetToDefault())
-export const authenticateUser = () => (dispatch) => dispatch(actions.authenticateUser())
+
+// /pages/login.js: 		getServerSideProps = () => {...}
+export const authenticateUser = (isAuthenticated = false) => (dispatch) => {
+	dispatch(actions.authenticateUser(isAuthenticated))
+}
 
 
-export const loginMe = (fields) => catchAsyncDispatch(async (dispatch, getStore) => {
-	dispatch(actions.requested())
-	const { data: { status } } = await axios.post(`/api/users/login`, fields)
-
-	dispatch(actions.logedIn(status))
-}, actions.failed)
 
 /*Geting User but how ? By sending token as cookie or Brearer token
 	1. as header: { Authorization : `Bearer ${token}` }
@@ -181,6 +184,8 @@ export const getUser = (token) => catchAsyncDispatch(async (dispatch) => {
 }, actions.failed)
 
 
+
+//  ?
 export const getAllUsers = (token, obj ) => catchAsyncDispatch(async (dispatch) => {
 	if(!token) return
 
@@ -210,6 +215,7 @@ export const updateProfile = (obj, token) => catchAsyncDispatch(async (dispatch)
 	dispatch(actions.profileUpdated(user))
 }, actions.failed)
 
+// ?
 export const updateMyPassword = (obj, token) => catchAsyncDispatch(async (dispatch) => {
 	dispatch(actions.requested())
 	const { data: { message } } = await axios.patch(`/api/users/update-my-password`, obj, { headers: {Authorization: `Bearer ${token}`} })
@@ -219,6 +225,7 @@ export const updateMyPassword = (obj, token) => catchAsyncDispatch(async (dispat
 }, actions.failed)
 
 
+// ?
 export const experienceFeature = (isExperienceAdd=true) => (dispatch) => {
 	dispatch(actions.experienceFeature(isExperienceAdd))
 }
@@ -237,14 +244,29 @@ export const userMailTo = (obj, token) => catchAsyncDispatch(async (dispatch) =>
 }, actions.failed)
 
 
-export const logoutMe = () => (dispatch) => dispatch(actions.logedOut())
 
-// /pages/signup.js
+// /pages/signup.js: submitHandler: () => { ... }
 export const signUpMe = (fields) => catchAsyncDispatch(async (dispatch) => {
 	dispatch(actions.requested())
 	const { data: { status } } = await axios.post('/api/users/signup', fields)
 	dispatch(actions.signedUp(status))
 }, actions.failed)
+
+// /pages/login.js: 		submitHandler=() => {...}
+export const loginMe = (fields) => catchAsyncDispatch(async (dispatch, getStore) => {
+	dispatch(actions.requested())
+	const { data: { status } } = await axios.post(`/api/users/login`, fields)
+
+	dispatch(actions.logedIn(status))
+}, actions.failed)
+
+// /layout/index.js: 	menuItemHandler = () => {} 
+export const logoutMe = () => catchAsyncDispatch( async (dispatch) => {
+	dispatch(actions.requested())
+	const { data: { status }} = await axios.post(`/api/users/logout`, {})
+	dispatch(actions.logedOut(status))
+}, actions.failed)
+
 
 
 // Forgot Password function

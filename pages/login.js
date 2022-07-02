@@ -89,7 +89,7 @@ const Login = () => {
 	const changeHandler = (name) => (evt) => setFields({...fields, [name]: evt.target.value})
 
 
-	const handleSignupForm = async (evt) => {
+	const submitHandler = async (evt) => {
 		evt.preventDefault()
 
 		const isValidated = formValidator(fields, setFieldsError)
@@ -115,7 +115,7 @@ const Login = () => {
 
 							<TabPanel value={1} index={1} >
 
-								<form noValidate onSubmit={handleSignupForm} >
+								<form noValidate onSubmit={submitHandler} >
 									{inputItems.map( (item, index ) => (
 										<TextField key={item.name}
 											sx={ index === 0 ? {} : { mt: 2 }}
@@ -210,14 +210,16 @@ export const getServerSideProps = wrapper.getServerSideProps(({ dispatch }) => (
 	if( !token ) return { props: {} }
 	
 	// 2. update store:	make store.users.authenticated = true
-	dispatch(authenticateUser()) 		
+	// Method-1: To authenticate by redux (Best way)
+	dispatch(authenticateUser(true)) 		
 	
+	// Method-2: Override Method-1 dispatch, so don't use it.
 
-	// 3. if verified success:  server-side redirect: when page refresh
-	if(token) return { redirect: { 
-		destination: redirectTo,
-		parmanent: false
-	}}
+	// // 3. if verified success:  server-side redirect: when page refresh
+	// if(token) return { redirect: { 
+	// 	destination: redirectTo,
+	// 	parmanent: false
+	// }}
 
 	return { props: {}}
 })

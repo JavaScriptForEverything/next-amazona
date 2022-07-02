@@ -104,7 +104,7 @@ const Signup = () => {
 	}
 
 
-	const handleSignupForm = async (evt) => {
+	const submitHandler = async (evt) => {
 		evt.preventDefault()
 
 		const isValidated = formValidator(fields, setFieldsError)
@@ -131,7 +131,7 @@ const Signup = () => {
 
 							<TabPanel value={1} index={1} >
 
-								<form noValidate onSubmit={handleSignupForm} >
+								<form noValidate onSubmit={submitHandler} >
 									{inputItems.map( (item, index ) => (
 										<TextField key={item.name}
 											sx={ index === 0 ? {} : { mt: 2 }}
