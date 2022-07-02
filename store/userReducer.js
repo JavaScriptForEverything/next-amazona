@@ -1,7 +1,7 @@
 import { createSlice } from '@reduxjs/toolkit'
+import { HYDRATE } from 'next-redux-wrapper'
 import axios from 'axios'
 import nookies from 'nookies'
-import { HYDRATE } from 'next-redux-wrapper'
 
 import { showAlert } from './dialogReducer'
 import { catchAsyncDispatch } from '../util'
@@ -13,7 +13,7 @@ const { reducer, actions } = createSlice({
 	initialState: {
 		error: '', 								// Must need to empty error on every request
 		loading: false, 					// Required to add loading features
-		authenticated: token && !!token || false,
+		authenticated: false,
 		token: token || '',
 
 		status: '', 							// 'success' || 'error' || 'failed'
@@ -65,12 +65,24 @@ const { reducer, actions } = createSlice({
 			error: '',  										// reset error
 			status: '',  										// reset status of success 
 		}),
+		authenticateUser: (state, action) => ({
+			...state,
+			loading: false,
+			error: '',  										// reset error
+			status: '',  										// reset status of success 
+			authenticated: true 						// to checked globally is authenticated or not
+		}),
 
 		experienceFeature: (state, action) => ({ ...state, isExperienceAdd: action.payload}),
 		profileEdited: (state, action) => ({ ...state, edit: action.payload}),
 
 		signedUp: (state, action) => ({ ...state, loading: false, status: action.payload }),
-		logedIn: (state, action) => ({ ...state, loading: false, status: action.payload }),
+		logedIn: (state, action) => ({ 
+			...state, 
+			loading: false, 
+			status: action.payload,
+			authenticated: true
+		}),
 
 		logedOut: (state, action) => {
 			nookies.destroy(null, 'token', { path: '/'})
@@ -132,16 +144,24 @@ const { reducer, actions } = createSlice({
 
 	}, // End of Reducer
 	extraReducers: {
-		[HYDRATE]: (state, action) => ({
-			...state, ...action.payload
-			// ...state, ...action.payload.user
-		})
+		[HYDRATE]: (state, action) => {
+		/* How Server-Side dispatch work ?
+				. Every server-side dispatch run there payload as regular dispatch do but
+				. Server side dispatch directly not effect local storage, instead create new copy of entire store
+				. and in [HYDRATE] we decide which Client-Side slice will be updated from the copied store
+		*/
+			return {
+				...state, 
+				...action.payload.user 		// Only update Client-Side user slice from server-side dispatch
+			}
+		}
 	}
 })
 export default reducer
 
 
 export const resetUserSlice = () => (dispatch) => dispatch(actions.resetToDefault())
+export const authenticateUser = () => (dispatch) => dispatch(actions.authenticateUser())
 
 
 export const loginMe = (fields) => catchAsyncDispatch(async (dispatch, getStore) => {
