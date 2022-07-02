@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import Image from 'next/image'
 
 import FooterSection from './footerSection'
 
@@ -85,8 +86,8 @@ const Footer = ({ ...params }) => {
 								alignItems: 'center',
 								gridGap: 8
 							}}>
-								<Link href='/about' passHref>
-									<MuiLink><img src='/logo.svg' /></MuiLink>
+								<Link href='/' passHref>
+									<MuiLink><Image src='/images/logo.svg' width={60} height={60} /></MuiLink>
 								</Link>
 
 								<Typography align='justify' fontSize='small'>
