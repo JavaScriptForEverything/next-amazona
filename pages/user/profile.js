@@ -1,8 +1,10 @@
-import nookies from 'nookies'
+import { wrapper } from '../../store'
+import { useRouter } from 'next/router'
+import { verify } from 'jsonwebtoken'
 
 import { useState, useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { updateProfile, experienceFeature, editFeature } from '../../store/userReducer'
+import { updateProfile, experienceFeature, editFeature, getUser, authenticateUser } from '../../store/userReducer'
 
 import Layout from '../../layout'
 import { toCapitalize, readAsDataURL } from '../../util'
@@ -58,6 +60,7 @@ const experiencesInfo = [
 
 
 const Profile = () => {
+	const router = useRouter()
 	const dispatch = useDispatch()
 
 	const [ avatarOpen, setAvatarOpen ] = useState(false)
@@ -78,6 +81,7 @@ const Profile = () => {
 
 	const { user, isExperienceAdd, edit } = useSelector(state => state.user)
 	// console.log({ resume: user.resume })
+	// console.log({ url: router })
 
 	const basic = [
 		{ label: 'Age', value: user.age  },
@@ -89,10 +93,10 @@ const Profile = () => {
 	]
 
 	// update/delete avatar here
-	useEffect(async() => {
+	useEffect(() => {
 		if( uploadAvatar) { 	// use await so that setUploadAvatar set value after 	dispatch(updateProfile(...))
-			await dispatch(updateProfile({ avatar: avatarFile })) 	// update avatar in store + in Database
-			await setUploadAvatar(false)
+			dispatch(updateProfile({ avatar: avatarFile })) 	// update avatar in store + in Database
+			setUploadAvatar(false)
 			setAvatarOpen(false)
 		}
 	}, [avatarFile])
@@ -401,16 +405,54 @@ const Profile = () => {
 export default Profile
 
 
-export const getServerSideProps = (ctx) => {
-	const { token } = nookies.get(ctx)
+// export const getServerSideProps = ({ req }) => {
+// 	const { token } = req.cookies
+// 	// console.log({ token })
 
-	if(!token) return { redirect: {// NextJS built-in Redirect features
-			destination: '/login',
-			parmanent: false
+// 	const { TOKEN_SALT } = process.env || {}
+// 	// console.log({ TOKEN_SALT })
+
+// 	// const { _id, iat } = verify(token, TOKEN_SALT)
+// 	// console.log({ _id, iat })
+
+// 	try {
+// 		const { _id, iat } = verify(token, TOKEN_SALT)
+// 		// dispatch(authenticateUser(true)) 		
+// 		console.log({ _id, iat })
+
+// 	} catch (err) {
+// 		console.log(err.message)
+// 		// dispatch(authenticateUser(false)) 		
+
+// 		return { redirect: { 	// NextJS built-in Redirect features
+// 				destination: '/login',
+// 				parmanent: false
+// 			}
+// 		}
+// 	}
+
+// 	return { props: {} }
+// }
+
+
+export const getServerSideProps = wrapper.getServerSideProps(({ dispatch }) => ({ req }) => {
+	const { token } = req.cookies || {}
+	const { TOKEN_SALT } = process.env || {}
+
+	try {
+		const { _id, iat } = verify(token, TOKEN_SALT)
+		dispatch(authenticateUser(true)) 		
+		// dispatch(getUserById(_id)) 			// called it in /login
+		// console.log({ _id, iat })
+
+	} catch (err) {
+		console.log(err.message)
+		dispatch(authenticateUser(false)) 		
+
+		return { redirect: { 	// NextJS built-in Redirect features
+				destination: '/login',
+				parmanent: false
+			}
 		}
 	}
-
-	return { props: {} }
-}
-
-
+})

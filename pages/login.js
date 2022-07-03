@@ -1,10 +1,11 @@
+import { verify } from 'jsonwebtoken'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useState, useEffect } from 'react'
 import { wrapper } from '../store'
 import { useDispatch, useSelector } from 'react-redux'
 import { showAlert } from '../store/dialogReducer'
-import { authenticateUser, loginMe } from '../store/userReducer'
+import { authenticateUser, getUser, getUserById, loginMe } from '../store/userReducer'
 import { formValidator, getKeysOfArrayObject, TabPanel } from '../util'
 
 import Layout from '../layout'
@@ -72,7 +73,7 @@ const Login = () => {
 
 		// client-Side redirect: after login success
 		if( status == 'success') {
-			dispatch( showAlert({ open: true, message: 'Login is success' }) )
+			dispatch( showAlert({ open: true, severity: 'success', message: 'Login is success' }) )
 			router.push(redirectTo) 										
 			return 
 		}
@@ -124,7 +125,7 @@ const Login = () => {
 											type={fields[isOn(item.name)] ? 'text' : item.type}
 											fullWidth
 											required
-											autoFocus={ index === 0 }
+											// autoFocus={ index === 0 }
 											InputProps={{
 												startAdornment: <InputAdornment position='start'> {item.adornment.start} </InputAdornment>,
 												endAdornment: item.adornment.end.length ?  (
@@ -205,21 +206,19 @@ export default Login
 export const getServerSideProps = wrapper.getServerSideProps(({ dispatch }) => ({ req }) => {
 
 	// 1. Get token
-	const token = req.headers.cookie
-	// console.log({ token })
-	if( !token ) return { props: {} }
-	
-	// 2. update store:	make store.users.authenticated = true
-	// Method-1: To authenticate by redux (Best way)
-	dispatch(authenticateUser(true)) 		
-	
-	// Method-2: Override Method-1 dispatch, so don't use it.
+	const { token } = req.cookies || {}
+	const { TOKEN_SALT } = process.env || {}
 
-	// // 3. if verified success:  server-side redirect: when page refresh
-	// if(token) return { redirect: { 
-	// 	destination: redirectTo,
-	// 	parmanent: false
-	// }}
+	try {
+		if(token) {
+			const { _id, iat } = verify(token, TOKEN_SALT)
+			dispatch(authenticateUser(true)) 		
+			dispatch(getUserById(req, _id))
+		}
 
-	return { props: {}}
+	} catch (err) {
+		console.log(err.message)
+		dispatch(authenticateUser(false)) 		
+	}
+	
 })

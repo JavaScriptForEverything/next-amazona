@@ -23,9 +23,14 @@ export const protect = catchAsync(async(req, res, next) => {
 				1. browser Cookie automatically or
 				2. user set manually as cookie or bearer token or
 				3. user send with body: required for reset password based on token */
+	// console.log({ token: req.headers})
+	// console.log({ token: req.cookies })
+
 	let token = req.headers.cookie?.split('=').pop()  						// from browser  or user send 	{ headers: {cookie: token} }
 	    token = token || req.headers.authorization?.split('Bearer ').pop() 	// 	{ headers: { Authorization: `Bearer ${token}`}}
 	    token = token || req.body.token  																		// { username: 'riajul', token: 'eyJhbGciOiJIUzI1...'}
+
+	// console.log({ token: req.headers.cookie })
 
 	if(!token) return next(appError('Please send token as header or body', 401))
 

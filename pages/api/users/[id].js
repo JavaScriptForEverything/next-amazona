@@ -1,13 +1,15 @@
 import '../../../server/models/database'
-import nc from 'next-connect'
 import { protect } from '../../../server/controllers/authController'
 import * as userController from '../../../server/controllers/userController'
 import { onError } from '../../../server/util'
+import nc from 'next-connect'
+const morgan = require('morgan')
 
 const handler = nc({ onError })
 
 handler
-	.use(protect)
+	.use(morgan('dev'))
+	// .use(protect)
 	.get(userController.getUserById)
 
 export default handler

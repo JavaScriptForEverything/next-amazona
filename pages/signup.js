@@ -89,7 +89,11 @@ const Signup = () => {
 		if( error) return dispatch( showAlert({ open: true, severity: 'error', message: error, duration: 8000 }) )
 
 		const message = 'Congratulate to becoming a member of our community'  
-		if( status == 'success') return dispatch( showAlert({ open: true, message }) )
+		if( status == 'success') {
+			dispatch( showAlert({ open: true, severity: 'success', message }) )
+			router.push('/login')
+			return 
+		}
 
 	}, [error, status])
 

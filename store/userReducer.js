@@ -67,13 +67,15 @@ const { reducer, actions } = createSlice({
 			error: '',  										// reset error
 			status: '',  										// reset status of success 
 		}),
-		authenticateUser: (state, action) => ({
-			...state,
-			loading: false,
-			error: '',  										// reset error
-			status: '',  										// reset status of success 
-			authenticated: action.payload 	// to checked globally is authenticated or not
-		}),
+		authenticateUser: (state, action) => {
+			return {
+				...state,
+				loading: false,
+				error: '',  												// reset error
+				status: '',  												// reset status of success 
+				authenticated: action.payload      	// to checked globally is authenticated or not
+			}
+		},
 
 		experienceFeature: (state, action) => ({ ...state, isExperienceAdd: action.payload}),
 		profileEdited: (state, action) => ({ ...state, edit: action.payload}),
@@ -94,11 +96,26 @@ const { reducer, actions } = createSlice({
 		}),
 
 		tokenSent: (state, action) => ({ ...state, loading: false }),
-		getMe: (state, action) => ({ // this method used to dispatch on SSR, which pass data to extraReducers [HYDRATE]
-			...state,
-			loading: false,
-			...action.payload
-		}),
+		getUserById: (state, action) => { 
+			console.log('reduxstore: ', action.payload)
+
+			return {
+				...state,
+				loading: false,
+				user: { 
+					new: 'newValue',
+					...state.user,
+					...action.payload 
+				}
+			}
+		},
+		// getMe: (state, action) => {
+		// 	console.log(action.payload)
+		// 	return {
+		// 		...state,
+		// 		loading: false,
+		// 	}
+		// },
 		allUsersAdded: (state, action) => ({
 			...state,
 			loading: false,
@@ -154,9 +171,12 @@ const { reducer, actions } = createSlice({
 				. Server side dispatch directly not effect local storage, instead create new copy of entire store
 				. and in [HYDRATE] we decide which Client-Side slice will be updated from the copied store
 		*/
+
+			// console.log({ ExtraReducers: action.payload })
 			return {
 				...state, 
-				...action.payload.user 		// Only update Client-Side user slice from server-side dispatch
+				...action.payload 
+				// ...action.payload.user 		// Only update Client-Side user slice from server-side dispatch
 			}
 		}
 	}
@@ -169,18 +189,34 @@ export const resetUserSlice = () => (dispatch) => dispatch(actions.resetToDefaul
 
 // /pages/login.js: 		getServerSideProps = () => {...}
 export const authenticateUser = (isAuthenticated = false) => (dispatch) => {
+	// console.log({ isAuthenticated })
 	dispatch(actions.authenticateUser(isAuthenticated))
 }
 
 
 
-/*Geting User but how ? By sending token as cookie or Brearer token
-	1. as header: { Authorization : `Bearer ${token}` }
-	2. as header: { cookie : token } */
-export const getUser = (token) => catchAsyncDispatch(async (dispatch) => {
+// /* /pages/api/users/me.js: .get(authController.getMe)
+// 	/layout/index.js: useEffect() */
+// export const getUser = (req) => catchAsyncDispatch(async (dispatch) => {
+// 	const { origin } = absoluteUrl(req)
+
+// 	// console.log('getUser(req) from userReducer')
+
+// 	dispatch(actions.requested())
+// 	const { data: { user } } = await axios.get(`${origin}/api/users/me`)
+// 	// console.log({ user })
+// 	dispatch(actions.getMe(user))
+// }, actions.failed)
+
+
+// ?
+export const getUserById = (req, id) => catchAsyncDispatch(async (dispatch) => {
+	const { origin } = absoluteUrl(req)
+
 	dispatch(actions.requested())
-	const { data } = await axios.get(`/api/users/me`, { headers: {Authorization: `Bearer ${token}`} })
-	dispatch(actions.getMe(data))
+	const { data: { user } } = await axios.get(`${origin}/api/users/${id}`)
+	console.log( 'getUserById: (from userReducer)', user )
+	// dispatch(actions.getUserById(user))
 }, actions.failed)
 
 

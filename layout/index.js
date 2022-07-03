@@ -53,20 +53,22 @@ const Layout = ({ title, description, children, ...params }) => {
 
 	const [ menuOpen, setMenuOpen ] = useState(false)
 	const [ anchorEl, setAnchorEl ] = useState(null)
-	const [ cookieToken, setCookieToken ] = useState('')
 
 	let { cartItems } = useSelector(state => state.product)
 	let [ darkMode, setDarkMode ] = useState(false)
 	let [ badge, setBadge ] = useState(0)
 
-	const { authenticated, token, user, status } = useSelector(state => state.user)
+	const { authenticated } = useSelector(state => state.user.user)
 	const { loading } = useSelector(state => state.product )
 
-	// console.log({ authenticated, token, user })
+	const user = {}
 
-	// Client-Side Redirect here and Server-Side redirect done in bottom in getServerSideProps
-	useEffect(() => (token) && dispatch(getUser(token)) , [token])
+	// console.log({ authenticated })
 
+	// // Client-Side Redirect here and Server-Side redirect done in bottom in getServerSideProps
+	// useEffect(() => (authenticated) && dispatch(getUser()) , [authenticated])
+
+	// console.log({ user })
 
 	/* NextJS render server-seide rendering first, but we want bellow code only render in client-side
 			1. Because, window object only available in Browser in Client-Side, and we use window.localStorage
@@ -133,7 +135,10 @@ const Layout = ({ title, description, children, ...params }) => {
 						<NoSsr>
 						{ authenticated ? (
 							<IconButton color='inherit' onClick={menuHandler} sx={{ ml: 2 }} >
-								<StyledAvatar sx={{ width: '2rem', height: '2rem' }} src={user.avatar ? user.avatar.secure_url : ''} />
+								<StyledAvatar 
+									src={user.avatar ? user.avatar.secure_url : ''} 
+									sx={{ width: '2rem', height: '2rem' }} 
+								/>
 								<Typography sx={{ ml: 1, display: {xs: 'none', sm: 'block'} }}>
 									{user?.username?.split(' ').shift()} </Typography>
 							</IconButton>
