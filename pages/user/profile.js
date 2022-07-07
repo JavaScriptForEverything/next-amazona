@@ -4,7 +4,7 @@ import { verify } from 'jsonwebtoken'
 
 import { useState, useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { updateProfile, experienceFeature, editFeature, getUser, authenticateUser } from '../../store/userReducer'
+import { updateProfile, experienceFeature, editFeature, getUser, authenticateUser, getUserById } from '../../store/userReducer'
 
 import Layout from '../../layout'
 import { toCapitalize, readAsDataURL } from '../../util'
@@ -79,9 +79,9 @@ const Profile = () => {
 
 	const [ openEdit, setOpenEdit ] = useState(false) 								// to pass experienceId to AddExpreience Form
 
-	const { user, isExperienceAdd, edit } = useSelector(state => state.user)
+	const { user, isExperienceAdd, edit } = useSelector(state => state.user.user)
 	// console.log({ resume: user.resume })
-	// console.log({ url: router })
+	// console.log(user)
 
 	const basic = [
 		{ label: 'Age', value: user.age  },
@@ -91,6 +91,12 @@ const Profile = () => {
 		{ label: 'Location', value: user.location && toCapitalize(`${user.location.city} ${user.location.country}`)  },
 		{ label: 'Email', value: user.email },
 	]
+
+
+	useEffect(() => {
+		if( Object.keys(user).length ) return localStorage.setItem('user', JSON.stringify(user))
+		localStorage.removeItem('user')
+	}, [user]) 
 
 	// update/delete avatar here
 	useEffect(() => {
@@ -435,15 +441,15 @@ export default Profile
 // }
 
 
-export const getServerSideProps = wrapper.getServerSideProps(({ dispatch }) => ({ req }) => {
+export const getServerSideProps = wrapper.getServerSideProps(({ dispatch }) => async ({ req }) => {
 	const { token } = req.cookies || {}
 	const { TOKEN_SALT } = process.env || {}
 
 	try {
 		const { _id, iat } = verify(token, TOKEN_SALT)
-		dispatch(authenticateUser(true)) 		
-		// dispatch(getUserById(_id)) 			// called it in /login
 		// console.log({ _id, iat })
+		dispatch(authenticateUser(true)) 		
+		await dispatch(getUserById(req, _id)) 			// called it in /login
 
 	} catch (err) {
 		console.log(err.message)

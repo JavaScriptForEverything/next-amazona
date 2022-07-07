@@ -63,7 +63,6 @@ const Layout = ({ title, description, children, ...params }) => {
 
 	const user = {}
 
-	// console.log({ authenticated })
 
 	// // Client-Side Redirect here and Server-Side redirect done in bottom in getServerSideProps
 	// useEffect(() => (authenticated) && dispatch(getUser()) , [authenticated])

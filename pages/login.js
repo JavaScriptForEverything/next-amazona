@@ -65,9 +65,23 @@ const Login = () => {
 	const [ fields, setFields ] = useState({ ...arrayObject })
 	const [ fieldsError, setFieldsError ] = useState({})
 
-	const { error, loading, status, authenticated } = useSelector(state => state.user)
+	const { error, loading, status, authenticated } = useSelector(state => state.user.user)
 	// console.log({ status })
 
+	// client-Side redirect: if any time 	authenticated = true
+	useEffect(() => {
+		if( authenticated ) {
+			localStorage.setItem('authenticated', true) 		// to used to authenticate on other page
+			router.push(redirectTo) 	
+			return 
+		} 
+
+		localStorage.setItem('authenticated', false) 		
+		router.push('/login') 	
+
+	}, [authenticated])
+
+	// show error after client-side redirect
 	useEffect(() => {
 		if(error) return dispatch( showAlert({ open: true, severity: 'error', message: error, duration: 8000 }) )
 
@@ -78,10 +92,8 @@ const Login = () => {
 			return 
 		}
 
-		// client-Side redirect: if any time 	authenticated = true
-		if( authenticated ) return router.push(redirectTo) 	
-
 	}, [error, status ])
+
 
 	const isOn = (name) => `is_${name}_on`   		// => just use name, instead of magic value
 	const adornmentClickHandler = (name) => () => {
@@ -209,12 +221,14 @@ export const getServerSideProps = wrapper.getServerSideProps(({ dispatch }) => (
 	const { token } = req.cookies || {}
 	const { TOKEN_SALT } = process.env || {}
 
+
 	try {
 		if(token) {
 			const { _id, iat } = verify(token, TOKEN_SALT)
 			dispatch(authenticateUser(true)) 		
-			dispatch(getUserById(req, _id))
+			// dispatch(getUserById(req, _id))
 		}
+
 
 	} catch (err) {
 		console.log(err.message)

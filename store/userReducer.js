@@ -83,9 +83,14 @@ const { reducer, actions } = createSlice({
 		signedUp: (state, action) => ({ ...state, loading: false, status: action.payload }),
 		logedIn: (state, action) => ({ 
 			...state, 
-			loading: false, 
-			status: action.payload,
-			authenticated: true 					// if(user.status === 'success') authenticated = true
+			// loading: false, 
+			// status: action.payload,
+			// authenticated: true 					// if(user.status === 'success') authenticated = true
+			user: { 												// always update 2nd user: store.user.user = action.payload
+				loading: false, 
+				status: action.payload,
+				authenticated: true 			
+			}
 		}),
 		logedOut: (state, action) => ({ 
 			...state, 
@@ -96,19 +101,13 @@ const { reducer, actions } = createSlice({
 		}),
 
 		tokenSent: (state, action) => ({ ...state, loading: false }),
-		getUserById: (state, action) => { 
-			console.log('reduxstore: ', action.payload)
-
-			return {
-				...state,
-				loading: false,
-				user: { 
-					new: 'newValue',
-					...state.user,
-					...action.payload 
-				}
+		getUserById: (state, action) => ({
+			...state,
+			loading: false,
+			user: {
+				...action.payload,
 			}
-		},
+		}),
 		// getMe: (state, action) => {
 		// 	console.log(action.payload)
 		// 	return {
@@ -209,14 +208,14 @@ export const authenticateUser = (isAuthenticated = false) => (dispatch) => {
 // }, actions.failed)
 
 
-// ?
+// /pages/user/profile.js 	= wrapper.getServerSideProps(...) 
 export const getUserById = (req, id) => catchAsyncDispatch(async (dispatch) => {
 	const { origin } = absoluteUrl(req)
 
 	dispatch(actions.requested())
 	const { data: { user } } = await axios.get(`${origin}/api/users/${id}`)
-	console.log( 'getUserById: (from userReducer)', user )
-	// dispatch(actions.getUserById(user))
+	// console.log( 'getUserById: (from userReducer)', user )
+	dispatch(actions.getUserById(user))
 }, actions.failed)
 
 
@@ -292,6 +291,8 @@ export const signUpMe = (fields) => catchAsyncDispatch(async (dispatch) => {
 export const loginMe = (fields) => catchAsyncDispatch(async (dispatch, getStore) => {
 	dispatch(actions.requested())
 	const { data: { status } } = await axios.post(`/api/users/login`, fields)
+
+	console.log({ status })
 
 	dispatch(actions.logedIn(status))
 }, actions.failed)
