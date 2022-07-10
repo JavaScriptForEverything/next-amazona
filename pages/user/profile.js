@@ -79,9 +79,11 @@ const Profile = () => {
 
 	const [ openEdit, setOpenEdit ] = useState(false) 								// to pass experienceId to AddExpreience Form
 
-	const { user, isExperienceAdd, edit } = useSelector(state => state.user.user)
+	const { user } = useSelector(state => state.user)
 	// console.log({ resume: user.resume })
 	// console.log(user)
+
+	// return ( <Layout> profile page </Layout>)
 
 	const basic = [
 		{ label: 'Age', value: user.age  },
@@ -94,7 +96,7 @@ const Profile = () => {
 
 
 	useEffect(() => {
-		if( Object.keys(user).length ) return localStorage.setItem('user', JSON.stringify(user))
+		if( user && Object.keys(user).length ) return localStorage.setItem('user', JSON.stringify(user))
 		localStorage.removeItem('user')
 	}, [user]) 
 
@@ -165,6 +167,8 @@ const Profile = () => {
 		setOpenEdit(true)
 		dispatch(editFeature('description'))
 	}
+
+	// return ( <Layout> 'profile page' </Layout>)
 
 	return (
 		<Layout title={`Profile Page | ${user.username} `}>
@@ -449,7 +453,7 @@ export const getServerSideProps = wrapper.getServerSideProps(({ dispatch }) => a
 		const { _id, iat } = verify(token, TOKEN_SALT)
 		// console.log({ _id, iat })
 		dispatch(authenticateUser(true)) 		
-		await dispatch(getUserById(req, _id)) 			// called it in /login
+		// await dispatch(getUserById(req, _id)) 			// called it in /login
 
 	} catch (err) {
 		console.log(err.message)

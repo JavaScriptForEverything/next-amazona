@@ -67,44 +67,42 @@ const { reducer, actions } = createSlice({
 			error: '',  										// reset error
 			status: '',  										// reset status of success 
 		}),
-		authenticateUser: (state, action) => {
-			return {
-				...state,
-				loading: false,
-				error: '',  												// reset error
-				status: '',  												// reset status of success 
-				authenticated: action.payload      	// to checked globally is authenticated or not
-			}
-		},
+		authenticateUser: (state, action) => ({
+			...state,
+			status: '',  										// reset status of success 
+			authenticated: true
+		}),
 
 		experienceFeature: (state, action) => ({ ...state, isExperienceAdd: action.payload}),
 		profileEdited: (state, action) => ({ ...state, edit: action.payload}),
 
 		signedUp: (state, action) => ({ ...state, loading: false, status: action.payload }),
-		logedIn: (state, action) => ({ 
-			...state, 
-			// loading: false, 
-			// status: action.payload,
-			// authenticated: true 					// if(user.status === 'success') authenticated = true
-			user: { 												// always update 2nd user: store.user.user = action.payload
-				loading: false, 
-				status: action.payload,
-				authenticated: true 			
-			}
-		}),
-		logedOut: (state, action) => ({ 
+		loginUser: (state, action) => ({ 
 			...state, 
 			loading: false, 
-			status: action.payload,
-			authenticated: false,  				// Remove cookie from server-side and 
-			user: {}  
+			authenticated: true, 					
+			...action.payload, 						// { status: 'success', user: { ... }}
 		}),
+    addUserToStore: (state, action) => ({
+      ...state,
+      loading: false,
+      authenticated: true,
+      user: action.payload
+    }),
+    logoutUser: (state, action) => ({
+      ...state,
+      loading: false,
+      authenticated: false,
+      user: {}
+    }),
+
 
 		tokenSent: (state, action) => ({ ...state, loading: false }),
 		getUserById: (state, action) => ({
 			...state,
 			loading: false,
 			user: {
+				...state.user,
 				...action.payload,
 			}
 		}),
@@ -133,7 +131,10 @@ const { reducer, actions } = createSlice({
 			loading: false,
 			authenticated: false,
 			token: '',
-			user: {},
+			// user: {},
+			user: {
+				user: {}
+			},
 			message: action.payload
 		}),
 		userDeleted: (state, action) => {
@@ -186,10 +187,9 @@ export default reducer
 // /layout/snackbar.js: 	closeHandler=() => {...}
 export const resetUserSlice = () => (dispatch) => dispatch(actions.resetToDefault())
 
-// /pages/login.js: 		getServerSideProps = () => {...}
-export const authenticateUser = (isAuthenticated = false) => (dispatch) => {
-	// console.log({ isAuthenticated })
-	dispatch(actions.authenticateUser(isAuthenticated))
+// /pages/login.js: 		useEffect( => {...}, [])
+export const authenticateUser = () => (dispatch) => {
+	dispatch(actions.authenticateUser())
 }
 
 
@@ -218,7 +218,10 @@ export const getUserById = (req, id) => catchAsyncDispatch(async (dispatch) => {
 	dispatch(actions.getUserById(user))
 }, actions.failed)
 
-
+// updateUserUser
+export const updateUserInStore = (user) => (dispatch) => {
+	dispatch(actions.getUserById(user))
+}
 
 //  ?
 export const getAllUsers = (token, obj ) => catchAsyncDispatch(async (dispatch) => {
@@ -288,20 +291,33 @@ export const signUpMe = (fields) => catchAsyncDispatch(async (dispatch) => {
 }, actions.failed)
 
 // /pages/login.js: 		submitHandler=() => {...}
-export const loginMe = (fields) => catchAsyncDispatch(async (dispatch, getStore) => {
+export const loginUser = (fields) => catchAsyncDispatch(async (dispatch, getStore) => {
 	dispatch(actions.requested())
-	const { data: { status } } = await axios.post(`/api/users/login`, fields)
+	const { data } = await axios.post(`/api/users/login`, fields)
+	dispatch(actions.loginUser(data))
 
-	console.log({ status })
-
-	dispatch(actions.logedIn(status))
+	localStorage.setItem('user', JSON.stringify(data.user))
 }, actions.failed)
 
+// /layout/index.js => useEffect()
+export const addUserToStore = () => (dispatch) => {
+	let user = localStorage.getItem('user')
+			user = user && JSON.parse(user)
+
+	const isUser = user && Object.keys(user).length
+	if(isUser) dispatch(actions.addUserToStore(user))
+}
+
+
 // /layout/index.js: 	menuItemHandler = () => {} 
-export const logoutMe = () => catchAsyncDispatch( async (dispatch) => {
+export const logoutUser = () => catchAsyncDispatch(async(dispatch) => {
+	await axios.post(`/api/users/logout`, {}) 		// 1. Remove token from cookie
+
 	dispatch(actions.requested())
-	const { data: { status }} = await axios.post(`/api/users/logout`, {})
-	dispatch(actions.logedOut(status))
+	dispatch(actions.logoutUser()) 								// 2. make { ..., authenticated: false } in store
+
+  localStorage.removeItem('user') 							// 3. remove user from localStorage
+
 }, actions.failed)
 
 

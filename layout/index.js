@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { getUser, logoutMe } from '../store/userReducer'
+import { addUserToStore, logoutUser } from '../store/userReducer'
 
 import Head from 'next/head'
 import Link from 'next/link'
@@ -49,7 +49,7 @@ const menuItems = [
 const Layout = ({ title, description, children, ...params }) => {
 	const dispatch = useDispatch()
 	const router = useRouter()
-	const { redirect } = router.query
+	// const { redirect } = router.query
 
 	const [ menuOpen, setMenuOpen ] = useState(false)
 	const [ anchorEl, setAnchorEl ] = useState(null)
@@ -58,16 +58,14 @@ const Layout = ({ title, description, children, ...params }) => {
 	let [ darkMode, setDarkMode ] = useState(false)
 	let [ badge, setBadge ] = useState(0)
 
-	const { authenticated } = useSelector(state => state.user.user)
+	const { authenticated, user } = useSelector(state => state.user)
 	const { loading } = useSelector(state => state.product )
 
-	const user = {}
+	// console.log(user)
+
+	useEffect(() => dispatch(addUserToStore()) , [])
 
 
-	// // Client-Side Redirect here and Server-Side redirect done in bottom in getServerSideProps
-	// useEffect(() => (authenticated) && dispatch(getUser()) , [authenticated])
-
-	// console.log({ user })
 
 	/* NextJS render server-seide rendering first, but we want bellow code only render in client-side
 			1. Because, window object only available in Browser in Client-Side, and we use window.localStorage
@@ -77,7 +75,7 @@ const Layout = ({ title, description, children, ...params }) => {
 		darkMode = JSON.parse( localStorage.getItem('darkMode') ) || false
 		setDarkMode(darkMode)
 
-		setBadge(cartItems.length)
+		setBadge(cartItems?.length)
 	}, [darkMode, cartItems])
 
 	const changeHandler = (evt, newValue) => {
@@ -95,12 +93,13 @@ const Layout = ({ title, description, children, ...params }) => {
 
 		if(label !== 'Logout') return router.push(path)
 
-		dispatch(logoutMe())
+		dispatch(logoutUser()) 								// 
 		router.push('/login')
 	}
 
 
 
+	// return 'Home page'
 
 	return (
 		<ThemeProvider theme={theme(darkMode)}>
@@ -135,7 +134,7 @@ const Layout = ({ title, description, children, ...params }) => {
 						{ authenticated ? (
 							<IconButton color='inherit' onClick={menuHandler} sx={{ ml: 2 }} >
 								<StyledAvatar 
-									src={user.avatar ? user.avatar.secure_url : ''} 
+									src={user?.avatar?.secure_url || ''} 
 									sx={{ width: '2rem', height: '2rem' }} 
 								/>
 								<Typography sx={{ ml: 1, display: {xs: 'none', sm: 'block'} }}>
@@ -156,7 +155,7 @@ const Layout = ({ title, description, children, ...params }) => {
 							<Box sx={{display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 0.5, my: 2 }} >
 							<IconButton onClick={f =>router.push('/user/profile')} >
 								<StyledAvatar
-									src={user.avatar ? user.avatar.secure_url : ''}
+									src={user?.avatar?.secure_url || ''}
 									alt={`${user?.title}-${user?.username}`}
 								/>
 							</IconButton>

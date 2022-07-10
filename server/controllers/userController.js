@@ -95,29 +95,41 @@ export const login = catchAsync(async (req, res, next) => {
 	// 4. Set Token as Cookie
 	const token = setToken(user._id)
 	res.setHeader('set-cookie', serialize('token', token, {
-		httpOnly: true, 																	// server-side only
-		secure: process.env.NODE_ENV === 'production', 		// only https 
 		expires: new Date( Date.now() + 60*60*24*30),
 		path: '/', 																				// cookie will be accessable on root label
+		httpOnly: true, 																	// server-side only
+		secure: process.env.NODE_ENV === 'production', 		// only https 
 		sameSite: 'strict', 															// Only current domain can access
 	}))
 
+	user.password = undefined
+
 	// 5. Send Response back
-	res.status(200).json({ status: 'success' })
+	res.status(200).json({ 
+		status: 'success',
+		user
+	})
 })
 
 
 
 /* userReducer.js  > /pages/api/users/logout.js	:	handler.post(logout)
-		. /layout/index.js: 	menuItemHandler = () => {} */
+		. /layout/index.js: 	menuItemHandler = () => {} 
+
+Problem:
+	. We can't access cookie inside requestHandler, but can in getServerSideProps
+	. To remove token from cookie, we must request AJAX call, getServerSideProps dispatch
+		not remove.  */
 export const logout = (req, res, next) => {
 	res.setHeader('Set-Cookie', serialize('token', '', {
+		expires: new Date(0), 														// expire auto remove token from cookie
+		// maxAge: 0,
+		path: '/', 																				// cookie will be accessable on root label
 		httpOnly: true, 																	// server-side only
 		secure: process.env.NODE_ENV === 'production', 		// only https 
-		expires: new Date(0),
-		path: '/', 																				// cookie will be accessable on root label
 		sameSite: 'strict', 															// Only current domain can access
 	}))
+
 	res.status(200).json({ status: 'success' })
 }
 

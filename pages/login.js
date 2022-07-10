@@ -5,7 +5,7 @@ import { useState, useEffect } from 'react'
 import { wrapper } from '../store'
 import { useDispatch, useSelector } from 'react-redux'
 import { showAlert } from '../store/dialogReducer'
-import { authenticateUser, getUser, getUserById, loginMe } from '../store/userReducer'
+import { authenticateUser, getUser, getUserById, loginUser } from '../store/userReducer'
 import { formValidator, getKeysOfArrayObject, TabPanel } from '../util'
 
 import Layout from '../layout'
@@ -60,26 +60,12 @@ const redirectTo = '/user/profile'
 const Login = () => {
 	const dispatch = useDispatch()
 	const router = useRouter()
-	const { redirect } = router.query 		// /login?redirect=something => something
 
 	const [ fields, setFields ] = useState({ ...arrayObject })
 	const [ fieldsError, setFieldsError ] = useState({})
 
-	const { error, loading, status, authenticated } = useSelector(state => state.user.user)
-	// console.log({ status })
+	const { error, loading, status, authenticated } = useSelector(state => state.user)
 
-	// client-Side redirect: if any time 	authenticated = true
-	useEffect(() => {
-		if( authenticated ) {
-			localStorage.setItem('authenticated', true) 		// to used to authenticate on other page
-			router.push(redirectTo) 	
-			return 
-		} 
-
-		localStorage.setItem('authenticated', false) 		
-		router.push('/login') 	
-
-	}, [authenticated])
 
 	// show error after client-side redirect
 	useEffect(() => {
@@ -88,6 +74,7 @@ const Login = () => {
 		// client-Side redirect: after login success
 		if( status == 'success') {
 			dispatch( showAlert({ open: true, severity: 'success', message: 'Login is success' }) )
+			dispatch(authenticateUser())
 			router.push(redirectTo) 										
 			return 
 		}
@@ -109,7 +96,7 @@ const Login = () => {
 		if(!isValidated) return 		// client-side validation
 
 		// 2. Send data to database
-		dispatch(loginMe(fields))
+		dispatch(loginUser(fields))
 
 		// 3. Redirect to login: We will do that by server-side rendering: by getServerSideProps
 	}
@@ -198,41 +185,23 @@ const Login = () => {
 export default Login
 
 
-// // login & signup page make server-seide redirect based on cookie
-// export const getServerSideProps = async (ctx) => {
-// 	// 1. Get token
-// 	const token = ctx.req.headers.cookie
-// 	// console.log({ token })
-// 	if( !token ) return { props: {} }
 
-// 	// 4. if verified success 
-// 	if(token) return { redirect: { 			// server-side redirect: when page refresh
-// 		destination: redirectTo,
-// 		parmanent: false
-// 	}}
-
-// 	return { props: { isAuthenticated: true }}
-// }
-
-
-export const getServerSideProps = wrapper.getServerSideProps(({ dispatch }) => ({ req }) => {
-
-	// 1. Get token
-	const { token } = req.cookies || {}
-	const { TOKEN_SALT } = process.env || {}
-
+export const getServerSideProps = (ctx) => {
+	const { token } = ctx.req.cookies || {}
+	if( !token )	return { props: {} }
 
 	try {
-		if(token) {
-			const { _id, iat } = verify(token, TOKEN_SALT)
-			dispatch(authenticateUser(true)) 		
-			// dispatch(getUserById(req, _id))
-		}
+		const TOKEN_SECRET = process.env.TOKEN_SECRET
+		const { _id, iat } = verify(token, TOKEN_SECRET)
 
+		return { redirect: {
+			destination: '/profile',
+			parmanent: false
+		}}
 
 	} catch (err) {
 		console.log(err.message)
-		dispatch(authenticateUser(false)) 		
 	}
-	
-})
+
+	return { props: {} }
+}

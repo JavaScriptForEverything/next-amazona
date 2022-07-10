@@ -16,15 +16,30 @@ const reducers = combineReducers({
 })
 
 const masterReducer = (state, action) => {
-	action.type === HYDRATE ? {
+	return action.type === HYDRATE ? {
 		...state,
-		...action.payload
+		user: {
+			...state.user,
+			user: { ...state.user.user, ...action.payload.user.user },
+		},
+		product: {
+			...state.product,
+			product: { ...state.product.product, ...action.payload.product.product },
+		},
+		payment: {
+			...state.payment,
+			payment: { ...state.payment.payment, ...action.payload.payment.payment },
+		},
+		dialog: {
+			...state.dialog,
+			dialog: { ...state.dialog.dialog, ...action.payload.dialog.dialog },
+		},
 	} : reducers(state, action)
 }
 
 
 const makeStore = () => configureStore({ 
-	reducer: reducers,
+	reducer: masterReducer,
 	middleware: (getMiddlewares) => [
 		...getMiddlewares(), 
 		// demoMiddleware,

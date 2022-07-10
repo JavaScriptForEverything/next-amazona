@@ -14,7 +14,28 @@
 		. FormValidate Dynamical Form Dynamically 	(Advanced Form)
 		. Show message of Error or success of form submit
 		. Reset Password by Sending Email
-		. JsonWebToken to authenticate via cookie (secure)
+
+
+	. Redux: (@reduxjs/toolkit)
+		. Best way to setup redux store
+		. create reducer by createSlice without duplicate code all around
+		. Server-Side dispatch and Client-Side dispatch
+		. Sharing state between page navigations.
+		. Global Alert message handled by redux store
+
+
+	. Authorization & Redirection
+		. Used JsonWebToken to authenticate via cookie (securely)
+		. Authenticate user both in Server-Side and Client-Side
+		. Protecte /user/profile when not loged in
+		. Protecte /login /signup... when loged in.
+		. Redirect user again on both in Server-Side and Client-Side
+
+
+	. Error Handling:
+		. Global Error handling
+		. Route Error handling
+
 
 	. Image:
 		. Generate dataRUL so show preview of image upload
@@ -22,31 +43,17 @@
 		. Resize image before save
 		. Remove image if request failed after image upload
 
-	. Redux: (@reduxjs/toolkit)
-		. Best way to setup redux store
-		. quickly create slice, without redendent or duplicate code
-		. Server-Side dispatch and Client-Side dispatch
-		. Global Alert message handled by redux store
-
-	. Error Handling:
-		. Global Error handling
-		. Route Error handling
-
-	. Route:
-		. Protected Route both in Server-Side and Client-Side 
-		. Restricted Route: 
 
 	. Payment Gateway
 		. Stripe: (paymentIntents) 	:
 
+
 	. Serverless API
-	. Server-Side Redirect and Client-Side Redirect
 	. Mongoose (MongoDB)
 	. Material UI (User Friendly UI) + Dark Mode
 	. Pagination + Filter + Search + Rating...
 	. Infinite Scrolling instead of Pagination
 	. send Mail (development: mailtrap, in Production: sendGrid)
-	. upload image in Cloudinary (PDF in cloudinary download blocked)
 	. Utility functions:
 
 	. Do next:
@@ -58,7 +65,7 @@
 	. About 	: /about
 	. signup 	: /signup
 	. Login 	: /login 
-	. Logout 	:  Client-Side Logout
+	. Logout 	: OnClick={logoutHandler}
 	. Cart  	: /cart
 	. Payment : /shipping
 	. Product Details : /product/:slug
@@ -68,3 +75,4 @@
 		. Dashboard	: /user/dashboard
 		. resetPassword : /user/reset-password (forgot-password + reset-password)
 		. updatePassword: /user/update-my-password
+
