@@ -20,7 +20,16 @@ import ClearIcon from '@mui/icons-material/Clear'
 import PersonIcon from '@mui/icons-material/Person'
 
 
-const optionsItems = ['None', 'ReactJS', 'Redux', 'Material-UI', 'NodeJS', 'MongoDB', 'ExpressJS']
+const optionsItems = [
+	'None', 
+	'ReactJS', 
+	'Redux', 
+	'Material-UI', 
+	'NodeJS', 
+	'MongoDB', 
+	'ExpressJS',
+	'React-Native'
+]
 
 
 const FormDialog = ({ open, setOpen }) => {

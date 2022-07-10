@@ -188,7 +188,6 @@ export default Login
 
 export const getServerSideProps = (ctx) => {
 	const { token } = ctx.req.cookies || {}
-	if( !token )	return { props: {} }
 
 	try {
 		const TOKEN_SECRET = process.env.TOKEN_SECRET

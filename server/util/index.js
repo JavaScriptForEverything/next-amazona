@@ -198,7 +198,7 @@ export const uploadImage = async (image={}, saveToDir, size=[50, 50]) => {
   
   // 5. Return image or error just node style:  (err, (success) => )
   return {
-    error,
+    // error, 			// why error return something, need to check
     image: { secure_url, public_id, size: image.size }
   }
 }

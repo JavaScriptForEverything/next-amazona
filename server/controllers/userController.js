@@ -12,7 +12,8 @@ import {
 	filterObjectWithAllowedArray,
 	sendMail,
 	apiFeatures,
-	uploadImage
+	uploadImage,
+	filterObjectWithExcludedArray
 } from '../util'
 
 
@@ -46,7 +47,7 @@ export const signup = async (req, res, next) => {
 
 	// 3. Save image to /public/images/users/
 	const saveToDir = path.join(PUBLIC_ROOT, '/images/users')
-	const { error, image } = await uploadImage(body.avatar, saveToDir, [100, 100] )
+	const { image } = await uploadImage(body.avatar, saveToDir, [100, 100] )
 
 	// N-1: last extep, to remove image, if throw error after image upload
 	req.body.avatar = image.secure_url 		
@@ -230,3 +231,45 @@ export const deleteMe = catchAsync(async(req, res, next) => {
 
 
 
+const excludedFields = [ 'role', '_id', 'password', 'email', 'passwordResetToken', 'passwordResetExpires', 'passwordChangedAt']
+
+/* userReducer.js  > /pages/api/users/me.js	:	handler.patch(protect, updateMe)
+ 		// .	/layout/index.js */
+export const updateUserById = async (req, res, next) => {
+	try {
+		if(req.body.password) return next(appError('Please use /user/update-my-password route'))
+		if(req.body.email) return next(appError('You can\'t change login email'))
+
+		const data = filterObjectWithExcludedArray(req.body, excludedFields )
+
+
+		// ------[ upload avatar ]---------
+		// // 3. Save image to /public/images/users/
+		const saveToDir = path.join(PUBLIC_ROOT, '/images/users')
+		const { image } = await uploadImage(req.body.avatar, saveToDir, [100, 100] )
+
+		data.avatar = image
+		req.body.avatar = image.secure_url 		// N-1: last step, to remove image, if throw error after image upload
+
+
+		// 4. save to database
+		const user = await User.findByIdAndUpdate(req.query.id, data, { new: true, runValidators: true })
+		if(!user) return next(appError('User can\'t update.', 500))
+
+		res.status(201).json({
+			status: 'success',
+			user
+		})
+
+	} catch (err) {
+
+		// 1. Get image path which we set when image uploaded
+		const destination = path.join(PUBLIC_ROOT, req.body.avatar)
+
+		// 2. check if file exists then try to remove image
+		fs.exists(destination, (isExist) => isExist && promisify(fs.unlink)(destination))
+
+		// 3. Close Request-Response-circle with sending error message
+		next(appError(err.message))
+	}
+}

@@ -1,16 +1,31 @@
+import path from 'path'
+import fs from 'fs'
+import { promisify } from 'util'
 import crypto from 'crypto'
 import bcript from 'bcryptjs'
-import cloudinary from 'cloudinary'
-
-import { catchAsync, getIdFromToken, setToken, appError, sendMail, filterObjectWithExcludedArray } from '../util'
 import User from '../models/userModel'
 
+
+import { 
+	catchAsync, 
+	getIdFromToken, 
+	setToken, 
+	appError, 
+	sendMail, 
+	filterObjectWithExcludedArray, 
+	uploadImage 
+} from '../util'
+
+
+import cloudinary from 'cloudinary'
 cloudinary.config({
 	cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
 	api_key: process.env.CLOUDINARY_API_KEY,
 	api_secret: process.env.CLOUDINARY_API_SECRET
 })
 
+
+const PUBLIC_ROOT = path.join(__dirname, '../../../../../public')
 
 
 
@@ -78,38 +93,59 @@ const excludedFields = [ 'role', '_id', 'password', 'email', 'passwordResetToken
 
 /* userReducer.js  > /pages/api/users/me.js	:	handler.patch(protect, updateMe)
  		// .	/layout/index.js */
-export const updateMe = catchAsync( async (req, res, next) => {
-	if(req.body.password) return next(appError('Please use /user/update-my-password route'))
-	if(req.body.email) return next(appError('You can\'t change login email'))
+export const updateMe = async (req, res, next) => {
+	try {
+		if(req.body.password) return next(appError('Please use /user/update-my-password route'))
+		if(req.body.email) return next(appError('You can\'t change login email'))
 
-	const data = filterObjectWithExcludedArray(req.body, excludedFields )
+		const data = filterObjectWithExcludedArray(req.body, excludedFields )
 
 
-	// ------[ upload avatar ]---------
-	if(data.avatar) {
-		// delete old image before upload
-		req.user.avatar.public_id && await cloudinary.v2.uploader.destroy(req.user.avatar.public_id)
+		// ------[ upload avatar ]---------
+		// if(data.avatar) {
+		// 	// delete old image before upload
+		// 	req.user.avatar.public_id && await cloudinary.v2.uploader.destroy(req.user.avatar.public_id)
 
-		const { public_id, secure_url } = await cloudinary.v2.uploader.upload(req.body.avatar, {
-			folder: 'next-amazona/users'
+		// 	const { public_id, secure_url } = await cloudinary.v2.uploader.upload(req.body.avatar, {
+		// 		folder: 'next-amazona/users'
+		// 	})
+		// 	data.avatar = { public_id, secure_url } 	// modify avatar String to Object
+		// }
+		// // delete avatar
+		// if( !data.avatar && req.user.avatar.public_id) 	await cloudinary.v2.uploader.destroy(req.user.avatar.public_id)
+
+
+		// 3. Save image to /public/images/users/
+		const saveToDir = path.join(PUBLIC_ROOT, '/images/users')
+		const { error, image } = await uploadImage(body.avatar, saveToDir, [100, 100] )
+		if(!error) return next(appError(`Avatar Upload Error: ${error}`, 500))
+
+		data.avatar = image
+
+		// N-1: last extep, to remove image, if throw error after image upload
+		req.body.avatar = image.secure_url 		
+
+		// 4. save to database
+		const user = await User.findByIdAndUpdate(req.user.id, data, { new: true, runValidators: true })
+		if(!user) return next(appError('User can\'t update.', 500))
+
+		res.status(201).json({
+			status: 'success',
+			user
 		})
-		data.avatar = { public_id, secure_url } 	// modify avatar String to Object
+
+	} catch (err) {
+
+		// 1. Get image path which we set when image uploaded
+		const destination = path.join(PUBLIC_ROOT, req.body.avatar)
+
+		// 2. check if file exists then try to remove image
+		fs.exists(destination, (isExist) => isExist && promisify(fs.unlink)(destination))
+
+		// 3. Close Request-Response-circle with sending error message
+		next(appError(err.message))
 	}
-	// delete avatar
-	if( !data.avatar && req.user.avatar.public_id) 	await cloudinary.v2.uploader.destroy(req.user.avatar.public_id)
-
-
-
-
-	const user = await User.findByIdAndUpdate(req.user.id, data, { new: true, runValidators: true })
-	if(!user) return next(appError('User can\'t update.', 500))
-
-
-	res.status(201).json({
-		status: 'success',
-		user
-	})
-})
+}
 
 /* userReducer.js  > /pages/api/users/update-my-password.js	:	handler.patch(protect, updateMyPassword)
  		.	/user/update-my-password.js */

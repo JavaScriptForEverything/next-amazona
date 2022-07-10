@@ -11,5 +11,6 @@ handler
 	.use(morgan('dev'))
 	// .use(protect)
 	.get(userController.getUserById)
+	.patch(userController.updateUserById)
 
 export default handler

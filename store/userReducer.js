@@ -28,26 +28,7 @@ const { reducer, actions } = createSlice({
 		users: [],
 		countPage: 0, 						// totalUsers / limit
 
-		user : { 									// set default user value
-		  _id: '',
-		  username: '',
-		  email: '',
-		  password: '',
-		  isAdmin: false,
-		  title: '',
-		  description: '',
-		  skills: [],
-		  phone: 0,
-		  age: '',
-		  resume: '',
-		  location: {
-		    address: '',
-		    city: '',
-		    country: ''
-		  },
-		  experience: '',
-		  experiences: []
-		}
+		user : { }
 	},
 	reducers: {
 		requested: (state, action) => ({
@@ -247,9 +228,9 @@ export const getAllUsers = (token, obj ) => catchAsyncDispatch(async (dispatch) 
 
 /* every place used this function we have to pass token too, but as we use cookie,
  	and backend check 3 place for token, luckyly browser send cooke that why our code wouldn't throw error */
-export const updateProfile = (obj, token) => catchAsyncDispatch(async (dispatch) => {
+export const updateProfile = (fields, userId) => catchAsyncDispatch(async (dispatch) => {
 	dispatch(actions.requested())
-	const { data: { user } } = await axios.patch(`/api/users/me`, obj, { headers: {Authorization: `Bearer ${token}`} })
+	const { data: { user } } = await axios.patch(`/api/users/${userId}`, fields )
 	dispatch(actions.profileUpdated(user))
 }, actions.failed)
 

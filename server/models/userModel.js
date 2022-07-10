@@ -123,7 +123,7 @@ const userSchema = new Schema({
 			default: 'bangladesh'
 		},
 	},
-	experience : {
+	experience : { 			// yearOfExperience
 		type: Number,
 		max: 50,
 		default: 6

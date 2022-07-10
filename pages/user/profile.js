@@ -1,14 +1,11 @@
-import { wrapper } from '../../store'
-import { useRouter } from 'next/router'
 import { verify } from 'jsonwebtoken'
-
+import { useRouter } from 'next/router'
 import { useState, useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { updateProfile, experienceFeature, editFeature, getUser, authenticateUser, getUserById } from '../../store/userReducer'
+import { updateProfile, experienceFeature, editFeature } from '../../store/userReducer'
+import { toCapitalize, readAsDataURL } from '../../util'
 
 import Layout from '../../layout'
-import { toCapitalize, readAsDataURL } from '../../util'
-import { description } from '../../data/profile'
 import ProfileSkills from '../../components/dialog/profile/skills'
 import ProfileBasicInfo from '../../components/dialog/profile/basicInfo'
 import ProfileSendMail from '../../components/dialog/profile/sendMail'
@@ -47,7 +44,7 @@ import DeleteIcon from '@mui/icons-material/Delete'
 
 const avatarMenuItems = [
 	{label: 'Upload Photo', icon: <UploadIcon />},
-	{label: 'Delete Photo', icon: <DeleteIcon />}
+	// {label: 'Delete Photo', icon: <DeleteIcon />}
 ]
 const experiencesInfo = [
 	// {label: 'create', icon: <AddIcon />},
@@ -103,7 +100,7 @@ const Profile = () => {
 	// update/delete avatar here
 	useEffect(() => {
 		if( uploadAvatar) { 	// use await so that setUploadAvatar set value after 	dispatch(updateProfile(...))
-			dispatch(updateProfile({ avatar: avatarFile })) 	// update avatar in store + in Database
+			dispatch(updateProfile({ avatar: avatarFile }, user._id)) 	// update avatar in store + in Database
 			setUploadAvatar(false)
 			setAvatarOpen(false)
 		}
@@ -119,7 +116,8 @@ const Profile = () => {
 		if(label === items[0].label) return 			// if upload avatar then handle in useEffect()
 
 		setAvatarOpen(false) 											// immediately close menu Popup
-		dispatch(updateProfile({ avatar: '' })) 	// delete avatar from database + redux store
+		console.log({ label })
+		// dispatch(updateProfile({ avatar: '' })) 	// delete avatar from database + redux store
 	}
 	const inputFileChangeHandler = (evt) => {
 		readAsDataURL(evt.target.files[0], setAvatarFile)
@@ -168,10 +166,14 @@ const Profile = () => {
 		dispatch(editFeature('description'))
 	}
 
-	// return ( <Layout> 'profile page' </Layout>)
+	const addNodeSubmitHandler = (evt) => {
+		evt.preventDefault()
+
+		console.log('Handle Add Note later')
+	}
 
 	return (
-		<Layout title={`Profile Page | ${user.username} `}>
+		<Layout title={`Profile Page | ${user.name} `}>
 
 			{/*-----[ dialog/models ]------*/}
 			{ user && <ProfileSkills open={openSkill} setOpen={setOpenSkill} /> }
@@ -195,7 +197,7 @@ const Profile = () => {
 											<Avatar
 												src={user.avatar ? user.avatar.secure_url : ''}
 												alt={user.avatar ? user.avatar.secure_url : ''}
-												title={user.username}
+												title={user.name}
 												sx={{ width: 150, height: 150, mb: 1 }}
 											/>
 										)}
@@ -213,16 +215,16 @@ const Profile = () => {
 								<Typography color='primary' sx={{textTransform: 'capitalize'}}
 									title='Double Click to Edit'
 									onDoubleClick={usernameHandler}
-								>{user.username}</Typography>
+								>{user.name}</Typography>
 								<Typography variant='caption'
 									title='Double Click to Edit'
 									onDoubleClick={titleHandler}
-								>{toCapitalize(user.title) || 'Full Stack Developer'}</Typography>
+								>{toCapitalize(user.title)}</Typography>
 								<Typography sx={{ mt: 2 }} variant='body2' color='textSecondary' align='justify' paragraph
 									title='Double Click to Edit'
 									onDoubleClick={descriptionHandler}
 								>
-									{user.description || description }
+									{user.description}
 								</Typography>
 
 							</Grid>
@@ -238,11 +240,16 @@ const Profile = () => {
 										dense
 										divider={ label !== items[items.length - 1].label}
 										component={ items[0].label === label ? 'label' : 'li'}
-										disabled={user.avatar && key === 0 ? true : false}
+										// disabled={user.avatar && key === 0 ? true : false}
 									>
 										<ListItemIcon>{icon}</ListItemIcon>
 										<ListItemText>{label}</ListItemText>
-										{label === items[0].label && <input type='file' accept='image/*' hidden onChange={inputFileChangeHandler} /> }
+										{label === items[0].label && <input 
+											type='file' 
+											accept='image/*' 
+											hidden 
+											onChange={inputFileChangeHandler} 
+										/> }
 									</MenuItem>
 								))}
 							</Menu>
@@ -261,12 +268,12 @@ const Profile = () => {
 								{user?.skills?.map(skill => <Button key={skill}
 									variant='outlined'
 									size='small'
-									sx={{ py:.5, px: 2, borderRadius: 4, textTransform: 'Capitalize' }}
+									sx={{ py:.5, px: 2, borderRadius: 1, textTransform: 'Capitalize' }}
 								>{skill}</Button> )}
 							</Grid>
 
 							<Typography variant='h5' sx={{ mt: 4 }} >Add Notes </Typography>
-							<form onSubmit={() => 0}>
+							<form onSubmit={addNodeSubmitHandler}>
 								<TextField
 									placeholder='Add notes for future feference'
 									fullWidth
@@ -295,8 +302,8 @@ const Profile = () => {
 								</Grid>
 							</Grid>
 							<Grid container spacing={2} >
-								{basic.map(({label, value}, key) => (
-									<Grid key={key} item xs={6} md={4} container direction='column' sx={{ overflow: 'hidden' }} >
+								{basic.map(({label, value}) => (
+									<Grid key={label} item xs={6} md={4} container direction='column' sx={{ overflow: 'hidden' }} >
 										<Typography color='textSecondary'>{label}</Typography>
 										<Typography variant='body2' >{value}</Typography>
 									</Grid>
@@ -415,49 +422,15 @@ const Profile = () => {
 export default Profile
 
 
-// export const getServerSideProps = ({ req }) => {
-// 	const { token } = req.cookies
-// 	// console.log({ token })
-
-// 	const { TOKEN_SALT } = process.env || {}
-// 	// console.log({ TOKEN_SALT })
-
-// 	// const { _id, iat } = verify(token, TOKEN_SALT)
-// 	// console.log({ _id, iat })
-
-// 	try {
-// 		const { _id, iat } = verify(token, TOKEN_SALT)
-// 		// dispatch(authenticateUser(true)) 		
-// 		console.log({ _id, iat })
-
-// 	} catch (err) {
-// 		console.log(err.message)
-// 		// dispatch(authenticateUser(false)) 		
-
-// 		return { redirect: { 	// NextJS built-in Redirect features
-// 				destination: '/login',
-// 				parmanent: false
-// 			}
-// 		}
-// 	}
-
-// 	return { props: {} }
-// }
-
-
-export const getServerSideProps = wrapper.getServerSideProps(({ dispatch }) => async ({ req }) => {
+export const getServerSideProps = ({ req }) => {
 	const { token } = req.cookies || {}
-	const { TOKEN_SALT } = process.env || {}
 
 	try {
+		const { TOKEN_SALT } = process.env || {}
 		const { _id, iat } = verify(token, TOKEN_SALT)
-		// console.log({ _id, iat })
-		dispatch(authenticateUser(true)) 		
-		// await dispatch(getUserById(req, _id)) 			// called it in /login
 
 	} catch (err) {
 		console.log(err.message)
-		dispatch(authenticateUser(false)) 		
 
 		return { redirect: { 	// NextJS built-in Redirect features
 				destination: '/login',
@@ -465,4 +438,6 @@ export const getServerSideProps = wrapper.getServerSideProps(({ dispatch }) => a
 			}
 		}
 	}
-})
+
+	return { props: {}}
+}
