@@ -5,6 +5,7 @@ import crypto from 'crypto'
 import bcript from 'bcryptjs'
 import User from '../models/userModel'
 
+import { parse } from 'cookie'
 
 import { 
 	catchAsync, 
@@ -35,18 +36,15 @@ const PUBLIC_ROOT = path.join(__dirname, '../../../../../public')
 	. /api/users/forgot-password/ 		: handler.patch(protect, resetPassword) */
 export const protect = catchAsync(async(req, res, next) => {
 	/* 1. Get Token: Token may comes form
-				1. browser Cookie automatically or
-				2. user set manually as cookie or bearer token or
-				3. user send with body: required for reset password based on token */
-	// console.log({ token: req.headers})
-	// console.log({ token: req.cookies })
+				1. Browser Cookie automatically 									: For Web Appication
+				2. user set manually as header as Bearer token 		: For Mobile Application
 
-	let token = req.headers.cookie?.split('=').pop()  						// from browser  or user send 	{ headers: {cookie: token} }
-	    token = token || req.headers.authorization?.split('Bearer ').pop() 	// 	{ headers: { Authorization: `Bearer ${token}`}}
-	    token = token || req.body.token  																		// { username: 'riajul', token: 'eyJhbGciOiJIUzI1...'}
+	/*
+		const token =  req.headers.authorization?.split('Bearer ').pop() 	
+			// axios.get('/api/users/me', { headers: { Authorization: `Bearer ${token}`}})
+	*/
 
-	// console.log({ token: req.headers.cookie })
-
+	const { token } = parse(req.headers.cookie)
 	if(!token) return next(appError('Please send token as header or body', 401))
 
 	// 2. Get id from token
@@ -89,7 +87,16 @@ export const getMe = (req, res, next) => {
 }
 
 
-const excludedFields = [ 'role', '_id', 'password', 'email', 'passwordResetToken', 'passwordResetExpires', 'passwordChangedAt']
+const excludedFields = [ 
+	'role', 
+	'_id', 
+	'password', 
+	'email', 
+	'avatar', 
+	'passwordResetToken', 
+	'passwordResetExpires', 
+	'passwordChangedAt'
+]
 
 /* userReducer.js  > /pages/api/users/me.js	:	handler.patch(protect, updateMe)
  		// .	/layout/index.js */
@@ -100,43 +107,27 @@ export const updateMe = async (req, res, next) => {
 
 		const data = filterObjectWithExcludedArray(req.body, excludedFields )
 
-
 		// ------[ upload avatar ]---------
-		// if(data.avatar) {
-		// 	// delete old image before upload
-		// 	req.user.avatar.public_id && await cloudinary.v2.uploader.destroy(req.user.avatar.public_id)
+		// // 1. Save image to /public/images/users/
+		if(req.body.avatar) {
+			// console.log(req.body.avatar.size)
+			const saveToDir = path.join(PUBLIC_ROOT, '/images/users')
+			const { image } = await uploadImage(avatar, saveToDir, [100, 100] )
 
-		// 	const { public_id, secure_url } = await cloudinary.v2.uploader.upload(req.body.avatar, {
-		// 		folder: 'next-amazona/users'
-		// 	})
-		// 	data.avatar = { public_id, secure_url } 	// modify avatar String to Object
-		// }
-		// // delete avatar
-		// if( !data.avatar && req.user.avatar.public_id) 	await cloudinary.v2.uploader.destroy(req.user.avatar.public_id)
+			data.avatar = await image
+			req.body.avatar = await image.secure_url 	// 3: to remove image, if throw error after image upload
+		}
 
 
-		// 3. Save image to /public/images/users/
-		const saveToDir = path.join(PUBLIC_ROOT, '/images/users')
-		const { error, image } = await uploadImage(body.avatar, saveToDir, [100, 100] )
-		if(!error) return next(appError(`Avatar Upload Error: ${error}`, 500))
-
-		data.avatar = image
-
-		// N-1: last extep, to remove image, if throw error after image upload
-		req.body.avatar = image.secure_url 		
-
-		// 4. save to database
+		// 2. save to database
 		const user = await User.findByIdAndUpdate(req.user.id, data, { new: true, runValidators: true })
 		if(!user) return next(appError('User can\'t update.', 500))
 
-		res.status(201).json({
-			status: 'success',
-			user
-		})
+		res.status(201).json({ status: 'success', user })
 
 	} catch (err) {
 
-		// 1. Get image path which we set when image uploaded
+		// 1. Get image path which we set in step (3) after image uploaded
 		const destination = path.join(PUBLIC_ROOT, req.body.avatar)
 
 		// 2. check if file exists then try to remove image

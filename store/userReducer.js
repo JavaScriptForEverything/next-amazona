@@ -194,8 +194,8 @@ export const getUserById = (req, id) => catchAsyncDispatch(async (dispatch) => {
 	const { origin } = absoluteUrl(req)
 
 	dispatch(actions.requested())
-	const { data: { user } } = await axios.get(`${origin}/api/users/${id}`)
-	// console.log( 'getUserById: (from userReducer)', user )
+	// const { data: { user } } = await axios.get(`${origin}/api/users/${id}`)
+	const { data: { user } } = await axios.get(`${origin}/api/users/me`)
 	dispatch(actions.getUserById(user))
 }, actions.failed)
 
@@ -228,9 +228,9 @@ export const getAllUsers = (token, obj ) => catchAsyncDispatch(async (dispatch) 
 
 /* every place used this function we have to pass token too, but as we use cookie,
  	and backend check 3 place for token, luckyly browser send cooke that why our code wouldn't throw error */
-export const updateProfile = (fields, userId) => catchAsyncDispatch(async (dispatch) => {
+export const updateProfile = (fields) => catchAsyncDispatch(async (dispatch) => {
 	dispatch(actions.requested())
-	const { data: { user } } = await axios.patch(`/api/users/${userId}`, fields )
+	const { data: { user } } = await axios.patch(`/api/users/me`, fields )
 	dispatch(actions.profileUpdated(user))
 }, actions.failed)
 
@@ -358,3 +358,13 @@ export const deleteUser = (token, fields) => catchAsyncDispatch(async dispatch =
 }, actions.failed)
 
 
+
+export const getMe = () => async (dispatch) => {
+	try {
+		const { data } = await axios.get('/api/users/me')
+		// console.log(data)
+
+	} catch (err) {
+		console.log(err.message)
+	}
+}

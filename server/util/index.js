@@ -170,9 +170,10 @@ export const apiFeatures = (Model, queryObj) => {
     }) */
 export const uploadImage = async (image={}, saveToDir, size=[50, 50]) => {
   let error = ''
+	// console.log({ image })
 
   // 1. Get image as dataURL
-  const dataURL = image?.secure_url                 
+  const dataURL = image.secure_url                 
   if(!dataURL) return error = 'No image found'
 
   const isValidDataURL = dataURL.startsWith('data:')

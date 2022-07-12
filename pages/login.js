@@ -5,7 +5,7 @@ import { useState, useEffect } from 'react'
 import { wrapper } from '../store'
 import { useDispatch, useSelector } from 'react-redux'
 import { showAlert } from '../store/dialogReducer'
-import { authenticateUser, getUser, getUserById, loginUser } from '../store/userReducer'
+import { authenticateUser, loginUser } from '../store/userReducer'
 import { formValidator, getKeysOfArrayObject, TabPanel } from '../util'
 
 import Layout from '../layout'

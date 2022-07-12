@@ -96,7 +96,7 @@ export const login = catchAsync(async (req, res, next) => {
 	// 4. Set Token as Cookie
 	const token = setToken(user._id)
 	res.setHeader('set-cookie', serialize('token', token, {
-		expires: new Date( Date.now() + 60*60*24*30),
+		expires: new Date( Date.now() + 1000*60*60*24*30),
 		path: '/', 																				// cookie will be accessable on root label
 		httpOnly: true, 																	// server-side only
 		secure: process.env.NODE_ENV === 'production', 		// only https 
@@ -233,7 +233,7 @@ export const deleteMe = catchAsync(async(req, res, next) => {
 
 const excludedFields = [ 'role', '_id', 'password', 'email', 'passwordResetToken', 'passwordResetExpires', 'passwordChangedAt']
 
-/* userReducer.js  > /pages/api/users/me.js	:	handler.patch(protect, updateMe)
+/* userReducer.js  > /pages/api/users/me.js	:	handler.patch(updateMe)
  		// .	/layout/index.js */
 export const updateUserById = async (req, res, next) => {
 	try {

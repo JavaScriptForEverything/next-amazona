@@ -43,9 +43,10 @@ const DashboardComponent = () => {
 	// console.log(selected)
 	const navItemClickHandler = (evt) => setSelected(+evt.currentTarget.dataset.listValue)
 
+	return <Layout title={`Dashboard of '${user.user}'`} > hello world </Layout>
 
 	return (
-		<Layout title={`Dashboard of '${user.username}'`} >
+		<Layout title={`Dashboard of '${user.user}'`} >
 
 
 			<Grid container spacing={2}>
@@ -86,13 +87,13 @@ export default DashboardComponent
 
 
 export const getServerSideProps = (ctx) => {
-	const { token } = nookies.get(ctx)
+	// const { token } = nookies.get(ctx)
 
-	if(!token) return { redirect: { 		// NextJS built-in Redirect features
-			destination: '/login',
-			parmanent: false
-		}
-	}
+	// if(!token) return { redirect: { 		// NextJS built-in Redirect features
+	// 		destination: '/login',
+	// 		parmanent: false
+	// 	}
+	// }
 
 	return { props: {} }
 }

@@ -78,7 +78,7 @@ const Profile = () => {
 
 	const { user } = useSelector(state => state.user)
 	// console.log({ resume: user.resume })
-	// console.log(user)
+	// console.log({ userId: user._id })
 
 	// return ( <Layout> profile page </Layout>)
 
@@ -100,7 +100,7 @@ const Profile = () => {
 	// update/delete avatar here
 	useEffect(() => {
 		if( uploadAvatar) { 	// use await so that setUploadAvatar set value after 	dispatch(updateProfile(...))
-			dispatch(updateProfile({ avatar: avatarFile }, user._id)) 	// update avatar in store + in Database
+			dispatch(updateProfile({ avatar: avatarFile })) 	// update avatar in store + in Database
 			setUploadAvatar(false)
 			setAvatarOpen(false)
 		}
@@ -140,7 +140,9 @@ const Profile = () => {
 			dispatch(experienceFeature(false)) 			// Enable UpdateExperienceForm
 		}
 		if(menuItem === 'Delete') { 	// Handle Menu Delele Here
-			dispatch(updateProfile({ experiences: user?.experiences.filter(item => item._id !== experienceId)}))
+			dispatch(updateProfile({ 
+				experiences: user?.experiences.filter(item => item._id !== experienceId)
+			}))
 		}
 	}
 
@@ -155,7 +157,7 @@ const Profile = () => {
 
 	const usernameHandler = (evt) => {
 		setOpenEdit(true)
-		dispatch(editFeature('username'))
+		dispatch(editFeature('name'))
 	}
 	const titleHandler = (evt) => {
 		setOpenEdit(true)

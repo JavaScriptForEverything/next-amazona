@@ -9,7 +9,7 @@ const handler = nc({ onError })
 
 handler
 	.use(morgan('dev'))
-	// .use(protect)
+	.use(protect)
 	.get(userController.getUserById)
 	.patch(userController.updateUserById)
 

@@ -1,13 +1,13 @@
 # See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
 
 # node modules
-/node_modules
+node_modules/
 
 # next.js
-/.next
+.next/
 
 # production
-/build
+build/
 
 # debug
 npm-debug.log*
@@ -19,5 +19,7 @@ yarn-error.log*
 .env
 
 # my testing files
-/demo
+demo/
 
+
+public/user/
