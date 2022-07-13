@@ -317,7 +317,7 @@ const Profile = () => {
 										variant='contained'
 										sx={{ textTransform: 'Capitalize' }}
 										startIcon={<FileDownloadIcon />}
-										component='a' href={user.resume} download='resume.pdf'
+										component='a' href={user.resume?.secure_url} download='resume.pdf'
 										disabled={!user.resume }
 									>Download Resume</Button>
 									<Button

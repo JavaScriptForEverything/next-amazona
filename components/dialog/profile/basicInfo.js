@@ -23,11 +23,11 @@ import PersonIcon from '@mui/icons-material/Person'
 
 
 const basicInfoItems = [
-	{label: 'Age', type: 'text', name: 'age'},
-	{label: 'Years Of Experience', type: 'text', name: 'experience'},
-	{label: 'Phone', type: 'text', name: 'phone'},
-	{label: 'CTC', type: 'text', name: 'ctc'},
-	{label: 'Location', type: 'text', name: 'location'},
+	// {label: 'Age', type: 'text', name: 'age'},
+	// {label: 'Years Of Experience', type: 'text', name: 'experience'},
+	// {label: 'Phone', type: 'text', name: 'phone'},
+	// {label: 'CTC', type: 'text', name: 'ctc'},
+	// {label: 'Location', type: 'text', name: 'location'},
 	{label: 'Resume', type: 'file', name: 'resume'},
 ]
 const basicInfoObj = {}
@@ -71,7 +71,7 @@ const FormDialog = ({ open, setOpen }) => {
 		if(fieldsObj.email &&!isEmail(fieldsObj.email)) errorsObj.email = 'Email address is invalid'
 
 		Object.keys(fieldsObj).forEach((field) => {
-			if(fieldsObj[field].trim() === '') 	errorsObj[field] = `${field} field is empty`
+			if(fieldsObj[field] === '') 	errorsObj[field] = `${field} field is empty`
 		})
 
 		setFieldsError(errorsObj)
@@ -82,7 +82,7 @@ const FormDialog = ({ open, setOpen }) => {
 
 	const closeHandler = () => setOpen(false)
 	const changeHandler = (evt) => {
-		if(evt.target.type === 'file') readAsDataURL(evt.target.files[0], setResume, false)
+		if(evt.target.type === 'file') readAsDataURL(evt.target.files[0], setResume, { pdf: true })
 
 		setFields({ ...fields, [evt.target.name]: evt.target.value})
 	}
@@ -98,8 +98,8 @@ const FormDialog = ({ open, setOpen }) => {
 		const isValidated = formValidator(fields)
 		if(!isValidated) return
 
-		setIsUpdated(true)
-		setDisabled(true)
+		// setIsUpdated(true)
+		// setDisabled(true)
 
 
 		const location = { 													// str => obj: 'Dhaka Bangladesh'
@@ -108,7 +108,7 @@ const FormDialog = ({ open, setOpen }) => {
 		}
 
 		dispatch(updateProfile({...fields, resume, location }))
-		// console.log({...fields, location })
+		// console.log({...fields, resume, location })
 	}
 
 	return (

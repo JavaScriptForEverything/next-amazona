@@ -14,7 +14,8 @@ import {
 	appError, 
 	sendMail, 
 	filterObjectWithExcludedArray, 
-	uploadImage 
+	uploadImage, 
+	uploadPdf
 } from '../util'
 
 
@@ -76,7 +77,7 @@ export const protect = catchAsync(async(req, res, next) => {
 
 
 
-export const upload = async (req, res, next) => {
+export const uploadAvatar = async (req, res, next) => {
 	const { avatar } = req.body || {}
 
 	// Step-1: only used if avatar available
@@ -93,6 +94,22 @@ export const upload = async (req, res, next) => {
 	next()
 }
 
+export const uploadResume = async (req, res, next) => {
+	const { resume } = req.body || {}
+
+	// Step-1: only used if resume available
+	if(!resume) return next()
+
+	// Step-2: Upload resume and Replace resume.secure_url with uploaded file url
+	const { file } = await uploadPdf(resume, `${PUBLIC_ROOT}/files`)
+	req.body.resume = file
+
+	// Step-3: Delete old image
+	const oldResume = path.join(PUBLIC_ROOT, req.user.resume?.secure_url)
+	fs.exists( oldResume, (isExist) => isExist && promisify(fs.unlink)(oldResume))
+
+	next()
+}
 
 /* userReducer.js  > /pages/api/users/me.js	:	handler.get(protect, getMe)
  		.	/layout/index.js */
@@ -124,6 +141,7 @@ export const updateMe = async (req, res, next) => {
 		if(req.body.email) return next(appError('You can\'t change login email'))
 
 		// const data = filterObjectWithExcludedArray(req.body, excludedFields )
+		// console.log(req.body)
 
 		// 2. save to database
 		const user = await User.findByIdAndUpdate(req.user.id, req.body, { new: true, runValidators: true })

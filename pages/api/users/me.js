@@ -11,6 +11,10 @@ handler
   .use(morgan('dev'))
 	.use(authController.protect)
 	.get(authController.getMe)
-	.patch(authController.upload, authController.updateMe)
+	.patch(
+		authController.uploadAvatar, 
+		authController.uploadResume, 
+		authController.updateMe
+	)
 
 export default handler

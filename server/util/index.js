@@ -1,3 +1,5 @@
+import fs from 'fs'
+import { promisify } from 'util'
 import { sign, verify } from 'jsonwebtoken' 	// required for setToken()
 import nodemailer from 'nodemailer'
 import { nanoid } from 'nanoid'
@@ -160,8 +162,8 @@ export const apiFeatures = (Model, queryObj) => {
 
 
 /* const PUBLIC_ROOT = path.join(__dirname, '../../../../public')  
-    const { error, image } = await uploadImage(req.body.avatar, PUBLIC_ROOT)
-		const { error, image } = await uploadImage(dataURL, saveToDir, [100, 100] )  // => size=[50, 50]
+    const { image } = await uploadImage(req.body.avatar, PUBLIC_ROOT)
+		const { image } = await uploadImage(dataURL, saveToDir, [100, 100] )  // => size=[50, 50]
     if(error) return next(appError(error))
 
     res.status(200).json({ 
@@ -200,5 +202,40 @@ export const uploadImage = async (image={}, saveToDir, size=[50, 50]) => {
   return {
     // error, 			// why error return something, need to check
     image: { secure_url, public_id, size: image.size }
+  }
+}
+
+
+
+
+
+export const uploadPdf = async (file={}, saveToDir) => {
+  let error = ''
+
+  // 1. Get image as dataURL
+  const dataURL = await file.secure_url                 
+  if(!dataURL) return error = 'No image found'
+
+  const isValidDataURL = dataURL.startsWith('data:')
+  if( !isValidDataURL ) return error = `upload image instead of '${dataURL}'`
+
+  // 2. remove metadata so that only base64 encoded data remains
+  const base64 = dataURL.split(';base64,').pop()    
+
+  // 3. convert base64 data to Binary buffer
+  const buf = Buffer.from(base64, 'base64')         
+
+  // 4. Save image from buffer  
+  const uniqueName = nanoid()
+  const public_id = uniqueName
+	const filename = public_id + '.pdf'
+	const destination = `${saveToDir}/${filename}`
+	const secure_url = destination.split('/public').pop()
+
+	await promisify(fs.writeFile)(destination, buf)
+
+
+  return {
+    file: { secure_url, public_id, size: file.size }
   }
 }

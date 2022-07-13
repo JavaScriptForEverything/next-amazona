@@ -45,10 +45,6 @@ const userSchema = new Schema({
 
 	// transactions: 								: populate this from payment createdAt
 
-	// avatar: { 											// we make it required in signup controler, by condition check.
-	// 	type: String,
-	// 	default: '/user.jpg'
-	// },
 	avatar: {
 		public_id: {
 			type: String,
@@ -60,7 +56,16 @@ const userSchema = new Schema({
 			required: true,
 		}, 
 		size: Number
-		
+	},
+	resume: {
+		public_id: {
+			type: String,
+			unique: true
+		}, 
+		secure_url: {
+			type: String,
+		}, 
+		size: Number
 	},
 	title: {
 		type: String,
@@ -128,9 +133,9 @@ const userSchema = new Schema({
 		max: 50,
 		default: 6
 	},
-	resume : {
-		type: String,
-	},
+	// resume : {
+	// 	type: String,
+	// },
 
 	// Experience Info
 	experiences: [{
