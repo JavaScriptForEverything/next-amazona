@@ -76,6 +76,24 @@ export const protect = catchAsync(async(req, res, next) => {
 
 
 
+export const upload = async (req, res, next) => {
+	const { avatar } = req.body || {}
+
+	// Step-1: only used if avatar available
+	if(!avatar) return next()
+
+	// Step-2: Upload avatar and Replace avatar.secure_url with uploaded image url
+	const { image } = await uploadImage(avatar, `${PUBLIC_ROOT}/images/users`)
+	req.body.avatar = image 	// body get updated avatar with image url
+
+	// Step-3: Delete old image
+	const oldImage = path.join(PUBLIC_ROOT, req.user.avatar.secure_url)
+	fs.exists( oldImage, (isExist) => isExist && promisify(fs.unlink)(oldImage))
+
+	next()
+}
+
+
 /* userReducer.js  > /pages/api/users/me.js	:	handler.get(protect, getMe)
  		.	/layout/index.js */
 export const getMe = (req, res, next) => {
@@ -87,16 +105,16 @@ export const getMe = (req, res, next) => {
 }
 
 
-const excludedFields = [ 
-	'role', 
-	'_id', 
-	'password', 
-	'email', 
-	'avatar', 
-	'passwordResetToken', 
-	'passwordResetExpires', 
-	'passwordChangedAt'
-]
+// const excludedFields = [ 
+// 	'role', 
+// 	'_id', 
+// 	'password', 
+// 	'email', 
+// 	'avatar', 
+// 	'passwordResetToken', 
+// 	'passwordResetExpires', 
+// 	'passwordChangedAt'
+// ]
 
 /* userReducer.js  > /pages/api/users/me.js	:	handler.patch(protect, updateMe)
  		// .	/layout/index.js */
@@ -105,22 +123,10 @@ export const updateMe = async (req, res, next) => {
 		if(req.body.password) return next(appError('Please use /user/update-my-password route'))
 		if(req.body.email) return next(appError('You can\'t change login email'))
 
-		const data = filterObjectWithExcludedArray(req.body, excludedFields )
-
-		// ------[ upload avatar ]---------
-		// // 1. Save image to /public/images/users/
-		if(req.body.avatar) {
-			// console.log(req.body.avatar.size)
-			const saveToDir = path.join(PUBLIC_ROOT, '/images/users')
-			const { image } = await uploadImage(avatar, saveToDir, [100, 100] )
-
-			data.avatar = await image
-			req.body.avatar = await image.secure_url 	// 3: to remove image, if throw error after image upload
-		}
-
+		// const data = filterObjectWithExcludedArray(req.body, excludedFields )
 
 		// 2. save to database
-		const user = await User.findByIdAndUpdate(req.user.id, data, { new: true, runValidators: true })
+		const user = await User.findByIdAndUpdate(req.user.id, req.body, { new: true, runValidators: true })
 		if(!user) return next(appError('User can\'t update.', 500))
 
 		res.status(201).json({ status: 'success', user })
@@ -128,7 +134,7 @@ export const updateMe = async (req, res, next) => {
 	} catch (err) {
 
 		// 1. Get image path which we set in step (3) after image uploaded
-		const destination = path.join(PUBLIC_ROOT, req.body.avatar)
+		const destination = path.join(PUBLIC_ROOT, req.body.avatar.secure_url)
 
 		// 2. check if file exists then try to remove image
 		fs.exists(destination, (isExist) => isExist && promisify(fs.unlink)(destination))
