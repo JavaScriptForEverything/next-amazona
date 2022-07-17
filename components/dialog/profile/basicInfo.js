@@ -23,11 +23,11 @@ import PersonIcon from '@mui/icons-material/Person'
 
 
 const basicInfoItems = [
-	// {label: 'Age', type: 'text', name: 'age'},
-	// {label: 'Years Of Experience', type: 'text', name: 'experience'},
-	// {label: 'Phone', type: 'text', name: 'phone'},
-	// {label: 'CTC', type: 'text', name: 'ctc'},
-	// {label: 'Location', type: 'text', name: 'location'},
+	{label: 'Age', type: 'text', name: 'age'},
+	{label: 'Years Of Experience', type: 'text', name: 'experience'},
+	{label: 'Phone', type: 'text', name: 'phone'},
+	{label: 'CTC', type: 'text', name: 'ctc'},
+	{label: 'Location', type: 'text', name: 'location'},
 	{label: 'Resume', type: 'file', name: 'resume'},
 ]
 const basicInfoObj = {}
@@ -46,7 +46,7 @@ const FormDialog = ({ open, setOpen }) => {
 	const [ resume, setResume ] = useState()
 
 	const { error, loading, user } = useSelector(state => state.user)
-	// console.log(user.location)
+	// console.log(user)
 
 	const updateBasicInfoObj = {
 	  age: user.age,
@@ -57,7 +57,8 @@ const FormDialog = ({ open, setOpen }) => {
 	  resume: user.resume
 	}
 	useEffect(() => { 								// fill data from store
-		setFields(updateBasicInfoObj)
+		// setFields(updateBasicInfoObj)
+		setFields(user)
 	}, [])
 
 	useEffect(() => {
@@ -107,8 +108,8 @@ const FormDialog = ({ open, setOpen }) => {
 		  country: fields?.location?.split(' ')[1], 	// Bangladesh
 		}
 
-		dispatch(updateProfile({...fields, resume, location }))
 		// console.log({...fields, resume, location })
+		dispatch(updateProfile({...fields, resume, location }))
 	}
 
 	return (

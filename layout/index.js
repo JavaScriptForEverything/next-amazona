@@ -159,10 +159,12 @@ const Layout = ({ title, description, children, ...params }) => {
 									alt={`${user?.title}-${user?.username}`}
 								/>
 							</IconButton>
-								<Typography sx={{textTransform: 'capitalize'}} >{user?.username}</Typography>
+								<Typography sx={{textTransform: 'capitalize'}} >{user?.name}</Typography>
 								<Link href='/user/profile' passHref><MuiLink>My Profile</MuiLink></Link>
 							</Box>
-							{menuItems.map((item, key, items) => [
+							{menuItems
+								.filter(item => item.label !== 'Dashboard' || user.role === 'admin')
+								.map((item, key, items) => [
 								key === 0 && <Divider />,
 								<MenuItem
 									key={item.label}

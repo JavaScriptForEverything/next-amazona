@@ -57,7 +57,12 @@ const { reducer, actions } = createSlice({
 		experienceFeature: (state, action) => ({ ...state, isExperienceAdd: action.payload}),
 		profileEdited: (state, action) => ({ ...state, edit: action.payload}),
 
-		signedUp: (state, action) => ({ ...state, loading: false, status: action.payload }),
+		signedUp: (state, action) => ({
+			...state,
+			loading: false,
+			authenticated: false,
+			status: action.payload
+		}),
 		loginUser: (state, action) => ({ 
 			...state, 
 			loading: false, 
