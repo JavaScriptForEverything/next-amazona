@@ -179,6 +179,36 @@ export const getUserById = catchAsync(async(req, res, next) => {
 
 
 
+// /* userReducer.js  > /api/users/[id].js	:	handler.post(userController.getMeinServer)
+//  		//.	/pages/user/dashboard.js */
+// export const getMeInServer = catchAsync(async(req, res, next) => {
+// 	const { id } = req.query
+
+// 	const user = await User.findById(id)
+// 	if(!user) return next(appError('No user Found', 404))
+
+// 	res.status(200).json({
+// 		status: 'success',
+// 		user
+// 	})
+// })
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 /* userReducer.js  > /api/users/send-mail.js	:	handler.post(protect, userMailTo)
  		/components/dialog/profile/sendMail.js */
 export const userMailTo = catchAsync(async(req, res, next) => {

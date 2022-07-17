@@ -34,7 +34,7 @@ const DeleteMe = ({ onClick=f=>f }) => {
 	const { error, loading, token } = useSelector(state => state.user)
 
 	useEffect(() => {
-		if(!token) router.push('/login')
+		// if(!token) router.push('/login')
 	}, [token])
 
 	const closeHandler = () => {

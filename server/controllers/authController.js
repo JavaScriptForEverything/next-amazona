@@ -45,11 +45,16 @@ export const protect = catchAsync(async(req, res, next) => {
 			// axios.get('/api/users/me', { headers: { Authorization: `Bearer ${token}`}})
 	*/
 
-	const { token } = parse(req.headers.cookie)
-	if(!token) return next(appError('Please send token as header or body', 401))
+	const { token } = parse(req.headers.cookie || '')
+	// console.log({ token })
+
+
+	// const { token } = parse(req.headers?.cookie || '')
+	if(!token) return next(appError('Please send token as cookie', 401))
 
 	// 2. Get id from token
 	const { _id, iat } = getIdFromToken(token)
+	// console.log({ userId: _id })
 
 	// 3. Get user by id
 	const user = await User.findById(_id)

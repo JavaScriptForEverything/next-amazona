@@ -194,15 +194,48 @@ export const authenticateUser = () => (dispatch) => {
 // }, actions.failed)
 
 
-// /pages/user/profile.js 	= wrapper.getServerSideProps(...) 
+
+// // ?
+// export const getMe = () => async (dispatch) => {
+// 	try {
+// 		const { data } = await axios.get('/api/users/me')
+// 		// console.log(data)
+
+// 	} catch (err) {
+// 		console.log(err.message)
+// 	}
+// }
+
+
+// ? 	rename it as getMe
 export const getUserById = (req, id) => catchAsyncDispatch(async (dispatch) => {
 	const { origin } = absoluteUrl(req)
 
 	dispatch(actions.requested())
-	// const { data: { user } } = await axios.get(`${origin}/api/users/${id}`)
 	const { data: { user } } = await axios.get(`${origin}/api/users/me`)
 	dispatch(actions.getUserById(user))
 }, actions.failed)
+
+
+// ? naname it as getUserById
+export const getMeById = async (req, id) => {
+	try {
+		const { origin } = absoluteUrl(req)
+		const { data: { user } } = await axios.get(`${origin}/api/users/${id}` )
+		// console.log({ user })
+		return user
+
+	} catch (err) {
+		const { method, path } = err.request
+		const { data, status } = err.response
+
+		const errorObject = { method, path, status, message: data.message }
+		console.log(errorObject)
+	}
+}
+
+
+
 
 // updateUserUser
 export const updateUserInStore = (user) => (dispatch) => {
@@ -364,12 +397,33 @@ export const deleteUser = (token, fields) => catchAsyncDispatch(async dispatch =
 
 
 
-export const getMe = () => async (dispatch) => {
-	try {
-		const { data } = await axios.get('/api/users/me')
-		// console.log(data)
 
-	} catch (err) {
-		console.log(err.message)
-	}
-}
+// export const getMeInServer = async ({ req, id, token }) => {
+// 	const { origin } = absoluteUrl(req)
+// 	// console.log({ token })
+
+// 	try {
+// 		// const { data: { user } } = await axios.get(`${origin}/api/users/${id}`, {
+// 		const { data: { user } } = await axios.post(`${origin}/api/users/${id}`, {}, {
+// 			// headers: {
+// 			// 	Authorization: `Bearer ${token}`, 				// (1) 	: As Bearer Token
+// 			// 	cookie: `token=${token}`, 														// (2) 	: As Cookie
+// 			// 	// withCredentials: true 										// 			: Mandatory to send cookie
+// 			// }
+// 		})
+// 		console.log({ user })
+// 		// return user
+
+// 	} catch (err) {
+// 		const { method, path } = err.request
+// 		const { data, status } = err.response
+
+// 		const errorObject = { method, path, status, message: data.message }
+
+// 		console.log(errorObject)
+
+// 	}
+// }
+
+
+

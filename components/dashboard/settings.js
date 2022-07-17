@@ -137,8 +137,9 @@ const Settings = () => {
 		console.log('Delete Me')
 	}
 
+	// return <Typography>Settings</Typography>
+
 	return (
-		<>
 		<Grid container spacing={1}>
 			{/*-----[ Left side ]------*/}
 			<Grid item xs={12} sm={6}>
@@ -146,7 +147,7 @@ const Settings = () => {
 					<Typography variant='h6' color='primary' sx={{ py: 1 }}> Edit Profile </Typography>
 					<form noValidate onSubmit={fieldSubmitHandler} >
 						{userInputs.map(({ label, name, type, image, options }, key) => Array.isArray(options) ? (
-							<Autocomplete key={key}
+							<Autocomplete key={label}
 								options={options}
 								getOptionLabel={ option => option }
 								renderInput={params => <TextField {...params}
@@ -162,7 +163,7 @@ const Settings = () => {
 								onChange={(evt, newValue) => changeHandler(evt, name, type, image, newValue)}
 							/>
 						) : (
-							<TextField key={key}
+							<TextField key={label}
 								label={label}
 								InputLabelProps={{ shrink: true }}
 								margin='dense'
@@ -198,7 +199,7 @@ const Settings = () => {
 				<Paper sx={{ p: 1 }}>
 					<Typography variant='h6' color='primary' sx={{ py: 1 }}> Change Password </Typography>
 					<form noValidate onSubmit={passwordSubmitHandler} >
-						{passwordInputs.map(({ label, name, type }, key) => <TextField key={key}
+						{passwordInputs.map(({ label, name, type }, key) => <TextField key={label}
 							label={label}
 							InputLabelProps={{ shrink: true }}
 							margin='dense'
@@ -229,7 +230,7 @@ const Settings = () => {
 				<Paper sx={{ p: 1, mt: 3 }}>
 					<Typography variant='h6' color='primary' sx={{ py: 1 }}> Notification </Typography>
 
-					{notifications.map(({ title, subheader, name }, key) => <Paper key={key}
+					{notifications.map(({ title, subheader, name }, key) => <Paper key={name}
 						sx={{
 						display: 'flex',
 						justifyContent: 'space-between',
@@ -261,10 +262,9 @@ const Settings = () => {
 						// onClick={handleDeleteUser}
 					/>
 				</Paper>
-
 			</Grid>
+
 		</Grid>
-		</>
 	)
 }
 export default Settings

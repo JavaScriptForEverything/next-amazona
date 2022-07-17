@@ -9,8 +9,9 @@ const handler = nc({ onError })
 
 handler
 	.use(morgan('dev'))
-	.use(protect)
+	// .use(protect) 										// no need because we sending id
 	.get(userController.getUserById)
+	// .post(userController.getMeInServer)
 	.patch(userController.updateUserById)
 
 export default handler

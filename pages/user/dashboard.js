@@ -1,6 +1,8 @@
-import nookies from 'nookies'
 import { useState } from 'react'
 import { useSelector } from 'react-redux'
+import { verify } from 'jsonwebtoken'
+// import { wrapper } from '../../store'
+import { getMeById } from '../../store/userReducer'
 
 import Layout from '../../layout'
 import Dashboard from '../../components/dashboard/dashboard'
@@ -39,11 +41,11 @@ const leftPanelItems = [
 const DashboardComponent = () => {
 	const [ selected, setSelected ] = useState(4)
 	const { user } = useSelector(state => state.user)
+	// console.log(user)
 
-	// console.log(selected)
 	const navItemClickHandler = (evt) => setSelected(+evt.currentTarget.dataset.listValue)
 
-	return <Layout title={`Dashboard of '${user.user}'`} > hello world </Layout>
+	// return <Layout title={`Dashboard of '${user.user}'`} > hello world </Layout>
 
 	return (
 		<Layout title={`Dashboard of '${user.user}'`} >
@@ -86,16 +88,34 @@ const DashboardComponent = () => {
 export default DashboardComponent
 
 
-export const getServerSideProps = (ctx) => {
-	// const { token } = nookies.get(ctx)
+export const getServerSideProps = async ({ req }) => {
+	const { token } = req.cookies || {}
 
-	// if(!token) return { redirect: { 		// NextJS built-in Redirect features
-	// 		destination: '/login',
-	// 		parmanent: false
-	// 	}
-	// }
+	try {
+		const { TOKEN_SALT } = process.env || {}
+		const { _id, iat } = verify(token, TOKEN_SALT)
 
-	return { props: {} }
+		const { role } = await getMeById(req, _id)
+
+		if( role !== 'admin' ) return { redirect: {
+				destination: '/user/profile',
+				parmanent: false
+			}
+		}
+
+	} catch (err) {
+		console.log(err.message)
+
+		return { redirect: { 	// NextJS built-in Redirect features
+				destination: '/login',
+				parmanent: false
+			}
+		}
+	}
+
+	return { props: {}}
 }
+
+
 
 
