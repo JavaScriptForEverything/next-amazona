@@ -114,7 +114,7 @@ const Products = ({ setView=f=>f }) => {
 
 	const coverImageDeleteHandler = (evt) => {
 		setFields({ ...fields, coverImage: '' }) 				// mimic remove image functionality
-		console.log({ coverImage: fields.coverImage })
+		// console.log({ coverImage: fields.coverImage })
 	}
 	const imagesDeleteHandler = (evt, item, id) => {
 		const images = fields.images?.filter( image => image !== item )
@@ -135,15 +135,15 @@ const Products = ({ setView=f=>f }) => {
 	const submitHandler = async (evt) => {
 		evt.preventDefault()
 
-		const isValidated = formValidator(fields, setFieldsError)
-		if(!isValidated) return
+		// const isValidated = formValidator(fields, setFieldsError)
+		// if(!isValidated) return
 
-		if(!fields.images?.length) return setFieldsError( errors => ({ ...errors, images: 'image field is empty' }))
+		// if(!fields.images?.length) return setFieldsError( errors => ({ ...errors, images: 'image field is empty' }))
 
 
-		// console.log(fields)
-		await dispatch(addProduct(fields, token))
-		await setAdded(true)
+		console.log(fields)
+		// await dispatch(addProduct(fields, token))
+		// await setAdded(true)
 	}
 
 	return (

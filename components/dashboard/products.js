@@ -1,7 +1,7 @@
 import nookies from 'nookies'
 import { useState, useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { getProductsXHR } from '../../store/productReducer'
+import { getProductsXHR, getClientSideProducts } from '../../store/productReducer'
 
 import SearchComponent from './_search'
 import FilterComponent from './_filter'
@@ -26,6 +26,7 @@ const menuItemsForFilter = [
 
 const Products = () => {
 	const dispatch = useDispatch()
+
 	const [ view, setView ] = useState(true)
 	const [ searchValue, setSearchValue ] = useState('')
 	const [ keyword, setKeyword ] = useState(menuItemsForFilter[0])
@@ -34,12 +35,15 @@ const Products = () => {
 
 	const { error, loading, products, countPage } = useSelector(state => state.product )
 
-	// console.log({ token, page, limit })
 
-	const { token } = nookies.get(null)
 	useEffect(() => {
-		dispatch(getProductsXHR({ token, page, limit }))
-	}, [token, page, limit])
+		dispatch(getClientSideProducts())
+	}, [])
+
+
+	useEffect(() => {
+		dispatch(getProductsXHR({ page, limit }))
+	}, [page, limit])
 
 
 	const addHandler = (evt) => setView(false) 		// to handle 2 page: create.js product

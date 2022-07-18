@@ -10,6 +10,10 @@ import { catchAsyncDispatch } from '../util'
 const { reducer, actions } = createSlice({
 	name: 'product',
 	initialState: {
+		loading: false,
+		error: '',
+		status: '',
+
 		products: [],
 		total:0, 								// Total products available in the database
 		// length: 0, 							// already get products from total products
@@ -19,8 +23,6 @@ const { reducer, actions } = createSlice({
 
 		brands: [],
 
-		loading: false,
-		error: '',
 
 		cartItems: (typeof window !== 'undefined') && JSON.parse(localStorage.getItem('cartItems')) || [],
 		shippingCharge: 0,
@@ -62,6 +64,12 @@ const { reducer, actions } = createSlice({
 		}),
 
 
+		getProducts: (state, action) => ({
+			...state,
+			loading: false,
+			...action.payload 							// <= { status: 'success', products: products }
+
+		}),
 		productAdded: (state, action) => ({
 			...state,
 			loading: false,
@@ -137,6 +145,14 @@ export const removeCartItems = () => (dispatch) => {
 export const getTotalPrice = () => (dispatch) => {
 	dispatch(actions.totalPrice())
 }
+
+
+// /components/dashboard/products.js 		: useEffect(() => {dispatch(getClientSideProducts()) }, [])
+export const getClientSideProducts = () => catchAsyncDispatch( async (dispatch) => {
+	dispatch(actions.requested())
+	const { data } = await axios.get('/api/products')
+	dispatch(actions.getProducts(data))
+}, actions.failed)
 
 
 

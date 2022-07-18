@@ -39,7 +39,7 @@ const leftPanelItems = [
 
 
 const DashboardComponent = () => {
-	const [ selected, setSelected ] = useState(4)
+	const [ selected, setSelected ] = useState(1)
 	const { user } = useSelector(state => state.user)
 	// console.log(user)
 
@@ -48,7 +48,7 @@ const DashboardComponent = () => {
 	// return <Layout title={`Dashboard of '${user.user}'`} > hello world </Layout>
 
 	return (
-		<Layout title={`Dashboard of '${user.user}'`} >
+		<Layout title={`Dashboard of '${user.name}'`} >
 
 
 			<Grid container spacing={2}>

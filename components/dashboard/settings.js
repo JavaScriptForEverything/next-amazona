@@ -1,4 +1,5 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import { useSelector } from 'react-redux'
 
 import { formValidator } from '../../util'
 import DeleteMe from './settings/deleteMe'
@@ -31,8 +32,8 @@ const readAsDataURL = (file, isImage=true) => new Promise((resolve, reject) => {
 
 // profile update
 const userInputs = [
-	fieldObjectCreator('Your Name', 'username'),  // (label, name, type='text', image=true, options)
-	fieldObjectCreator('Email Address', 'email', 'email'),
+	fieldObjectCreator('Your Name', 'name'),  // (label, name, type='text', image=true, options)
+	// fieldObjectCreator('Email Address', 'email', 'email'),
 	fieldObjectCreator('Avatar', 'avatar', 'file'),
 	fieldObjectCreator('Title', 'title'),
 	fieldObjectCreator('Description', 'description', 'textarea'),
@@ -80,6 +81,12 @@ const Settings = () => {
 	const [ notificationFields, setNotificationFields ] = useState(getNameFieldOfArrayObject(notifications, 'selected'))
 
 	// console.log(notificationFields)
+	const { user } = useSelector(state => state.user)
+		// console.log(user)
+
+	// useEffect(() => {
+	// 	// setFields({ ...user })
+	// }, [])
 
 
 	// profile update
