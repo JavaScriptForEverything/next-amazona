@@ -70,10 +70,10 @@ const { reducer, actions } = createSlice({
 			...action.payload 							// <= { status: 'success', products: products }
 
 		}),
-		productAdded: (state, action) => ({
+		addProduct: (state, action) => ({
 			...state,
 			loading: false,
-			product: action.payload
+			...action.payload								// <= { status: 'success', product: {...} }
 		}),
 		getBrands: (state, action) => ({
 			...state,
@@ -237,10 +237,10 @@ export const getProductsOnScroll = ({ token, page=1, limit=4 }) => catchAsyncDis
 }, actions.failed)
 
 
-export const addProduct = (obj, token) => catchAsyncDispatch( async (dispatch) => {
+export const addProduct = (fields, token) => catchAsyncDispatch( async (dispatch) => {
 	dispatch(actions.requested())
-	const { data: { product } } = await axios.post('/api/products', obj, { headers: {Authorization: `Bearer ${token}`} })
-	dispatch(actions.productAdded(product))
+	const { data } = await axios.post('/api/products', fields, { headers: {Authorization: `Bearer ${token}`} })
+	dispatch(actions.addProduct(data))
 }, actions.failed)
 
 

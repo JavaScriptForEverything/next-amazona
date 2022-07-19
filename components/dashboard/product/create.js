@@ -28,13 +28,13 @@ const brands = ['niki', 'adidas', 'ramond', 'oliver', 'zara', 'casely']
 const categories = ['pant', 'shirt']
 const inputItems = [
 	arrayObjectCreator('Product Name', 'name'),
-	// arrayObjectCreator('Quantity', 'quantity', 'number'),
-	// arrayObjectCreator('Brand', 'brand', 'text', brands),
-	// arrayObjectCreator('Category', 'category', 'text', categories),
-	// arrayObjectCreator('Size', 'size', 'text', ['xs', 'sm', 'lg', 'xxl']),
-	// arrayObjectCreator('Price', 'price', 'number'),
-	// arrayObjectCreator('Summary', 'summary'),
-	// arrayObjectCreator('Description', 'description'),
+	arrayObjectCreator('Quantity', 'quantity', 'number'),
+	arrayObjectCreator('Brand', 'brand', 'text', brands),
+	arrayObjectCreator('Category', 'category', 'text', categories),
+	arrayObjectCreator('Size', 'size', 'text', ['xs', 'sm', 'lg', 'xxl']),
+	arrayObjectCreator('Price', 'price', 'number'),
+	arrayObjectCreator('Summary', 'summary'),
+	arrayObjectCreator('Description', 'description'),
 ]
 let inputItemsObj = { images: [], coverImage: '' }
 inputItems.forEach(item => inputItemsObj[item.name] = '')
@@ -54,9 +54,9 @@ const Products = ({ setView=f=>f }) => {
 	const [ fieldsError, setFieldsError ] = useState(inputItemsObj)
 
 
-	const { loading, error, product } = useSelector(state => state.product)
+	const { status, loading, error, product } = useSelector(state => state.product)
 	// const error = false
-	console.log(fields)
+	// console.log(fields)
 
 
 
@@ -65,12 +65,14 @@ const Products = ({ setView=f=>f }) => {
 	}, [error])
 
 
+	useEffect(() => {
+		if(status === 'success') setAdded(true)
+	}, [status])
+
 	// handle multiple image upload
 	useEffect(() => {
 	 	image && setFields({ ...fields, images: [...fields.images, image] })
 	}, [image])
-
-
 
 	// uploadImagesDropzoneHandler
 	const coverImageDropzoneHandler = (acceptedFiles) => {
@@ -145,18 +147,15 @@ const Products = ({ setView=f=>f }) => {
 		setAdded(false)
 		setFields(inputItemsObj)
 	}
-	const submitHandler = async (evt) => {
+	const submitHandler = (evt) => {
 		evt.preventDefault()
 
-		// const isValidated = formValidator(fields, setFieldsError)
-		// if(!isValidated) return
+		const isValidated = formValidator(fields, setFieldsError)
+		if(!isValidated) return
 
-		// if(!fields.images?.length) return setFieldsError( errors => ({ ...errors, images: 'image field is empty' }))
+		if(!fields.images?.length) return setFieldsError( errors => ({ ...errors, images: 'image field is empty' }))
 
-
-		console.log(fields)
-		// await dispatch(addProduct(fields))
-		// await setAdded(true)
+		dispatch(addProduct(fields))
 	}
 
 	return (

@@ -1,24 +1,20 @@
+import path from 'path'
+import fs from 'fs'
+import { promisify } from 'util'
+
 import { Types } from 'mongoose'
-import cloudinary from 'cloudinary'
 import Product from '../models/productModel'
 import {
 	catchAsync,
 	appError,
 	filterObjectWithAllowedArray,
 	filterObjectWithExcludedArray,
-	apiFeatures
+	apiFeatures,
+	uploadImage
 } from '../util'
 
-cloudinary.config({
-	cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
-	api_key: process.env.CLOUDINARY_API_KEY,
-	api_secret: process.env.CLOUDINARY_API_SECRET
-})
 
-
-
-
-
+const PUBLIC_ROOT = path.join(__dirname, '../../../..', '/public')
 
 
 
@@ -59,10 +55,7 @@ export const getAllProducts = catchAsync( async (req, res, next) => {
 
 /* productReducer.js  > /pages/api/products/index.js	:	handler.post(protect, addProduct)
  		.	/pages/user/dashboard.js  => /components/dashboard/products.js */
-export const addProduct = catchAsync( async (req, res, next) => {
-
-	// 1. filter body
-	const body = filterObjectWithAllowedArray(req.body, [
+const filterData = [
 		'name',
 		'price',
 		'quantity',
@@ -73,41 +66,64 @@ export const addProduct = catchAsync( async (req, res, next) => {
 		'description',
 		'images',
 		'coverImage'
-	])
+	]
+export const addProduct = async (req, res, next) => {
 
-	let images = []
-	if(body.images?.length) {
-		// 2. upload image to cloudinary
-		const multipleImagesPromise = body.images.map(image => cloudinary.v2.uploader.upload(image, {
-			folder: 'next-amazona/products'
-		}))
+	try {
+		// 1. filter body
+		const body = filterObjectWithAllowedArray(req.body, filterData)
 
-		// 3. after upload, return only public_id & secure_url property
-		images = await Promise.all(multipleImagesPromise)
-		images = images.map(image => ({ public_id: image.public_id, secure_url: image.secure_url}))
+		const saveToDir = path.join(PUBLIC_ROOT, '/images/products')
 
-		if(!images.length) return next(appError('Please add images [atleast one]', 404))
+		// save req.body.coverPhoto
+		const { image: coverImage } = await uploadImage(body.coverImage, saveToDir, [600, 200])
+		req.body.coverImage = coverImage 		// set if error happend then remove
+
+		// save req.body.images
+		const promiseImages = body.images.map( async (photo) => {
+			const { image } = await uploadImage(photo, saveToDir, [600, 200])
+			return image
+		})
+		const images = await Promise.all(promiseImages)
+		req.body.images = images
+
+
+		const product = await Product.create({
+			...body,
+			coverImage,
+			images,
+			user: req.user._id
+		})
+
+		if(!product) return next(appError('No product found.', 404))
+
+			// console.log(product.coverImage)
+
+		// 5. Finally response back to client & client store data in redux store then use from store.
+		res.status(200).json({
+			status: 'success',
+			product
+		})
+
+	} catch (err) {
+		const { coverImage, images } = req.body
+
+		// remove coverPhoto
+		fs.exists(coverImage, async(isExist) => {
+			if(isExist) await promisify(fs.unlink)(coverImage)
+		})
+
+		// remove images
+		images.forEach(image => {
+			fs.exists(image, async(isExist) => {
+				if(isExist) await promisify(fs.unlink)(image)
+			})
+		})
+
+		next(appError(err.message))
 	}
 
-	const { public_id, secure_url } = await cloudinary.v2.uploader.upload(body.coverImage, {folder: 'next-amazona/products'})
-
-
-	// 4. pass filtered body & override images with cloudinary { public_id, secure_url }
-	const product = await Product.create({
-		...body,
-		images,
-		coverImage: { public_id, secure_url },
-		user: req.user._id
-	})
-
-	if(!product) return next(appError('No product found.', 404))
-
-	// 5. Finally response back to client & client store data in redux store then use from store.
-	res.status(200).json({
-		status: 'success',
-		product
-	})
-})
+}
 
 
 
