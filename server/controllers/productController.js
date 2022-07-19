@@ -110,13 +110,13 @@ export const addProduct = async (req, res, next) => {
 
 		// remove coverPhoto
 		fs.exists(coverImage, async(isExist) => {
-			if(isExist) await promisify(fs.unlink)(coverImage)
+			if(isExist) promisify(fs.unlink)(coverImage)
 		})
 
 		// remove images
 		images.forEach(image => {
 			fs.exists(image, async(isExist) => {
-				if(isExist) await promisify(fs.unlink)(image)
+				if(isExist) promisify(fs.unlink)(image)
 			})
 		})
 

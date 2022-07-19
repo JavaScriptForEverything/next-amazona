@@ -73,7 +73,11 @@ const { reducer, actions } = createSlice({
 		addProduct: (state, action) => ({
 			...state,
 			loading: false,
-			...action.payload								// <= { status: 'success', product: {...} }
+			status: action.payload.status,
+			products: [
+				...state.products,
+				action.payload.product
+			]
 		}),
 		getBrands: (state, action) => ({
 			...state,

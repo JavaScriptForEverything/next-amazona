@@ -3,11 +3,13 @@ import { getAllProducts, addProduct } from '../../../server/controllers/productC
 import { protect } from '../../../server/controllers/authController'
 import { onError } from '../../../server/util'
 import nc from 'next-connect'
+const morgan = require('morgan')
 
 
 const handler = nc({ onError })
 
 handler
+	.use( morgan('dev') )
 	.get(getAllProducts)
 	.post(protect, addProduct)
 

@@ -56,7 +56,7 @@ const Products = ({ setView=f=>f }) => {
 
 	const { status, loading, error, product } = useSelector(state => state.product)
 	// const error = false
-	// console.log(fields)
+	console.log(added)
 
 
 
@@ -316,7 +316,7 @@ const Products = ({ setView=f=>f }) => {
 									<Button variant='outlined' onClick={resetHandler}>Reset</Button>
 									<Button type='submit' variant='contained'
 										color={error ? 'error' : 'primary'}
-										disabled={error ? false : added}
+										disabled={added}
 									>
 										{ loading ? <CircularProgress color='inherit' size={24} /> : (
 											(error ? 'Error' : (added ? 'Added' : 'Add'))
