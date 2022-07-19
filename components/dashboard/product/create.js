@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useDropzone } from 'react-dropzone'
 import { useDispatch, useSelector } from 'react-redux'
-import { addProduct } from '../../../store/productReducer'
+import { addProduct, resetSlice } from '../../../store/productReducer'
 import { showAlert } from '../../../store/dialogReducer'
 
 import { humanReadableFileSize, arrayObjectCreator, formValidator } from '../../../util'
@@ -66,7 +66,10 @@ const Products = ({ setView=f=>f }) => {
 
 
 	useEffect(() => {
-		if(status === 'success') setAdded(true)
+		if(status === 'success') {
+			setAdded(true)
+			dispatch(resetSlice())
+		}
 	}, [status])
 
 	// handle multiple image upload

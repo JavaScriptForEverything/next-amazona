@@ -1,7 +1,7 @@
 import nookies from 'nookies'
 import { useState, useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { getProductsXHR, getClientSideProducts } from '../../store/productReducer'
+import { getProductsXHR, getClientSideProducts, resetSlice } from '../../store/productReducer'
 
 import SearchComponent from './_search'
 import FilterComponent from './_filter'
@@ -33,12 +33,16 @@ const Products = () => {
 	const [ page, setPage ] = useState(1)
 	const [ limit, setLimit ] = useState(4)
 
-	const { error, loading, products, countPage } = useSelector(state => state.product )
+	const { status, error, loading, products, countPage } = useSelector(state => state.product )
 
 
 	useEffect(() => {
 		dispatch(getClientSideProducts())
 	}, [])
+
+	useEffect(() => {
+		dispatch(resetSlice())
+	}, [status])
 
 
 	useEffect(() => {

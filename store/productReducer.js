@@ -29,8 +29,24 @@ const { reducer, actions } = createSlice({
 		totalPrice: 0,
 	},
 	reducers: {
-		requested: (state, action) => ({ ...state, loading: true, error: '' }),
-		failed: (state, action) => ({...state, loading: false, error: action.payload, }),
+		requested: (state, action) => ({
+			...state,
+			loading: true,
+			error: '',
+			status: ''
+		}),
+		failed: (state, action) => ({
+			...state,
+			loading: false,
+			error: action.payload
+		}),
+		resetToDefault: (state, action) => ({
+			...state,
+			loading: false,
+			error: '',  										// reset error
+			status: '',  										// reset status of success
+		}),
+
 		cartItemAdded: (state, action) => {
 			localStorage.setItem('cartItems', JSON.stringify(state.cartItems.concat(action.payload)) )
 
@@ -128,6 +144,8 @@ const { reducer, actions } = createSlice({
 })
 export default reducer
 
+
+export const resetSlice = () => (dispatch) => dispatch(actions.resetToDefault())
 
 export const addItemToCart = (cart) => (dispatch) => {
 	dispatch(actions.requested())
