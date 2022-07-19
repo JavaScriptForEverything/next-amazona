@@ -3,7 +3,6 @@ import { useDropzone } from 'react-dropzone'
 import { useDispatch, useSelector } from 'react-redux'
 import { addProduct } from '../../../store/productReducer'
 import { showAlert } from '../../../store/dialogReducer'
-import nookies from 'nookies'
 
 import { humanReadableFileSize, arrayObjectCreator, formValidator } from '../../../util'
 
@@ -29,13 +28,13 @@ const brands = ['niki', 'adidas', 'ramond', 'oliver', 'zara', 'casely']
 const categories = ['pant', 'shirt']
 const inputItems = [
 	arrayObjectCreator('Product Name', 'name'),
-	arrayObjectCreator('Quantity', 'quantity', 'number'),
-	arrayObjectCreator('Brand', 'brand', 'text', brands),
-	arrayObjectCreator('Category', 'category', 'text', categories),
-	arrayObjectCreator('Size', 'size', 'text', ['xs', 'sm', 'lg', 'xxl']),
-	arrayObjectCreator('Price', 'price', 'number'),
-	arrayObjectCreator('Summary', 'summary'),
-	arrayObjectCreator('Description', 'description'),
+	// arrayObjectCreator('Quantity', 'quantity', 'number'),
+	// arrayObjectCreator('Brand', 'brand', 'text', brands),
+	// arrayObjectCreator('Category', 'category', 'text', categories),
+	// arrayObjectCreator('Size', 'size', 'text', ['xs', 'sm', 'lg', 'xxl']),
+	// arrayObjectCreator('Price', 'price', 'number'),
+	// arrayObjectCreator('Summary', 'summary'),
+	// arrayObjectCreator('Description', 'description'),
 ]
 let inputItemsObj = { images: [], coverImage: '' }
 inputItems.forEach(item => inputItemsObj[item.name] = '')
@@ -43,25 +42,33 @@ inputItems.forEach(item => inputItemsObj[item.name] = '')
 
 const Products = ({ setView=f=>f }) => {
 	const dispatch = useDispatch()
-	const { token } = nookies.get(null)
+
 	const [ added, setAdded ] = useState(false)
+	const [ image, setImage ] = useState()
 
-	const [ files, setFiles ] = useState({
-		images: [], 					// to store images javascript File Object
-		coverImage: {} 				// to store coverImage javascript File Object
+	const [ fields, setFields ] = useState({
+		...inputItemsObj,
+		coverImage: {}, 				// to store coverImage javascript File Object
+		images: [], 						// to store images javascript File Object
 	})
-
-	const [ fields, setFields ] = useState(inputItemsObj)
 	const [ fieldsError, setFieldsError ] = useState(inputItemsObj)
 
 
 	const { loading, error, product } = useSelector(state => state.product)
-	// const { loading, product } = useSelector(state => state.product)
 	// const error = false
+	console.log(fields)
+
+
 
 	useEffect(() => {
 		error && dispatch(showAlert({ open: true, severity: 'error', message: error}))
 	}, [error])
+
+
+	// handle multiple image upload
+	useEffect(() => {
+	 	image && setFields({ ...fields, images: [...fields.images, image] })
+	}, [image])
 
 
 
@@ -76,9 +83,11 @@ const Products = ({ setView=f=>f }) => {
 
 			reader.onload = () => {
 				if( reader.readyState === 2 ) {
-				 // setCoverImage(reader.result)
-				 setFields({ ...fields, coverImage: reader.result })
-				 setFiles({ ...files, coverImage: File })
+				 setFields({ ...fields, coverImage: {
+				 	secure_url:	reader.result,
+				 	size: File.size,
+				 	name: File.name
+				 }})
 				}
 			}
 		})
@@ -90,6 +99,7 @@ const Products = ({ setView=f=>f }) => {
 
 	// uploadImagesDropzoneHandler
 	const uploadImagesDropzoneHandler = (acceptedFiles) => {
+
 		acceptedFiles.forEach(File => {
 			const reader = new FileReader()
 			reader.readAsDataURL(File)
@@ -97,12 +107,18 @@ const Products = ({ setView=f=>f }) => {
 			const isImage = File.type.match('image/*')
 			if(!isImage) return console.error('You must have to pass image')
 
+
 			reader.onload = () => {
 				if( reader.readyState === 2 ) {
-				 setFields({ ...fields, images: [...fields.images, reader.result]})
-				 setFiles({ ...files, images: [...files.images, File]})
+
+					setImage({
+						name: File.name,
+						size: File.size,
+						secure_url: reader.result
+					})
 				}
 			}
+
 		})
 	}
 	const uploadImagesDropzone = useDropzone({ 				// const { getRootProps, getInputProps } = useDropzone({})
@@ -122,10 +138,7 @@ const Products = ({ setView=f=>f }) => {
 	}
 
 	const changeHandler = (evt, name, newValue) => {
-		setFields({
-			...fields,
-			[name]: newValue || evt.target.value,
-		})
+		setFields({...fields, [name]: newValue || evt.target.value })
 		setAdded(false)
 	}
 	const resetHandler = () => {
@@ -142,7 +155,7 @@ const Products = ({ setView=f=>f }) => {
 
 
 		console.log(fields)
-		// await dispatch(addProduct(fields, token))
+		// await dispatch(addProduct(fields))
 		// await setAdded(true)
 	}
 
@@ -187,18 +200,19 @@ const Products = ({ setView=f=>f }) => {
 							</Box>
 							<Typography color='error'>{fieldsError.coverImage}</Typography>
 
-							{ fields.coverImage && <List>
+							{/*{ fields.coverImage && <List>*/}
+							{ !!Object.keys(fields.coverImage).length && <List>
 								<ListItem
 									selected
 									secondaryAction={<IconButton onClick={coverImageDeleteHandler}><DeleteIcon /></IconButton>}
 								>
 									<ListItemAvatar>
-										<Avatar src={fields.coverImage} />
+										<Avatar src={fields.coverImage?.secure_url} />
 									</ListItemAvatar>
 
 									<ListItemText
-										primary={files.coverImage?.name}
-										secondary={files.coverImage?.size ? humanReadableFileSize(files.coverImage.size) : ''}
+										primary={fields.coverImage?.name}
+										secondary={fields.coverImage?.size ? humanReadableFileSize(fields.coverImage.size) : ''}
 									/>
 								</ListItem>
 							</List>}
@@ -229,19 +243,19 @@ const Products = ({ setView=f=>f }) => {
 							</Box>
 							<Typography color='error'>{fieldsError.images}</Typography>
 
-							{ fields.images?.map( (file, key) => (
+							{ fields.images?.map( (image, key) => (
 							<List key={key}>
 								<ListItem
 									selected
-									secondaryAction={<IconButton onClick={(evt) => imagesDeleteHandler(evt, file, key)}><DeleteIcon /></IconButton>}
+									secondaryAction={<IconButton onClick={(evt) => imagesDeleteHandler(evt, image, key)}><DeleteIcon /></IconButton>}
 								>
 									<ListItemAvatar>
-										<Avatar src={file} />
+										<Avatar src={image.secure_url} />
 									</ListItemAvatar>
 
 									<ListItemText
-										primary={files.images?.[key]?.name}
-										secondary={files.images?.[key]?.size ? humanReadableFileSize(files.images?.[key].size) : ''}
+										primary={image.name}
+										secondary={image.size ? humanReadableFileSize(image.size) : ''}
 									/>
 								</ListItem>
 							</List>
