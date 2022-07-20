@@ -80,13 +80,21 @@ const { reducer, actions } = createSlice({
 		}),
 
 
+		// set value from getServerSideProps = wrapper.getServerSideProps( store => ctx => {...})
+		getServerSideProducts: (state, action ) => { 				// (1) called in serverSide
+		// console.log(action.payload)
+			return {
+				...state,
+				loading: false,
+				...action.payload, 															// (2) set in serverSide: 	state.product = action.payload
+			}
+		},
 		getProducts: (state, action) => ({
 			...state,
 			loading: false,
-			...action.payload 							// <= { status: 'success', products: products }
-
+			...action.payload 																// (3) store serverSide payload into clientSide product
 		}),
-		addProduct: (state, action) => ({
+		addProduct: (state, action) => ({ 		// single product
 			...state,
 			loading: false,
 			status: action.payload.status,
@@ -102,14 +110,6 @@ const { reducer, actions } = createSlice({
 		}),
 
 
-		allProductsAdded: (state, action ) => ({
-			...state,
-			loading: false,
-			products: action.payload.products,
-			total: action.payload.total,
-			// length: action.payload.length,
-			// ...action.payload
-		}),
 		productAddedByFilter: (state, action) => {
 			// console.log(action.payload)
 
@@ -133,16 +133,15 @@ const { reducer, actions } = createSlice({
 		}),
 
 		// getServerSideProps() 	/pages/product/[slug].js
-		getProduct: (state, action) => ({...state, loading: false, product: action.payload })
+		getProduct: (state, action) => ({...state, loading: false, product: action.payload }),
+
 
 	},
 
-	extraReducers: { 	// Dy drade all else, some state will be removed
-		// [HYDRATE]: (state, action) => ({ ...state, ...action.payload }),
-		[HYDRATE]: (state, action) => ({ ...state, ...action.payload.product }),
-	}
 })
 export default reducer
+
+export const { getProducts } = actions
 
 
 export const resetSlice = () => (dispatch) => dispatch(actions.resetToDefault())
@@ -179,9 +178,8 @@ export const getClientSideProducts = () => catchAsyncDispatch( async (dispatch) 
 
 
 // getAllProducts will be dispatched here instead of /pages/product.js getServerSideProps
-export const getAllProducts = (ctx={}) => async (dispatch) => {
-	const { token } = nookies.get(ctx)
-	if(!token) return
+export const getServerSideProducts = (ctx={}) => async (dispatch) => {
+	const { resolvedUrl } = ctx
 
 	const queryObj = ctx.query || {}
 
@@ -204,8 +202,8 @@ export const getAllProducts = (ctx={}) => async (dispatch) => {
 	if(origin) url = origin + url
 
 	dispatch(actions.requested())
-	const { data } = await axios.get(url, {headers: { Authorization: `Bearer ${token}` } })
-	dispatch(actions.allProductsAdded(data))
+	const { data } = await axios.get(url)
+	dispatch(actions.getServerSideProducts({ ...data, resolvedUrl }))
 }
 
 // getServerSideProps() 	/pages/product/[slug].js
@@ -242,7 +240,7 @@ export const getProductsXHR = ({ token, page=1, limit=4 }) => catchAsyncDispatch
 
 	dispatch(actions.requested())
 	const { data } = await axios.get(`/api/products?page=${page}&limit=${limit}`, {headers: { Authorization: `Bearer ${token}` } })
-	dispatch(actions.allProductsAdded(data))
+	dispatch(actions.getServerSideProducts(data))
 
 }, actions.failed)
 

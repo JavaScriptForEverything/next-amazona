@@ -6,7 +6,7 @@ import dialogReducer from './dialogReducer'
 import userReducer from './userReducer'
 import paymentReducer from './paymentReducer'
 
-import demoMiddleware from './middleware/demo'
+import productMiddleware from './middleware/products'
 
 const reducers = combineReducers({
 	product: productReducer,
@@ -42,8 +42,7 @@ const makeStore = () => configureStore({
 	reducer: masterReducer,
 	middleware: (getMiddlewares) => [
 		...getMiddlewares(), 
-		// demoMiddleware,
-		demoMiddleware('dev') 
+		productMiddleware,
 	]
  })
 export const wrapper = createWrapper(makeStore, { debug: false })

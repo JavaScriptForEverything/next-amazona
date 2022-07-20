@@ -1,8 +1,7 @@
-import nookies from 'nookies'
 import { useState, useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { wrapper } from '../store'
-import { getAllProducts, getProductsOnScroll } from '../store/productReducer'
+import { getServerSideProducts, getProductsOnScroll } from '../store/productReducer'
 
 import Layout from '../layout'
 import Search from '../components/home/leftPanel/search'
@@ -37,8 +36,7 @@ const Home = () => {
 
 
 	useEffect(() => {
-		const { token } = nookies.get(null)
-		dispatch(getProductsOnScroll({page, limit, token}))
+		dispatch(getProductsOnScroll({page, limit}))
 	}, [page, limit])
 
 	const handleScroll = (evt) => {
@@ -58,7 +56,6 @@ const Home = () => {
 		window.addEventListener('scroll', handleScroll)
 		return () => window.removeEventListener('scroll', handleScroll)
 	}, [])
-
 
 
 	return (
@@ -117,7 +114,7 @@ const Home = () => {
 export default Home
 
 export const getServerSideProps = wrapper.getServerSideProps(({dispatch}) => async(ctx) => {
-	await dispatch(getAllProducts(ctx))
+	await dispatch(getServerSideProducts(ctx))
 })
 
 
