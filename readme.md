@@ -48,6 +48,11 @@
 		. Stripe: (paymentIntents) 	:
 
 
+	. Custom Components:
+		. Carousel 		: (By NextJS <Image /> Component)
+		. Global Alert
+
+
 	. Serverless API
 	. Mongoose (MongoDB)
 	. Material UI (User Friendly UI) + Dark Mode
@@ -58,6 +63,7 @@
 
 	. Do next:
 		. CRUD Product (By Form or By 3-dot menu)
+
 
 
 ###### Routes (Pages)

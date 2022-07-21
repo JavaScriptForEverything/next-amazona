@@ -1,11 +1,13 @@
-import { useState, useEffect, useCallback, useMemo } from 'react'
-import { getMe } from '../store/userReducer'
+import Link from 'next/link'
+import Image from 'next/image'
+import { useState, useEffect } from 'react'
 import { useDispatch } from 'react-redux'
 
 import Layout from '../layout'
 import InfiniteScroll from '../layout/_infiniteScroll'
 import Typography from '@mui/material/Typography'
 import Button  from '@mui/material/Button'
+import MuiLink  from '@mui/material/Link'
 
 
 
@@ -15,38 +17,32 @@ const About = () => {
 	const [ value, setValue ] = useState(0)
 
 
-
-	// const data = [1, 2, 3]
-	const data = useMemo(() => [1, 2, 3], [])
-
-	// const fetchData = (users) => {
-	// 	fetch(`https://jsonplaceholder.typicode.com/${users}`)
-	//   .then(response => response.json())
-	//   .then(json => console.log(json))
-	// }
-
-	const fetchData = useCallback((users) => {
-		fetch(`https://jsonplaceholder.typicode.com/${users}`)
-	  .then(response => response.json())
-	  .then(json => console.log(json))
-	}, [])
-
-
-	const getMeHandler = () => {
-		dispatch(getMe())
-	}
-
 	return (
 		<Layout title='about page'>
 			<Typography>About Page</Typography>
 		{/*<InfiniteScroll />*/}
 
-		<Button 
-			variant='outlined'
-			onClick={getMeHandler}
-		> get me </Button>
 
 
+		<Link href='/contact' passHref>
+			<MuiLink>
+				<Image
+					src='/images/products/uRmdaz2gIjZZ_U1XAJrzd.jpg'
+					width={1600}
+					height={900}
+				/>
+			</MuiLink>
+		</Link>
+
+{/*		<Link href='/contact' passHref>
+			<MuiLink>
+				<Image
+					src='/images/products/uRmdaz2gIjZZ_U1XAJrzd.jpg'
+					style={{ width: '100%', height: 'auto' }}
+				/>
+			</MuiLink>
+		</Link>
+*/}
 
 
 		</Layout>

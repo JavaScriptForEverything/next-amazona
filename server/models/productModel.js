@@ -52,14 +52,14 @@ const productSchema = new Schema({
 		type: String,
 		required: true,
 		minLength: 10,
-		maxLength: 150,
+		maxLength: 300,
 		trim: true
 	},
 	description: {
 		type: String,
 		required: true,
 		minLength: 10,
-		maxLength: 5000,
+		maxLength: 1000,
 		trim: true
 	},
 	// images: [{

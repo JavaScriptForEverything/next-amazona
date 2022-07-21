@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import Image from 'next/image'
 
 import Box from '@mui/material/Box'
 import Paper from '@mui/material/Card'
@@ -18,11 +19,16 @@ const ProductListView = ({ product }) => {
 			my: 2,
 		}}>
 			<Box sx={{placeSelf: 'stretch'}}>
-				<CardMedia
-					component='img'
-					src={product.coverImage.secure_url}
-					height='100%'
-				/>
+				<Link href={`/product/${product.slug}`} passHref>
+					<MuiLink>
+						<Image
+							src={product.coverImage.secure_url}
+							width={200}
+							height={200}
+							layout='responsive'
+						/>
+					</MuiLink>
+				</Link>
 			</Box>
 
 			<Box sx={{p: 2 }}>
