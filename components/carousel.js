@@ -68,7 +68,6 @@ const Carousel = (props) => {
 				<KeyboardArrowRightIcon fontSize='large' />
 			</IconButton>
 			{/*)}*/}
-		</Box>
 
 
 		{ indicators && (
@@ -92,6 +91,7 @@ const Carousel = (props) => {
 				))}
 			</Box>
 		)}
+		</Box>
 
 		</>
 	)
