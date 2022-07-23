@@ -20,7 +20,7 @@ const Carousel = (props) => {
 		images=[],
 		width=640,
 		height=360,
-		indicators=false,
+		indicators=true,
 	} = props
 
 	const [ image, setImage ] = useState(0)
