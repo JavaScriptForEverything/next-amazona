@@ -111,11 +111,6 @@ const { reducer, actions } = createSlice({
 
 
 		productAddedByFilter: (state, action) => {
-			// console.log(action.payload)
-
-			// console.log(state.product.products)
-			// console.log(state)
-
 			return {
 				...state,
 				loading: false,
@@ -133,7 +128,11 @@ const { reducer, actions } = createSlice({
 		}),
 
 		// getServerSideProps() 	/pages/product/[slug].js
-		getProduct: (state, action) => ({...state, loading: false, product: action.payload }),
+		getProduct: (state, action) => ({
+			...state,
+			loading: false,
+			product: action.payload
+		}),
 
 
 	},

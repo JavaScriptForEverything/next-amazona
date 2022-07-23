@@ -1,23 +1,34 @@
 import { combineReducers, configureStore } from '@reduxjs/toolkit'
 import { createWrapper, HYDRATE } from 'next-redux-wrapper'
 
-import productReducer from './productReducer'
 import dialogReducer from './dialogReducer'
-import userReducer from './userReducer'
 import paymentReducer from './paymentReducer'
+import userReducer from './userReducer'
+import productReducer from './productReducer'
+import reviewReducer from './reviewReducer'
 
 import productMiddleware from './middleware/products'
 
 const reducers = combineReducers({
-	product: productReducer,
 	dialog: dialogReducer,
+	payment: paymentReducer,
 	user: userReducer,
-	payment: paymentReducer
+	product: productReducer,
+	review: reviewReducer
+
 })
 
 const masterReducer = (state, action) => {
 	return action.type === HYDRATE ? {
 		...state,
+		dialog: {
+			...state.dialog,
+			dialog: { ...state.dialog.dialog, ...action.payload.dialog.dialog },
+		},
+		payment: {
+			...state.payment,
+			payment: { ...state.payment.payment, ...action.payload.payment.payment },
+		},
 		user: {
 			...state.user,
 			user: { ...state.user.user, ...action.payload.user.user },
@@ -25,14 +36,6 @@ const masterReducer = (state, action) => {
 		product: {
 			...state.product,
 			product: { ...state.product.product, ...action.payload.product.product },
-		},
-		payment: {
-			...state.payment,
-			payment: { ...state.payment.payment, ...action.payload.payment.payment },
-		},
-		dialog: {
-			...state.dialog,
-			dialog: { ...state.dialog.dialog, ...action.payload.dialog.dialog },
 		},
 	} : reducers(state, action)
 }

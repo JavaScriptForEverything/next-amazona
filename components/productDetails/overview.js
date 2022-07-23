@@ -36,8 +36,8 @@ const ProductOverview = () => {
 			<AddToCart sx={{my: 2}} />
 
 			<Box sx={{ mt: 5 }}>
-				<Typography>Description</Typography>
-				<Typography variant='body2' color='textSecondary'>{product.description}</Typography>
+				<Typography>Summary</Typography>
+				<Typography variant='body2' color='textSecondary'>{product.summary}</Typography>
 			</Box>
 
 
