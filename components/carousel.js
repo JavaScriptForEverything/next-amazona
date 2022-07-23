@@ -6,7 +6,8 @@ import IconButton from '@mui/material/IconButton'
 
 import KeyboardArrowLeftIcon from '@mui/icons-material/KeyboardArrowLeft'
 import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight'
-import FiberManualRecordIcon from '@mui/icons-material/FiberManualRecord'
+// import FiberManualRecordIcon from '@mui/icons-material/FiberManualRecord'
+import FiberManualRecordIcon from '@mui/icons-material/Remove'
 
 /* 	<Carousel
 			images={product.images.map(image => image.secure_url)}
@@ -27,12 +28,12 @@ const Carousel = (props) => {
 	const style = {
 		position: 'absolute',
 		right: 8,
-		top: '50%',
+		top: 'calc(50% - 16px)',
 		color: 'white',
-		backgroundColor: '#1976d288',
+		// backgroundColor: '#1976d288',
 		'&:hover' : {
-			backgroundColor: '#1976d2'
-		}
+			// backgroundColor: '#1976d2'
+		},
 	}
 
 	const prevHandler = () => {
@@ -58,29 +59,34 @@ const Carousel = (props) => {
 
 			{/*{image > 0 && (*/}
 			<IconButton sx={{ ...style, left: 8 }} onClick={prevHandler} >
-				<KeyboardArrowLeftIcon />
+				<KeyboardArrowLeftIcon fontSize='large' />
 			</IconButton>
 			{/*)}*/}
 
 			{/*{image < images.length-1 && (*/}
 			<IconButton sx={style} onClick={nextHandler} >
-				<KeyboardArrowRightIcon />
+				<KeyboardArrowRightIcon fontSize='large' />
 			</IconButton>
 			{/*)}*/}
-
 		</Box>
+
 
 		{ indicators && (
 			<Box sx={{
-				display: 'flex',
-				justifyContent: 'center',
-				alignItems: 'center',
-				my: 1,
+				// display: 'flex',
+				// justifyContent: 'center',
+				// alignItems: 'center',
+				// my: 1,
+
+				position: 'absolute',
+				mt: -5,
+				left: `calc(50% - ${8*2 * images.length}px )`
+
 			}}>
 				{[...Array(images.length)].map((_, i) => (
 					<FiberManualRecordIcon key={i}
-						fontSize='small'
-						sx={ image !== i ? { color: 'gray' } : { color: 'dodgerblue' } }
+						fontSize='large'
+						sx={ image !== i ? { color: '#fff5' } : { color: '#fff' } }
 						onClick={() => setImage(i)}
 					/>
 				))}
